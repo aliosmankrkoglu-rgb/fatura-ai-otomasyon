@@ -25,7 +25,6 @@ def excel_tablosu_olustur(df):
         df.to_excel(writer, index=False, sheet_name='Faturalar')
         worksheet = writer.sheets['Faturalar']
 
-        # Başlık stili (Koyu mavi zemin, beyaz kalın yazı)
         baslik_dolgu = PatternFill(start_color="1F4E78", end_color="1F4E78", fill_type="solid")
         baslik_yazi = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
         govde_yazi = Font(name="Calibri", size=10)
@@ -37,14 +36,12 @@ def excel_tablosu_olustur(df):
             bottom=Side(style='thin', color='D9D9D9')
         )
 
-        # Başlık satırını biçimlendir
         for col_idx in range(1, len(df.columns) + 1):
             hucre = worksheet.cell(row=1, column=col_idx)
             hucre.fill = baslik_dolgu
             hucre.font = baslik_yazi
             hucre.alignment = Alignment(horizontal="center", vertical="center")
 
-        # Veri satırlarını biçimlendir ve sütun genişliklerini otomatik ayarla
         for col in worksheet.columns:
             maksimum_uzunluk = 0
             sutun_harfi = get_column_letter(col[0].column)
@@ -59,7 +56,6 @@ def excel_tablosu_olustur(df):
                 if deger_uzunlugu > maksimum_uzunluk:
                     maksimum_uzunluk = deger_uzunlugu
             
-            # Sütunun rahat okunması için kenar boşluğu
             worksheet.column_dimensions[sutun_harfi].width = max(maksimum_uzunluk + 5, 14)
 
     return output.getvalue()
@@ -75,9 +71,8 @@ yuklenen_dosyalar = st.file_uploader(
 )
 
 if yuklenen_dosyalar:
-    # KULLANIM SINIRI: Maksimum 2 dosya
     if len(yuklenen_dosyalar) > 2:
-        st.error("🛑 Ücretsiz demo sürümünde aynı anda en fazla 2 fatura işleyebilirsiniz. Sınırsız kullanım ve muhasebe entegrasyonu için lütfen iletişime geçin.")
+        st.error("🛑 Ücretsiz demo sürümünde aynı anda en fazla 2 fatura işleyebilirsiniz. Sınırsız kullanım ve kurumsal entegrasyon için lütfen iletişime geçin.")
     else:
         st.info(f"İşlenecek belge sayısı: **{len(yuklenen_dosyalar)}**")
         
@@ -109,8 +104,7 @@ if yuklenen_dosyalar:
                 Tutar alanlarını sayısal olarak ver. Markdown etiketi (```json) kullanma, doğrudan saf JSON döndür.
                 """
                 
-               maksimum_deneme = 3
-                
+                maksimum_deneme = 3
                 for deneme in range(maksimum_deneme):
                     try:
                         yanit = client.models.generate_content(
@@ -133,30 +127,8 @@ if yuklenen_dosyalar:
                     except Exception as e:
                         hata_metni = str(e)
                         if ("503" in hata_metni or "429" in hata_metni) and deneme < maksimum_deneme - 1:
-                            bekleme = 3 * (deneme + 1)  # 3 sn ve 6 sn bekleme (uzun bekletmez)
+                            bekleme = 3 * (deneme + 1)
                             status_text.text(f"Yoğunluk sebebiyle hızlı deneme yapılıyor ({bekleme} sn)...")
-                            time.sleep(bekleme)
-                            continue
-                        else:
-                            st.error(f"{dosya.name} işlenemedi: {hata_metni[:120]}")
-                            break
-                        
-                    except Exception as e:
-                        hata_metni = str(e)
-                        if ("503" in hata_metni or "429" in hata_metni) and deneme < maksimum_deneme - 1:
-                            bekleme = 2 * (deneme + 1)
-                            status_text.text(f"Hızlı yeniden deneme yapılıyor ({bekleme} sn)...")
-                            time.sleep(bekleme)
-                            continue
-                        else:
-                            st.error(f"{dosya.name} işlenemedi: {hata_metni[:120]}")
-                            break
-                        
-                    except Exception as e:
-                        hata_metni = str(e)
-                        if ("503" in hata_metni or "429" in hata_metni) and deneme < maksimum_deneme - 1:
-                            bekleme = 10 * (deneme + 1)
-                            status_text.text(f"Yoğunluk sebebiyle bekleniyor ({bekleme} sn)...")
                             time.sleep(bekleme)
                             continue
                         else:
@@ -174,7 +146,6 @@ if yuklenen_dosyalar:
                 st.subheader("📊 Ayrıştırılan Veri Tablosu")
                 st.dataframe(df, use_container_width=True)
                 
-                # Excel oluştur ve indirme butonunu hazırla
                 excel_dosyasi = excel_tablosu_olustur(df)
                 st.download_button(
                     label="📥 Kurumsal Excel Dosyasını İndir (.xlsx)",
