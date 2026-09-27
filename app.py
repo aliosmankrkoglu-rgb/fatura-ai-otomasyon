@@ -121,7 +121,7 @@ if yuklenen_dosyalar:
                 for deneme in range(maksimum_deneme):
                     try:
                         yanit = client.models.generate_content(
-                            model="gemini-2.5-flash",
+                           model="gemini-3.5-flash-lite",
                             contents=[
                                 types.Part.from_bytes(
                                     data=dosya_baytlari,
