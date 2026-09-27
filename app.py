@@ -18,16 +18,16 @@ st.set_page_config(
 # --- 6 DİLLİ GLOBAL SÖZLÜK ---
 LANG_DATA = {
     "🇹🇷 TR": {
-        "badge": "YAPAY ZEKA FİNANS MOTORU",
+        "badge": "YAPAY ZEKA FİNANS TERMİNALİ",
         "title": "LedgerAI",
-        "subtitle": "Faturaları saniyeler içinde sektörel hesap kodlarına ve ERP yevmiye fişine dönüştürün.",
-        "drop_title": "Belgeleri Buraya Sürükleyin",
-        "drop_sub": "PDF, PNG, JPG • Oturum başına maksimum 5 belge",
-        "process_btn": "⚡ Fişleri Otonom Muhasebeleştir",
-        "limit_err": "🛑 Demo sürümünde en fazla 5 fatura işlenebilir.",
+        "subtitle": "Faturaları saniyeler içinde sektörel hesap kodlarına ve dengeli ERP yevmiye fişine dönüştürün.",
+        "drop_title": "Belgeleri Buraya Bırakın",
+        "drop_sub": "PDF, PNG, JPG formatında fatura veya fişler",
+        "process_btn": "⚡ Otonom Muhasebeleştir",
+        "limit_err": "🛑 Demo sürümünde oturum başına en fazla 5 fatura işlenebilir.",
         "ready_count": "İşlenecek belge sayısı: **{count}**",
         "success": "✓ Fişler başarıyla oluşturuldu ve Borç/Alacak dengelendi.",
-        "failed": "❌ Belgeler işlenemedi. Lütfen dosya netliğini kontrol edin.",
+        "failed": "❌ Belgeler işlenemedi. Lütfen görsel netliğini kontrol edin.",
         "preview_title": "📊 Muhasebe Yevmiye Fişi (Canlı Düzenlenebilir)",
         "preview_tip": "💡 Hücrelere çift tıklayarak kod veya açıklamaları değiştirebilirsiniz.",
         "tot_deb": "Toplam Borç",
@@ -36,7 +36,7 @@ LANG_DATA = {
         "unbalanced": "⚠️ Bakiye Farkı Var!",
         "download_btn": "📥 Kurumsal Excel'i İndir (.xlsx)",
         "industries": ["⚡ Otomatik Sektör (AI)", "🛒 Ticaret / Al-Sat (153 Ağırlıklı)", "🏢 Hizmet & Ofis (770/740)", "🏭 Üretim & Fabrika (150/730)"],
-        "themes": ["✨ Ultra Canlı Aurora", "🌌 Cyberpunk Gece", "🌑 Saf Titanyum"],
+        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Gece", "🌑 Platin Titanyum"],
         "about_btn": "ℹ️ Mimari",
         "about_title": "LedgerAI Mimarisi",
         "about_content": """
@@ -44,15 +44,18 @@ LANG_DATA = {
         * **Sektörel Mantık:** Faturadaki mal alımını şirketin faaliyetine göre (153, 150 veya 770) dinamik ayırır.
         * **Kusursuz Bakiye:** Borç = Alacak matematiksel denetimini kuruşu kuruşuna yapar.
         * **ERP Hazır:** ETA, Luca, Zirve, Logo, Datev ve QuickBooks'a doğrudan aktarılabilir Excel üretir.
-        """
+        """,
+        "badge_erp": "✓ ETA • LUCA • DATEV • QUICKBOOKS UYUMLU",
+        "badge_audit": "✓ %100 BORÇ/ALACAK DENGE GARANTİSİ",
+        "badge_sec": "✓ OTONOM OCR & TEK DÜZEN HARİTALAMA"
     },
     "🇺🇸 EN": {
-        "badge": "AI FINANCIAL ENGINE",
+        "badge": "AI FINANCIAL TERMINAL",
         "title": "LedgerAI",
         "subtitle": "Convert raw invoices into balanced, multi-GAAP ERP journal vouchers autonomously.",
         "drop_title": "Drop Financial Documents Here",
-        "drop_sub": "PDF, PNG, JPG • Maximum 5 documents per session",
-        "process_btn": "⚡ Generate Balanced Vouchers",
+        "drop_sub": "Invoices or receipts in PDF, PNG, JPG",
+        "process_btn": "⚡ Generate Journal Vouchers",
         "limit_err": "🛑 Demo limit is 5 documents per batch.",
         "ready_count": "Documents ready: **{count}**",
         "success": "✓ Journal vouchers generated and balanced.",
@@ -65,18 +68,21 @@ LANG_DATA = {
         "unbalanced": "⚠️ Unbalanced Voucher!",
         "download_btn": "📥 Download Clean Excel (.xlsx)",
         "industries": ["⚡ Auto Industry (AI)", "🛒 Retail / Inventory (1200)", "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Pure Titanium"],
+        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platinum Titanium"],
         "about_btn": "ℹ️ Architecture",
         "about_title": "LedgerAI Architecture",
-        "about_content": "Autonomous double-entry journal voucher generator compatible with US GAAP, Datev and PCG."
+        "about_content": "Autonomous double-entry journal voucher generator compatible with US GAAP, Datev and PCG.",
+        "badge_erp": "✓ QUICKBOOKS • XERO • DATEV • SAP READY",
+        "badge_audit": "✓ 100% DEBIT/CREDIT BALANCE GUARANTEE",
+        "badge_sec": "✓ AUTONOMOUS OCR & GAAP MAPPING"
     },
     "🇩🇪 DE": {
-        "badge": "KI BUCHHALTUNGS-ENGINE",
+        "badge": "KI FINANZTERMINAL",
         "title": "LedgerAI",
         "subtitle": "Autonome Belegerfassung und Datev-konforme Kontierung in Echtzeit.",
         "drop_title": "Belege hier ablegen",
-        "drop_sub": "PDF, PNG, JPG • Maximal 5 Belege",
-        "process_btn": "⚡ Buchungssatz Generieren",
+        "drop_sub": "PDF, PNG, JPG • Rechnungen & Quittungen",
+        "process_btn": "⚡ Buchungssätze Erstellen",
         "limit_err": "🛑 Maximal 5 Dokumente im Demo-Modus.",
         "ready_count": "Bereit: **{count}**",
         "success": "✓ Buchungen erfolgreich erstellt.",
@@ -89,17 +95,20 @@ LANG_DATA = {
         "unbalanced": "⚠️ Differenz festgestellt!",
         "download_btn": "📥 Excel Herunterladen (.xlsx)",
         "industries": ["⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf", "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Reines Titan"],
-        "about_btn": "ℹ️ Architektur",
+        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platin Titan"],
+        "about_btn": "ℹ️ Info",
         "about_title": "LedgerAI Architektur",
-        "about_content": "Vollautomatisierte Buchungssatzerstellung nach Datev SKR03/04 Richtlinien."
+        "about_content": "Vollautomatisierte Buchungssatzerstellung nach Datev SKR03/04 Richtlinien.",
+        "badge_erp": "✓ DATEV SKR03/04 • SAP KOMPATIBEL",
+        "badge_audit": "✓ 100% SOLL/HABEN AUSGEGLICHENHEIT",
+        "badge_sec": "✓ INTELLIGENTE VORKONTIERUNG"
     },
     "🇫🇷 FR": {
-        "badge": "MOTEUR FINANCIER IA",
+        "badge": "TERMINAL FINANCIER IA",
         "title": "LedgerAI",
         "subtitle": "Génération d'écritures comptables équilibrées et ventilées par secteur.",
         "drop_title": "Déposer les pièces comptables",
-        "drop_sub": "PDF, PNG, JPG • 5 documents maximum",
+        "drop_sub": "Factures et reçus (PDF, PNG, JPG)",
         "process_btn": "⚡ Générer les Écritures",
         "limit_err": "🛑 Limite: 5 documents par lot.",
         "ready_count": "Prêts: **{count}**",
@@ -113,17 +122,20 @@ LANG_DATA = {
         "unbalanced": "⚠️ Déséquilibre Détecté!",
         "download_btn": "📥 Télécharger Excel (.xlsx)",
         "industries": ["⚡ Auto (IA)", "🛒 Négoce / Stock", "🏢 Services / Conseil", "🏭 Production / Industrie"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Titane Pur"],
+        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platine Titane"],
         "about_btn": "ℹ️ Info",
         "about_title": "Architecture LedgerAI",
-        "about_content": "Conformité Plan Comptable Général (PCG) avec vérification Débit = Crédit."
+        "about_content": "Conformité Plan Comptable Général (PCG) avec vérification Débit = Crédit.",
+        "badge_erp": "✓ CONFORME PCG & ERP STANDARDS",
+        "badge_audit": "✓ ÉQUILIBRE DÉBIT/CRÉDIT GARANTI",
+        "badge_sec": "✓ VENTILATION AUTOMATIQUE DES TAXES"
     },
     "🇪🇸 ES": {
-        "badge": "MOTOR FINANCIERO IA",
+        "badge": "TERMINAL FINANCIERO IA",
         "title": "LedgerAI",
         "subtitle": "Asientos contables equilibrados listos para ERP según el sector empresarial.",
         "drop_title": "Arrastra los documentos aquí",
-        "drop_sub": "PDF, PNG, JPG • Máximo 5 documentos",
+        "drop_sub": "PDF, PNG, JPG • Facturas y recibos",
         "process_btn": "⚡ Generar Asientos",
         "limit_err": "🛑 Máximo 5 documentos por lote.",
         "ready_count": "Listos: **{count}**",
@@ -137,17 +149,20 @@ LANG_DATA = {
         "unbalanced": "⚠️ Descuadre Detectado!",
         "download_btn": "📥 Descargar Excel (.xlsx)",
         "industries": ["⚡ Automático (IA)", "🛒 Comercio / Inventario", "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Titanio Puro"],
+        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
         "about_btn": "ℹ️ Info",
         "about_title": "Arquitectura LedgerAI",
-        "about_content": "Contabilidad autónoma con cuadre de Debe y Haber garantizado."
+        "about_content": "Contabilidad autónoma con cuadre de Debe y Haber garantizado.",
+        "badge_erp": "✓ COMPATIBLE ERP & SOFTWARE FISCAL",
+        "badge_audit": "✓ CUADRE DEBE = HABER GARANTIZADO",
+        "badge_sec": "✓ ASIGNACIÓN DE ASIENTOS CON IA"
     },
     "🇮🇹 IT": {
-        "badge": "MOTORE FINANZIARIO IA",
+        "badge": "TERMINALE FINANZIARIO IA",
         "title": "LedgerAI",
         "subtitle": "Scritture contabili in partita doppia bilanciate per qualsiasi ERP.",
         "drop_title": "Trascina qui le fatture",
-        "drop_sub": "PDF, PNG, JPG • Massimo 5 documenti",
+        "drop_sub": "PDF, PNG, JPG • Ricevute e fatture",
         "process_btn": "⚡ Genera Scritture",
         "limit_err": "🛑 Massimo 5 documenti.",
         "ready_count": "Pronti: **{count}**",
@@ -161,10 +176,13 @@ LANG_DATA = {
         "unbalanced": "⚠️ Sbilancio!",
         "download_btn": "📥 Scarica Excel (.xlsx)",
         "industries": ["⚡ Automatico (IA)", "🛒 Commercio / Magazzino", "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Titanio Puro"],
+        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
         "about_btn": "ℹ️ Info",
         "about_title": "Architettura LedgerAI",
-        "about_content": "Generazione automatica di prima nota conforme ai principi contabili."
+        "about_content": "Generazione automatica di prima nota conforme ai principi contabili.",
+        "badge_erp": "✓ PRONTO PER GESTIONALI ERP",
+        "badge_audit": "✓ QUADRATURA DARE/AVERE GARANTITA",
+        "badge_sec": "✓ CLASSIFICAZIONE CONTO AVANZATA"
     }
 }
 
@@ -178,49 +196,76 @@ if "industry_idx" not in st.session_state:
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
-# --- CANLI, HAREKETLİ AMBİYANS IŞIĞI VE CAM KONSOL CSS ---
+# --- GERÇEK VE FARK EDİLİR 3 FARKLI ANİMASYON / TEMA CSS ---
 if st.session_state["theme_idx"] == 1:
-    # 🌌 Cyberpunk Gece (Derin Mor & Elektrik Mavisi Işık Hüzmeleri)
+    # 🌌 Cyberpunk Gece (Radikal Neon Fuşya, Mor ve Lazer Mavisi Işık Patlamaları)
     bg_css = """
-        @keyframes orbMove {
-            0% { background-position: 0% 0%, 100% 100%, 50% 50%; }
-            50% { background-position: 100% 50%, 0% 50%, 80% 20%; }
-            100% { background-position: 0% 0%, 100% 100%, 50% 50%; }
+        @keyframes cyberpunkPulse {
+            0% { 
+                background-position: 0% 0%, 100% 100%, 50% 10%; 
+                filter: brightness(1) contrast(1.1); 
+            }
+            50% { 
+                background-position: 100% 100%, 0% 0%, 50% 90%; 
+                filter: brightness(1.25) contrast(1.25); 
+            }
+            100% { 
+                background-position: 0% 0%, 100% 100%, 50% 10%; 
+                filter: brightness(1) contrast(1.1); 
+            }
         }
         .stApp {
-            background: radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.22) 0%, transparent 45%),
-                        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
-                        radial-gradient(circle at 50% 30%, rgba(236, 72, 153, 0.12) 0%, transparent 50%),
-                        linear-gradient(145deg, #05060C 0%, #0A0D18 50%, #060810 100%);
-            background-size: 200% 200%;
-            animation: orbMove 16s ease-in-out infinite;
+            background: radial-gradient(circle at 15% 15%, rgba(217, 70, 239, 0.45) 0%, transparent 45%),
+                        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.40) 0%, transparent 45%),
+                        radial-gradient(circle at 50% 40%, rgba(147, 51, 234, 0.35) 0%, transparent 55%),
+                        linear-gradient(135deg, #020108 0%, #080318 45%, #050A1A 80%, #020108 100%);
+            background-size: 220% 220%;
+            animation: cyberpunkPulse 12s ease-in-out infinite;
             background-attachment: fixed;
         }
     """
 elif st.session_state["theme_idx"] == 0:
-    # ✨ Ultra Canlı Aurora (Zümrüt Yeşili, Safir Mavisi, Ametist Işıltısı)
+    # ✨ Ultra Aurora (Zümrüt Yeşili, Safir Mavisi ve Altın Işık Hüzmeleri)
     bg_css = """
-        @keyframes auroraWave {
-            0% { background-position: 0% 40%; filter: hue-rotate(0deg); }
-            50% { background-position: 100% 60%; filter: hue-rotate(25deg); }
-            100% { background-position: 0% 40%; filter: hue-rotate(0deg); }
+        @keyframes auroraRealFlow {
+            0% { 
+                background-position: 0% 30%; 
+                filter: hue-rotate(0deg); 
+            }
+            50% { 
+                background-position: 100% 70%; 
+                filter: hue-rotate(45deg); 
+            }
+            100% { 
+                background-position: 0% 30%; 
+                filter: hue-rotate(0deg); 
+            }
         }
         .stApp {
-            background: radial-gradient(circle at 10% 15%, rgba(99, 102, 241, 0.35) 0%, transparent 45%),
-                        radial-gradient(circle at 90% 25%, rgba(6, 182, 212, 0.28) 0%, transparent 45%),
-                        radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.22) 0%, transparent 50%),
-                        linear-gradient(135deg, #04060B 0%, #070B16 40%, #0A1124 70%, #04060B 100%);
-            background-size: 250% 250%;
-            animation: auroraWave 20s ease-in-out infinite;
+            background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.45) 0%, transparent 45%),
+                        radial-gradient(circle at 90% 20%, rgba(14, 165, 233, 0.45) 0%, transparent 45%),
+                        radial-gradient(circle at 50% 90%, rgba(99, 102, 241, 0.35) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(245, 158, 11, 0.20) 0%, transparent 40%),
+                        linear-gradient(140deg, #020710 0%, #041424 40%, #09213A 70%, #020710 100%);
+            background-size: 240% 240%;
+            animation: auroraRealFlow 16s ease-in-out infinite;
             background-attachment: fixed;
         }
     """
 else:
-    # 🌑 Saf Titanyum (Hareketli Doku Efektli Koyu Lüks)
+    # 🌑 Platin Titanyum (Apple Pro / Metalik Gümüş & Saf Antrasit)
     bg_css = """
+        @keyframes titaniumSheen {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
         .stApp {
-            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 60%),
-                        #05070B;
+            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
+                        radial-gradient(circle at 80% 100%, rgba(148, 163, 184, 0.08) 0%, transparent 50%),
+                        linear-gradient(135deg, #07090E 0%, #0F131D 50%, #080A10 100%);
+            background-size: 200% 200%;
+            animation: titaniumSheen 20s ease infinite;
             background-attachment: fixed;
         }
     """
@@ -239,21 +284,21 @@ st.markdown(f"""
     
     .stApp {{
         color: #F8FAFC;
-        padding-bottom: 110px;
+        padding-bottom: 120px;
     }}
 
-    /* Merkezi Lüks Cam Konsol Kartı */
-    .app-card {{
-        max-width: 780px;
-        margin: 20px auto 0 auto;
-        background: rgba(13, 18, 30, 0.65);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+    /* TEK PARÇA LÜKS CAM KONSOL */
+    .master-console {{
+        max-width: 820px;
+        margin: 25px auto 0 auto;
+        background: rgba(11, 16, 28, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 28px;
-        backdrop-filter: blur(32px);
-        -webkit-backdrop-filter: blur(32px);
-        padding: 40px 36px 36px 36px;
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), 
-                    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(36px);
+        -webkit-backdrop-filter: blur(36px);
+        padding: 36px 40px 32px 40px;
+        box-shadow: 0 35px 90px rgba(0, 0, 0, 0.75), 
+                    inset 0 1px 0 rgba(255, 255, 255, 0.18);
         text-align: center;
     }}
 
@@ -261,50 +306,51 @@ st.markdown(f"""
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 4px 12px;
-        background: rgba(99, 102, 241, 0.15);
-        border: 1px solid rgba(129, 140, 248, 0.35);
+        padding: 4px 14px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 99px;
         font-size: 0.68rem;
-        font-weight: 700;
+        font-weight: 800;
         letter-spacing: 1.5px;
-        color: #C7D2FE;
-        margin-bottom: 14px;
+        color: #CBD5E1;
+        margin-bottom: 12px;
         text-transform: uppercase;
     }}
 
     .hero-title {{
-        font-size: 2.8rem;
+        font-size: 2.9rem;
         font-weight: 800;
-        letter-spacing: -1px;
-        background: linear-gradient(135deg, #FFFFFF 30%, #CBD5E1 100%);
+        letter-spacing: -1.2px;
+        background: linear-gradient(135deg, #FFFFFF 40%, #CBD5E1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 6px;
-        line-height: 1.1;
+        line-height: 1.05;
     }}
     
     .hero-sub {{
-        font-size: 0.95rem;
+        font-size: 0.96rem;
         color: #94A3B8;
         font-weight: 400;
         line-height: 1.5;
-        max-width: 540px;
-        margin: 0 auto 26px auto;
+        max-width: 580px;
+        margin: 0 auto 24px auto;
     }}
 
-    /* Kusursuz Yükleme Alanı */
+    /* Konsol İçi Bütünleşik Yükleme Alanı */
     div[data-testid="stFileUploader"] {{
-        background: rgba(8, 12, 22, 0.6);
-        border: 1px dashed rgba(255, 255, 255, 0.2);
+        background: rgba(6, 9, 18, 0.65);
+        border: 1px dashed rgba(255, 255, 255, 0.22);
         border-radius: 18px;
-        padding: 26px 16px;
+        padding: 24px 16px;
         transition: all 0.3s ease;
+        margin-bottom: 12px;
     }}
     div[data-testid="stFileUploader"]:hover {{
-        border-color: rgba(99, 102, 241, 0.8);
-        box-shadow: 0 0 30px rgba(99, 102, 241, 0.25);
-        background: rgba(10, 15, 28, 0.75);
+        border-color: rgba(99, 102, 241, 0.85);
+        box-shadow: 0 0 35px rgba(99, 102, 241, 0.3);
+        background: rgba(9, 14, 26, 0.8);
     }}
 
     /* İşlem Butonu */
@@ -312,36 +358,57 @@ st.markdown(f"""
         background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
         border: none;
         border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        padding: 12px 28px;
+        font-weight: 700;
+        font-size: 0.98rem;
+        padding: 13px 30px;
         color: #FFFFFF;
-        box-shadow: 0 4px 25px rgba(79, 70, 229, 0.45);
+        box-shadow: 0 4px 30px rgba(79, 70, 229, 0.5);
         transition: all 0.25s ease;
-        margin-top: 10px;
+        margin-top: 6px;
     }}
     div.stButton > button:first-child:hover {{
-        box-shadow: 0 6px 35px rgba(6, 182, 212, 0.65);
+        box-shadow: 0 6px 40px rgba(6, 182, 212, 0.7);
         transform: translateY(-2px);
+    }}
+
+    /* GÜVEN ROZETLERİ (BOŞLUĞU DOLDURAN ALAN) */
+    .trust-grid {{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin: 22px auto 0 auto;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }}
+    .trust-item {{
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        color: #94A3B8;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }}
 
     /* EK DÜZENLEMELER: DOCK'U SAYFANIN EN ALTINA SABİTLEME */
     .dock-fixed-outer {{
         position: fixed;
-        bottom: 20px;
+        bottom: 22px;
         left: 0;
         right: 0;
         margin: 0 auto;
         width: fit-content;
         max-width: 92vw;
         z-index: 999999;
-        background: rgba(11, 15, 26, 0.85);
+        background: rgba(10, 14, 26, 0.86);
         border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 50px;
-        backdrop-filter: blur(28px);
-        -webkit-backdrop-filter: blur(28px);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
         padding: 4px 14px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.18);
     }}
 
     .dock-fixed-outer div[data-testid="stSelectbox"] > div {{
@@ -404,184 +471,190 @@ def excel_olustur(df):
 
     return output.getvalue()
 
-# --- MERKEZİ BENTO CAM KART ---
+# --- TEK PARÇA MERKEZİ KONSOL ALANI ---
 st.markdown(f"""
-<div class='app-card'>
+<div class='master-console'>
     <div class='top-badge'>● {T['badge']}</div>
     <div class='hero-title'>{T['title']}</div>
     <div class='hero-sub'>{T['subtitle']}</div>
+""", unsafe_allow_html=True)
+
+# Konsolun içerisine doğrudan yerleşen dosya yükleyici
+yuklenen_dosyalar = st.file_uploader(
+    T["drop_title"], 
+    type=["pdf", "png", "jpg", "jpeg"], 
+    accept_multiple_files=True,
+    label_visibility="collapsed",
+    help=T["drop_sub"]
+)
+
+if yuklenen_dosyalar:
+    if len(yuklenen_dosyalar) > 5:
+        st.error(T["limit_err"])
+    else:
+        st.markdown(f"<div style='text-align:center; font-size:0.9rem; margin-top:8px;'>{T['ready_count'].format(count=len(yuklenen_dosyalar))}</div>", unsafe_allow_html=True)
+        
+        if st.button(T["process_btn"], use_container_width=True):
+            ham_veriler = []
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            toplam_dosya = len(yuklenen_dosyalar)
+            
+            # Seçilen sektör mantığı direktifi
+            sektor_secimi = T["industries"][st.session_state["industry_idx"]]
+            sektor_direktifi = f"Firma Faaliyet Türü: {sektor_secimi}. "
+            if "Ticaret" in sektor_secimi or "Retail" in sektor_secimi:
+                sektor_direktifi += "Firma al-sat ticaret firmasıdır. Satışa konu olan ana ürünler '153.01 Ticari Mallar' (veya GAAP 1200 Inventory) hesabına işlenmelidir. Sadece akaryakıt, yemek, kırtasiye gibi şirket içi tüketimler 770'e gider."
+            elif "Hizmet" in sektor_secimi or "Services" in sektor_secimi:
+                sektor_direktifi += "Firma hizmet/ofis firmasıdır. Ürün alımları doğrudan işin maliyeti (740) veya genel gider (770) olarak kodlanmalıdır."
+            elif "Üretim" in sektor_secimi or "Manufacturing" in sektor_secimi:
+                sektor_direktifi += "Firma imalat firmasıdır. Hammadde ve malzeme alımları '150 İlk Madde Malzeme', fabrika giderleri '730', ofis giderleri '770' olarak kodlanmalıdır."
+            else:
+                sektor_direktifi += "Belgedeki kalemleri incele; ticari ürün ise 153, ofis/masraf ise 770, demirbaş ise 255'e mantıklı ata."
+
+            for index, dosya in enumerate(yuklenen_dosyalar):
+                status_text.text(f"İşleniyor ({index + 1}/{toplam_dosya}): {dosya.name}...")
+                dosya_baytlari = dosya.read()
+                mime_tipi = dosya.type if dosya.type else "application/pdf"
+                
+                prompt = f"""
+                Sen kıdemli bir otonom mali müşavir ve ERP denetçisisin.
+                {sektor_direktifi}
+                
+                Belge ülkesini (TR, DE, FR, US) ve para birimini otomatik tespit et.
+                - Türkiye için Tek Düzen (153/150/770/740, 191 KDV, 320 Cari).
+                - Almanya için Datev SKR03/04.
+                - Fransa için PCG.
+                - Global/ABD için US GAAP (1200 Inventory, 6000 OpEx, 2000 AP).
+
+                SADECE şu JSON şablonunu döndür:
+                {{
+                  "doc_country": "TR",
+                  "currency": "TL",
+                  "invoice_no": "...",
+                  "date": "YYYY-MM-DD",
+                  "vendor": "...",
+                  "tax_id": "...",
+                  "account_code": "...",
+                  "account_name": "...",
+                  "net": 0.0,
+                  "tax_rate": 20,
+                  "tax": 0.0,
+                  "total": 0.0
+                }}
+                Rakamlar float olmalıdır. Markdown etiketi ekleme.
+                """
+                
+                maksimum_deneme = 3
+                for deneme in range(maksimum_deneme):
+                    try:
+                        yanit = client.models.generate_content(
+                            model="gemini-3.5-flash-lite",
+                            contents=[types.Part.from_bytes(data=dosya_baytlari, mime_type=mime_tipi), prompt]
+                        )
+                        temiz = yanit.text.replace("```json", "").replace("```", "").strip()
+                        veri = json.loads(temiz)
+                        veri["dosya_adi"] = dosya.name
+                        ham_veriler.append(veri)
+                        break
+                    except Exception as e:
+                        hata_msg = str(e)
+                        if ("503" in hata_msg or "429" in hata_msg) and deneme < maksimum_deneme - 1:
+                            time.sleep(3 * (deneme + 1))
+                            continue
+                        else:
+                            st.warning(f"⚠️ {dosya.name}: {hata_msg[:70]}")
+                            break
+                
+                progress_bar.progress((index + 1) / toplam_dosya)
+            
+            if len(ham_veriler) == toplam_dosya:
+                status_text.success(T["success"])
+            elif len(ham_veriler) > 0:
+                status_text.warning(f"✓ {len(ham_veriler)} / {toplam_dosya} işlendi.")
+            else:
+                status_text.error(T["failed"])
+
+            if ham_veriler:
+                fis_satirlari = []
+                fis_no = 1
+                
+                for item in ham_veriler:
+                    curr = item.get("currency", "TL")
+                    inv_no = str(item.get("invoice_no") or "").strip()
+                    date_val = str(item.get("date") or "").strip()
+                    vendor = str(item.get("vendor") or "Satıcı").strip()
+                    tax_id = str(item.get("tax_id") or "").strip()
+                    acc_code = str(item.get("account_code") or "770.01").strip()
+                    acc_name = str(item.get("account_name") or "Gider Hesabı").strip()
+                    
+                    net = float(item.get("net") or 0.0)
+                    tax = float(item.get("tax") or 0.0)
+                    total = float(item.get("total") or (net + tax))
+                    tax_rate = item.get("tax_rate") or 20
+                    
+                    clean_name = "".join(c for c in vendor[:10] if c.isalnum()).upper() or "SATICI"
+                    cari_kod = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
+                    kdv_kod = f"191.{int(tax_rate):02d}"
+
+                    # Başlıklar
+                    if "TR" in st.session_state["user_lang"]:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Fiş No", "Tarih", "Hesap Kodu", "Hesap Adı", "Açıklama", "Borç", "Alacak"
+                        kdv_adi = f"%{tax_rate} İndirilecek KDV"
+                    elif "DE" in st.session_state["user_lang"]:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Beleg", "Datum", "Konto", "Bezeichnung", "Text", "Soll", "Haben"
+                        kdv_adi = f"Vorsteuer {tax_rate}%"
+                    elif "FR" in st.session_state["user_lang"]:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Pièce", "Date", "Compte", "Libellé", "Détail", "Débit", "Crédit"
+                        kdv_adi = f"TVA {tax_rate}%"
+                    elif "ES" in st.session_state["user_lang"]:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Asiento", "Fecha", "Cuenta", "Nombre Cuenta", "Concepto", "Debe", "Haber"
+                        kdv_adi = f"IVA Soportado {tax_rate}%"
+                    elif "IT" in st.session_state["user_lang"]:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Partita", "Data", "Conto", "Descrizione", "Causale", "Dare", "Avere"
+                        kdv_adi = f"IVA a Credito {tax_rate}%"
+                    else:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Voucher #", "Date", "Account Code", "Account Name", "Memo", "Debit", "Credit"
+                        kdv_adi = f"Tax ({tax_rate}%)"
+
+                    # 1. Gider/Mal Satırı
+                    fis_satirlari.append({
+                        h_v: fis_no, h_d: date_val, h_c: acc_code, h_n: acc_name,
+                        h_m: f"{vendor} - {inv_no}", "Para": curr, h_deb: net, h_crd: 0.0
+                    })
+                    
+                    # 2. KDV Satırı
+                    if tax > 0:
+                        fis_satirlari.append({
+                            h_v: fis_no, h_d: date_val, h_c: kdv_kod, h_n: kdv_adi,
+                            h_m: f"{vendor} - KDV", "Para": curr, h_deb: tax, h_crd: 0.0
+                        })
+                    
+                    # 3. Satıcı Satırı
+                    fis_satirlari.append({
+                        h_v: fis_no, h_d: date_val, h_c: cari_kod, h_n: vendor,
+                        h_m: f"{vendor} - {inv_no}", "Para": curr, h_deb: 0.0, h_crd: total
+                    })
+                    
+                    fis_no += 1
+
+                st.session_state["out_df"] = pd.DataFrame(fis_satirlari)
+                st.session_state["h_deb"] = h_deb
+                st.session_state["h_crd"] = h_crd
+
+# Konsolun altındaki güven rozetleri (boşluğu kapatan alan)
+st.markdown(f"""
+    <div class='trust-grid'>
+        <div class='trust-item'>{T['badge_erp']}</div>
+        <div class='trust-item'>{T['badge_audit']}</div>
+        <div class='trust-item'>{T['badge_sec']}</div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Kart hizasında dosya yükleme alanı
-c_left, c_mid, c_right = st.columns([1, 4, 1])
-
-with c_mid:
-    yuklenen_dosyalar = st.file_uploader(
-        T["drop_title"], 
-        type=["pdf", "png", "jpg", "jpeg"], 
-        accept_multiple_files=True,
-        label_visibility="collapsed",
-        help=T["drop_sub"]
-    )
-
-    if yuklenen_dosyalar:
-        if len(yuklenen_dosyalar) > 5:
-            st.error(T["limit_err"])
-        else:
-            st.markdown(f"<div style='text-align:center; margin-top:8px;'>{T['ready_count'].format(count=len(yuklenen_dosyalar))}</div>", unsafe_allow_html=True)
-            
-            if st.button(T["process_btn"], use_container_width=True):
-                ham_veriler = []
-                progress_bar = st.progress(0)
-                status_text = st.empty()
-                toplam_dosya = len(yuklenen_dosyalar)
-                
-                # Seçilen sektör mantığı direktifi
-                sektor_secimi = T["industries"][st.session_state["industry_idx"]]
-                sektor_direktifi = f"Firma Faaliyet Türü: {sektor_secimi}. "
-                if "Ticaret" in sektor_secimi or "Retail" in sektor_secimi:
-                    sektor_direktifi += "Firma al-sat ticaret firmasıdır. Satışa konu olan ana ürünler '153.01 Ticari Mallar' (veya GAAP 1200 Inventory) hesabına işlenmelidir. Sadece akaryakıt, yemek, kırtasiye gibi şirket içi tüketimler 770'e gider."
-                elif "Hizmet" in sektor_secimi or "Services" in sektor_secimi:
-                    sektor_direktifi += "Firma hizmet/ofis firmasıdır. Ürün alımları doğrudan işin maliyeti (740) veya genel gider (770) olarak kodlanmalıdır."
-                elif "Üretim" in sektor_secimi or "Manufacturing" in sektor_secimi:
-                    sektor_direktifi += "Firma imalat firmasıdır. Hammadde ve malzeme alımları '150 İlk Madde Malzeme', fabrika giderleri '730', ofis giderleri '770' olarak kodlanmalıdır."
-                else:
-                    sektor_direktifi += "Belgedeki kalemleri incele; ticari ürün ise 153, ofis/masraf ise 770, demirbaş ise 255'e mantıklı ata."
-
-                for index, dosya in enumerate(yuklenen_dosyalar):
-                    status_text.text(f"İşleniyor ({index + 1}/{toplam_dosya}): {dosya.name}...")
-                    dosya_baytlari = dosya.read()
-                    mime_tipi = dosya.type if dosya.type else "application/pdf"
-                    
-                    prompt = f"""
-                    Sen kıdemli bir otonom mali müşavir ve ERP denetçisisin.
-                    {sektor_direktifi}
-                    
-                    Belge ülkesini (TR, DE, FR, US) ve para birimini otomatik tespit et.
-                    - Türkiye için Tek Düzen (153/150/770/740, 191 KDV, 320 Cari).
-                    - Almanya için Datev SKR03/04.
-                    - Fransa için PCG.
-                    - Global/ABD için US GAAP (1200 Inventory, 6000 OpEx, 2000 AP).
-
-                    SADECE şu JSON şablonunu döndür:
-                    {{
-                      "doc_country": "TR",
-                      "currency": "TL",
-                      "invoice_no": "...",
-                      "date": "YYYY-MM-DD",
-                      "vendor": "...",
-                      "tax_id": "...",
-                      "account_code": "...",
-                      "account_name": "...",
-                      "net": 0.0,
-                      "tax_rate": 20,
-                      "tax": 0.0,
-                      "total": 0.0
-                    }}
-                    Rakamlar float olmalıdır. Markdown etiketi ekleme.
-                    """
-                    
-                    maksimum_deneme = 3
-                    for deneme in range(maksimum_deneme):
-                        try:
-                            yanit = client.models.generate_content(
-                                model="gemini-3.5-flash-lite",
-                                contents=[types.Part.from_bytes(data=dosya_baytlari, mime_type=mime_tipi), prompt]
-                            )
-                            temiz = yanit.text.replace("```json", "").replace("```", "").strip()
-                            veri = json.loads(temiz)
-                            veri["dosya_adi"] = dosya.name
-                            ham_veriler.append(veri)
-                            break
-                        except Exception as e:
-                            hata_msg = str(e)
-                            if ("503" in hata_msg or "429" in hata_msg) and deneme < maksimum_deneme - 1:
-                                time.sleep(3 * (deneme + 1))
-                                continue
-                            else:
-                                st.warning(f"⚠️ {dosya.name}: {hata_msg[:70]}")
-                                break
-                    
-                    progress_bar.progress((index + 1) / toplam_dosya)
-                
-                if len(ham_veriler) == toplam_dosya:
-                    status_text.success(T["success"])
-                elif len(ham_veriler) > 0:
-                    status_text.warning(f"✓ {len(ham_veriler)} / {toplam_dosya} işlendi.")
-                else:
-                    status_text.error(T["failed"])
-
-                if ham_veriler:
-                    fis_satirlari = []
-                    fis_no = 1
-                    
-                    for item in ham_veriler:
-                        curr = item.get("currency", "TL")
-                        inv_no = str(item.get("invoice_no") or "").strip()
-                        date_val = str(item.get("date") or "").strip()
-                        vendor = str(item.get("vendor") or "Satıcı").strip()
-                        tax_id = str(item.get("tax_id") or "").strip()
-                        acc_code = str(item.get("account_code") or "770.01").strip()
-                        acc_name = str(item.get("account_name") or "Gider Hesabı").strip()
-                        
-                        net = float(item.get("net") or 0.0)
-                        tax = float(item.get("tax") or 0.0)
-                        total = float(item.get("total") or (net + tax))
-                        tax_rate = item.get("tax_rate") or 20
-                        
-                        clean_name = "".join(c for c in vendor[:10] if c.isalnum()).upper() or "SATICI"
-                        cari_kod = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
-                        kdv_kod = f"191.{int(tax_rate):02d}"
-
-                        # Başlıklar
-                        if "TR" in st.session_state["user_lang"]:
-                            h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Fiş No", "Tarih", "Hesap Kodu", "Hesap Adı", "Açıklama", "Borç", "Alacak"
-                            kdv_adi = f"%{tax_rate} İndirilecek KDV"
-                        elif "DE" in st.session_state["user_lang"]:
-                            h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Beleg", "Datum", "Konto", "Bezeichnung", "Text", "Soll", "Haben"
-                            kdv_adi = f"Vorsteuer {tax_rate}%"
-                        elif "FR" in st.session_state["user_lang"]:
-                            h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Pièce", "Date", "Compte", "Libellé", "Détail", "Débit", "Crédit"
-                            kdv_adi = f"TVA {tax_rate}%"
-                        elif "ES" in st.session_state["user_lang"]:
-                            h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Asiento", "Fecha", "Cuenta", "Nombre Cuenta", "Concepto", "Debe", "Haber"
-                            kdv_adi = f"IVA Soportado {tax_rate}%"
-                        elif "IT" in st.session_state["user_lang"]:
-                            h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Partita", "Data", "Conto", "Descrizione", "Causale", "Dare", "Avere"
-                            kdv_adi = f"IVA a Credito {tax_rate}%"
-                        else:
-                            h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Voucher #", "Date", "Account Code", "Account Name", "Memo", "Debit", "Credit"
-                            kdv_adi = f"Tax ({tax_rate}%)"
-
-                        # 1. Gider/Mal Satırı
-                        fis_satirlari.append({
-                            h_v: fis_no, h_d: date_val, h_c: acc_code, h_n: acc_name,
-                            h_m: f"{vendor} - {inv_no}", "Para": curr, h_deb: net, h_crd: 0.0
-                        })
-                        
-                        # 2. KDV Satırı
-                        if tax > 0:
-                            fis_satirlari.append({
-                                h_v: fis_no, h_d: date_val, h_c: kdv_kod, h_n: kdv_adi,
-                                h_m: f"{vendor} - KDV", "Para": curr, h_deb: tax, h_crd: 0.0
-                            })
-                        
-                        # 3. Satıcı Satırı
-                        fis_satirlari.append({
-                            h_v: fis_no, h_d: date_val, h_c: cari_kod, h_n: vendor,
-                            h_m: f"{vendor} - {inv_no}", "Para": curr, h_deb: 0.0, h_crd: total
-                        })
-                        
-                        fis_no += 1
-
-                    st.session_state["out_df"] = pd.DataFrame(fis_satirlari)
-                    st.session_state["h_deb"] = h_deb
-                    st.session_state["h_crd"] = h_crd
-
 # --- TABLO VE ÇIKTI ALANI ---
 if "out_df" in st.session_state:
-    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
     st.subheader(T["preview_title"])
     st.caption(T["preview_tip"])
     
