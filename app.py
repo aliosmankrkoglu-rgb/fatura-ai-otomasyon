@@ -109,7 +109,7 @@ LANG_DATA = {
         "bot_title": "👾 LedgerBot Finans Mentorü",
         "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya pratik hesap kodlarını sormak için bana yazabilirsin. Kısa, net ve örnekle anlatırım!",
         "bot_placeholder": "Sorunu yaz (Örn: Laptop aldık nereye atayım? Borç-Alacak mantığı nedir?)...",
-        "bot_clear": "🧹 Sohbeti Temizle",
+        "bot_clear": "🧹 Temizle",
         "headers": {
             "vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu",
             "name": "Hesap Adı", "desc": "Açıklama", "curr": "Para Birimi",
@@ -155,7 +155,7 @@ LANG_DATA = {
         "bot_title": "👾 LedgerBot Finance Mentor",
         "bot_welcome": "Hi! I am your AI finance mentor. Ask me any accounting concepts or codes. I reply concisely with direct practical examples!",
         "bot_placeholder": "Ask a question (e.g. How to book SaaS subscriptions? Debit vs Credit?)...",
-        "bot_clear": "🧹 Clear Chat",
+        "bot_clear": "🧹 Clear",
         "headers": {
             "vouch": "Voucher #", "date": "Date", "code": "Account Code",
             "name": "Account Name", "desc": "Memo", "curr": "Currency",
@@ -201,7 +201,7 @@ LANG_DATA = {
         "bot_title": "👾 LedgerBot Finanzmentor",
         "bot_welcome": "Hallo! Ich erkläre Buchhaltung kurz und präzise mit Beispielen für SKR03/04.",
         "bot_placeholder": "Frage eingeben...",
-        "bot_clear": "🧹 Chat leeren",
+        "bot_clear": "🧹 Leeren",
         "headers": {
             "vouch": "Beleg", "date": "Datum", "code": "Konto",
             "name": "Bezeichnung", "desc": "Text", "curr": "Währung",
@@ -293,7 +293,7 @@ LANG_DATA = {
         "bot_title": "👾 LedgerBot Mentor",
         "bot_welcome": "¡Hola! Pregúntame dudas contables del PGC. Respuestas directas, pedagógicas y breves.",
         "bot_placeholder": "Escribe tu duda...",
-        "bot_clear": "🧹 Limpiar chat",
+        "bot_clear": "🧹 Limpiar",
         "headers": {
             "vouch": "Asiento", "date": "Fecha", "code": "Cuenta",
             "name": "Nombre Cuenta", "desc": "Concepto", "curr": "Moneda",
@@ -339,7 +339,7 @@ LANG_DATA = {
         "bot_title": "👾 LedgerBot Mentor",
         "bot_welcome": "Ciao! Chiedimi qualsiasi cosa sulla partita doppia. Risposte sintetiche e chiare con esempi!",
         "bot_placeholder": "Fai una domanda contabile...",
-        "bot_clear": "🧹 Cancella chat",
+        "bot_clear": "🧹 Cancella",
         "headers": {
             "vouch": "Partita", "date": "Data", "code": "Conto",
             "name": "Descrizione", "desc": "Causale", "curr": "Valuta",
@@ -982,9 +982,22 @@ c_bot_l, c_bot_center, c_bot_r = st.columns([1, 4, 1])
 
 with c_bot_center:
     with st.expander(T["bot_title"], expanded=False):
-        top_col1, top_col2 = st.columns([4, 1])
+        top_col1, top_col2 = st.columns([5.5, 1.5])
         top_col1.caption(T["bot_welcome"])
         with top_col2:
+            st.markdown("""
+            <style>
+                div[data-testid="stExpander"] div.stButton > button {
+                    height: 28px !important;
+                    min-height: 28px !important;
+                    padding: 2px 10px !important;
+                    font-size: 0.75rem !important;
+                    border-radius: 8px !important;
+                    white-space: nowrap !important;
+                    margin-top: 0px !important;
+                }
+            </style>
+            """, unsafe_allow_html=True)
             if st.button(T["bot_clear"], use_container_width=True):
                 st.session_state["chat_messages"] = []
                 st.rerun()
@@ -994,7 +1007,6 @@ with c_bot_center:
         if not st.session_state["chat_messages"]:
             st.markdown(f"<div style='color: #64748B; font-size: 0.85rem; padding: 10px 0;'>💡 <i>{T['bot_placeholder']}</i></div>", unsafe_allow_html=True)
         else:
-            # En son 4 mesajı göstererek sayfa şişmesini engeller
             for msg in st.session_state["chat_messages"][-4:]:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
@@ -1004,19 +1016,17 @@ with c_bot_center:
         if user_query:
             st.session_state["chat_messages"].append({"role": "user", "content": user_query})
             
-            # NET, ÖZ, EĞİTİCİ VE SOMUT ÖRNEKLİ PROMPT DİREKTİFİ
             prompt_bot = f"""
             Sen LedgerAI'ın kurumsal finans mentorü ve pratik muhasebe uzmanısın.
             Kullanıcı Dili: {st.session_state['user_lang']}
             Kullanıcı Sorusu: "{user_query}"
 
             TALİMATLAR:
-            1. Asla lafı uzatma, gevezelik yapma, kitap gibi genel tanımlar yazma.
+            1. Asla lafı uzatma, gevezelik yapma, genel tanımlar yazma.
             2. MAKSİMUM 2-3 CÜMLEDE doğrudan ve net cevabı ver.
             3. Muhasebe öğrenmek isteyen birine anlatır gibi mantığını öğret:
                - "Şu hesaba gider, çünkü..." şeklinde kısaca sebebini söyle.
             4. Her cevabın sonuna tek satırlık somut fiş kaydı veya pratik örnek ekle:
-               Örn: 
                - Borç: 153 Ticari Mallar / 191 KDV
                - Alacak: 320 Satıcılar
             5. Türkiye için Tek Düzen kodlarını (153, 770, 740, 255 vb.), global için GAAP/Datev kodlarını kullan.
