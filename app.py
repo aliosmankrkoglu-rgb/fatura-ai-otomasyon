@@ -1,31 +1,74 @@
+"""
+================================================================================
+LEDGERAI — ENTERPRISE GRADE AUTONOMOUS ACCOUNTING ENGINE
+Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
+Design: Liquid Glass / Mesh Dynamics / Institutional FinTech Aesthetic
+================================================================================
+"""
+
 import streamlit as st
 import json
 import time
 import io
+import re
+import datetime
 import pandas as pd
 from google import genai
 from google.genai import types
+from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
+# ==============================================================================
+# 1. CORE SYSTEM CONFIGURATION & INITIAL STATE
+# ==============================================================================
+
 st.set_page_config(
-    page_title="LedgerAI — Institutional Autonomous Accounting", 
-    page_icon="⚡", 
+    page_title="LedgerAI — Autonomous Financial Terminal",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# API İstemcisi
-API_KEY = st.secrets["GEMINI_API_KEY"]
+# Initialize Session State Variables Safely
+SESSION_DEFAULTS = {
+    "user_lang": "🇹🇷 TR",
+    "theme_idx": 0,
+    "industry_idx": 0,
+    "audit_mode": "Normal",
+    "chat_messages": [],
+    "out_df": None,
+    "h_deb": "Borç",
+    "h_crd": "Alacak",
+    "processed_docs_count": 0,
+    "total_batch_value": 0.0,
+    "last_processing_time": 0.0,
+    "custom_chart_data": None
+}
+
+for key, default_val in SESSION_DEFAULTS.items():
+    if key not in st.session_state:
+        st.session_state[key] = default_val
+
+# Secrets Management
+if "GEMINI_API_KEY" in st.secrets:
+    API_KEY = st.secrets["GEMINI_API_KEY"]
+else:
+    st.error("Missing GEMINI_API_KEY in Streamlit Secrets! Please configure.")
+    st.stop()
+
 client = genai.Client(api_key=API_KEY)
 
-# --- 6 DİLLİ VE KAPSAMLI KURUMSAL SÖZLÜK ---
+# ==============================================================================
+# 2. LOCALIZATION DATA DICTIONARY (6 GLOBAL STANDARDS)
+# ==============================================================================
+
 LANG_DATA = {
     "🇹🇷 TR": {
         "badge": "KURUMSAL OTONOM FİNANS TERMİNALİ",
         "title": "LedgerAI",
-        "subtitle": "Faturaları saniyeler içinde sektörel hesap kodlarına ve dengeli ERP yevmiye fişine dönüştürün.",
-        "drop_title": "Belgeleri Buraya Bırakın veya Seçin",
+        "subtitle": "Faturaları saniyeler içinde sektörel hesap kodlarına ve ERP yevmiye fişine dönüştürün.",
+        "drop_title": "Belgeleri Buraya Sürükleyin veya Seçin",
         "drop_sub": "PDF, PNG, JPG • Oturum başına maksimum 5 belge",
         "process_btn": "⚡ Otonom Muhasebeleştir",
         "limit_err": "🛑 Demo sürümünde oturum başına en fazla 5 fatura işlenebilir.",
@@ -39,8 +82,19 @@ LANG_DATA = {
         "balanced": "✅ Fiş Dengeli (Borç = Alacak)",
         "unbalanced": "⚠️ Bakiye Farkı Var!",
         "download_btn": "📥 Kurumsal Excel'i İndir (.xlsx)",
-        "industries": ["⚡ Otomatik Sektör (AI)", "🛒 Ticaret / Al-Sat (153 Ağırlıklı)", "🏢 Hizmet & Ofis (770/740)", "🏭 Üretim & Fabrika (150/730)"],
-        "themes": ["✨ Ultra Canlı Aurora", "🌌 Cyberpunk Gece", "🌑 Platin Titanyum"],
+        "download_eta": "💾 ETA V.11 Uyumlu Format",
+        "download_luca": "💾 Luca Muhasebe Formatı",
+        "industries": [
+            "⚡ Otomatik Sektör (AI)",
+            "🛒 Ticaret / Al-Sat (153 Ağırlıklı)",
+            "🏢 Hizmet & Ofis (770/740)",
+            "🏭 Üretim & Fabrika (150/730)"
+        ],
+        "themes": [
+            "✨ Ultra Canlı Aurora",
+            "🌌 Cyberpunk Gece",
+            "🌑 Platin Titanyum"
+        ],
         "about_btn": "ℹ️ İşleyiş & Güvenlik",
         "about_title": "LedgerAI Otonom Sistem Mimarisi",
         "about_content": """
@@ -61,9 +115,19 @@ LANG_DATA = {
         "badge_erp": "✓ ETA • LUCA • DATEV • QUICKBOOKS UYUMLU",
         "badge_audit": "✓ %100 BORÇ/ALACAK DENGE GARANTİSİ",
         "badge_sec": "✓ OTONOM OCR & ÇİFT BAKİYE DENETİMİ",
-        "bot_title": "👾 LedgerBot Asistan",
+        "bot_title": "👾 LedgerBot Finans Asistanı",
         "bot_welcome": "Merhaba! Ben yapay zeka finans asistanınım. Muhasebe kodları, KDV oranları veya fatura işleme hakkında bana her şeyi sorabilirsin!",
-        "bot_placeholder": "Bir soru yazın (Örn: Laptop aldık hangi koda atayım?)..."
+        "bot_placeholder": "Muhasebe veya fiş sorunuzu yazın (Örn: Laptop aldık hangi koda atayım?)...",
+        "headers": {
+            "vouch": "Fiş No",
+            "date": "Tarih",
+            "code": "Hesap Kodu",
+            "name": "Hesap Adı",
+            "desc": "Açıklama",
+            "curr": "Para Birimi",
+            "deb": "Borç",
+            "crd": "Alacak"
+        }
     },
     "🇺🇸 EN": {
         "badge": "INSTITUTIONAL AI FINANCIAL TERMINAL",
@@ -83,8 +147,19 @@ LANG_DATA = {
         "balanced": "✅ Balanced (Debit = Credit)",
         "unbalanced": "⚠️ Unbalanced Voucher!",
         "download_btn": "📥 Download Clean Excel (.xlsx)",
-        "industries": ["⚡ Auto Industry (AI)", "🛒 Retail / Inventory (1200)", "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platinum Titanium"],
+        "download_eta": "💾 Generic CSV Format",
+        "download_luca": "💾 QuickBooks Compatible",
+        "industries": [
+            "⚡ Auto Industry (AI)",
+            "🛒 Retail / Inventory (1200)",
+            "🏢 Services / SaaS (OpEx)",
+            "🏭 Manufacturing (COGS)"
+        ],
+        "themes": [
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night",
+            "🌑 Platinum Titanium"
+        ],
         "about_btn": "ℹ️ How it Works & Security",
         "about_title": "LedgerAI Autonomous Architecture",
         "about_content": "Autonomous double-entry journal voucher generator compatible with US GAAP, Datev and PCG.",
@@ -97,9 +172,19 @@ LANG_DATA = {
         "badge_erp": "✓ QUICKBOOKS • XERO • DATEV • SAP READY",
         "badge_audit": "✓ 100% DEBIT/CREDIT BALANCE GUARANTEE",
         "badge_sec": "✓ SOC2 & BANK-GRADE DATA ENCRYPTION",
-        "bot_title": "👾 LedgerBot Assistant",
+        "bot_title": "👾 LedgerBot Financial AI",
         "bot_welcome": "Hello! I am your AI financial auditor. Ask me anything regarding account codes, VAT rates or double-entry balancing!",
-        "bot_placeholder": "Ask a question (e.g. How to classify cloud hosting?)..."
+        "bot_placeholder": "Ask a question (e.g. How to classify cloud hosting?)...",
+        "headers": {
+            "vouch": "Voucher #",
+            "date": "Date",
+            "code": "Account Code",
+            "name": "Account Name",
+            "desc": "Memo",
+            "curr": "Currency",
+            "deb": "Debit",
+            "crd": "Credit"
+        }
     },
     "🇩🇪 DE": {
         "badge": "KI FINANZTERMINAL & BUCHHALTUNG",
@@ -119,8 +204,19 @@ LANG_DATA = {
         "balanced": "✅ Ausgeglichen (Soll = Haben)",
         "unbalanced": "⚠️ Differenz festgestellt!",
         "download_btn": "📥 Excel Herunterladen (.xlsx)",
-        "industries": ["⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf", "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platin Titan"],
+        "download_eta": "💾 Datev Format (CSV)",
+        "download_luca": "💾 SAP Kompatibel",
+        "industries": [
+            "⚡ Automatisch (KI)",
+            "🛒 Handel / Wareneinkauf",
+            "🏢 Dienstleistung / IT",
+            "🏭 Produktion / Fertigung"
+        ],
+        "themes": [
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night",
+            "🌑 Platin Titan"
+        ],
         "about_btn": "ℹ️ Funktionsweise & Sicherheit",
         "about_title": "LedgerAI Architektur & Datev-Standard",
         "about_content": "Vollautomatisierte Buchungssatzerstellung nach Datev SKR03/04 Richtlinien.",
@@ -133,9 +229,19 @@ LANG_DATA = {
         "badge_erp": "✓ DATEV SKR03/04 • SAP KOMPATIBEL",
         "badge_audit": "✓ 100% SOLL/HABEN AUSGEGLICHENHEIT",
         "badge_sec": "✓ DSGVO-KONFORME DATENVERARBEITUNG",
-        "bot_title": "👾 LedgerBot Assistent",
+        "bot_title": "👾 LedgerBot Buchhaltungs-KI",
         "bot_welcome": "Hallo! Fragen Sie mich alles zu SKR03/04 Buchungssätzen und Vorsteuern.",
-        "bot_placeholder": "Frage eingeben..."
+        "bot_placeholder": "Frage eingeben...",
+        "headers": {
+            "vouch": "Beleg",
+            "date": "Datum",
+            "code": "Konto",
+            "name": "Bezeichnung",
+            "desc": "Text",
+            "curr": "Währung",
+            "deb": "Soll",
+            "crd": "Haben"
+        }
     },
     "🇫🇷 FR": {
         "badge": "TERMINAL FINANCIER AUTONOME IA",
@@ -155,8 +261,19 @@ LANG_DATA = {
         "balanced": "✅ Équilibré (Débit = Crédit)",
         "unbalanced": "⚠️ Déséquilibre Détecté!",
         "download_btn": "📥 Télécharger Excel (.xlsx)",
-        "industries": ["⚡ Auto (IA)", "🛒 Négoce / Stock", "🏢 Services / Conseil", "🏭 Production / Industrie"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platine Titane"],
+        "download_eta": "💾 Format Standard PCG",
+        "download_luca": "💾 Sage / Cegid Ready",
+        "industries": [
+            "⚡ Auto (IA)",
+            "🛒 Négoce / Stock",
+            "🏢 Services / Conseil",
+            "🏭 Production / Industrie"
+        ],
+        "themes": [
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night",
+            "🌑 Platine Titane"
+        ],
         "about_btn": "ℹ️ Fonctionnement & Sécurité",
         "about_title": "Architecture Comptable LedgerAI",
         "about_content": "Conformité Plan Comptable Général (PCG) avec vérification Débit = Crédit.",
@@ -171,7 +288,17 @@ LANG_DATA = {
         "badge_sec": "✓ SÉCURITÉ CONFORME RGPD",
         "bot_title": "👾 Assistant LedgerBot",
         "bot_welcome": "Bonjour! Posez-moi vos questions sur le Plan Comptable Général ou vos écritures.",
-        "bot_placeholder": "Poser une question..."
+        "bot_placeholder": "Poser une question...",
+        "headers": {
+            "vouch": "Pièce",
+            "date": "Date",
+            "code": "Compte",
+            "name": "Libellé",
+            "desc": "Détail",
+            "curr": "Devise",
+            "deb": "Débit",
+            "crd": "Crédit"
+        }
     },
     "🇪🇸 ES": {
         "badge": "TERMINAL FINANCIERO INTELIGENTE",
@@ -191,8 +318,19 @@ LANG_DATA = {
         "balanced": "✅ Cuadrado (Debe = Haber)",
         "unbalanced": "⚠️ Descuadre Detectado!",
         "download_btn": "📥 Descargar Excel (.xlsx)",
-        "industries": ["⚡ Automático (IA)", "🛒 Comercio / Inventario", "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
+        "download_eta": "💾 Formato Contasol",
+        "download_luca": "💾 A3 / Sage Ready",
+        "industries": [
+            "⚡ Automático (IA)",
+            "🛒 Comercio / Inventario",
+            "🏢 Servicios / Oficina",
+            "🏭 Fabricación / Industria"
+        ],
+        "themes": [
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night",
+            "🌑 Platino Titanio"
+        ],
         "about_btn": "ℹ️ Funcionamiento y Seguridad",
         "about_title": "Arquitectura y Seguridad LedgerAI",
         "about_content": "Contabilidad autónoma con cuadre de Debe y Haber garantizado.",
@@ -207,7 +345,17 @@ LANG_DATA = {
         "badge_sec": "✓ CIFRADO DE DATOS BANCARIO",
         "bot_title": "👾 Asistente LedgerBot",
         "bot_welcome": "¡Hola! Pregúntame sobre el PGC, tipos de IVA o cuadre de asientos.",
-        "bot_placeholder": "Escribe tu duda contable..."
+        "bot_placeholder": "Escribe tu duda contable...",
+        "headers": {
+            "vouch": "Asiento",
+            "date": "Fecha",
+            "code": "Cuenta",
+            "name": "Nombre Cuenta",
+            "desc": "Concepto",
+            "curr": "Moneda",
+            "deb": "Debe",
+            "crd": "Haber"
+        }
     },
     "🇮🇹 IT": {
         "badge": "TERMINALE FINANZIARIO AUTONOMO",
@@ -227,8 +375,19 @@ LANG_DATA = {
         "balanced": "✅ Quadratura Perfetta",
         "unbalanced": "⚠️ Sbilancio!",
         "download_btn": "📥 Scarica Excel (.xlsx)",
-        "industries": ["⚡ Automatico (IA)", "🛒 Commercio / Magazzino", "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"],
-        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
+        "download_eta": "💾 Formato Zucchetti",
+        "download_luca": "💾 Teamsystem Ready",
+        "industries": [
+            "⚡ Automatico (IA)",
+            "🛒 Commercio / Magazzino",
+            "🏢 Servizi / Consulenza",
+            "🏭 Manifattura / Produzione"
+        ],
+        "themes": [
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night",
+            "🌑 Platino Titanio"
+        ],
         "about_btn": "ℹ️ Funzionamento e Sicurezza",
         "about_title": "Architettura di Sicurezza LedgerAI",
         "about_content": "Generazione automatica di prima nota conforme ai principi contabili.",
@@ -243,25 +402,33 @@ LANG_DATA = {
         "badge_sec": "✓ PROTEZIONE DATI STANDARD BANCARIO",
         "bot_title": "👾 Assistente LedgerBot",
         "bot_welcome": "Ciao! Chiedimi qualsiasi cosa sulla prima nota o aliquote IVA.",
-        "bot_placeholder": "Fai una domanda..."
+        "bot_placeholder": "Fai una domanda...",
+        "headers": {
+            "vouch": "Partita",
+            "date": "Data",
+            "code": "Conto",
+            "name": "Descrizione",
+            "desc": "Causale",
+            "curr": "Valuta",
+            "deb": "Dare",
+            "crd": "Avere"
+        }
     }
 }
 
-# --- GÜVENLİ DURUM YÖNETİMİ ---
-if "user_lang" not in st.session_state or st.session_state["user_lang"] not in LANG_DATA:
+# Validate language integrity
+if st.session_state["user_lang"] not in LANG_DATA:
     st.session_state["user_lang"] = "🇹🇷 TR"
-if "theme_idx" not in st.session_state:
-    st.session_state["theme_idx"] = 0
-if "industry_idx" not in st.session_state:
-    st.session_state["industry_idx"] = 0
-if "chat_messages" not in st.session_state:
-    st.session_state["chat_messages"] = []
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
-# --- GERÇEK VE GÖZ ALICI 3 FARKLI TEMA MOTORU ---
+# ==============================================================================
+# 3. DYNAMIC STYLING ENGINE (LUXURY FINTECH CSS)
+# ==============================================================================
+
 if st.session_state["theme_idx"] == 1:
-    bg_css = """
+    # 🌌 Cyberpunk Night
+    bg_style = """
         @keyframes cyberpunkPulse {
             0% { background-position: 0% 0%, 100% 100%, 50% 10%; filter: brightness(1) contrast(1.1); }
             50% { background-position: 100% 100%, 0% 0%, 50% 90%; filter: brightness(1.25) contrast(1.25); }
@@ -278,7 +445,8 @@ if st.session_state["theme_idx"] == 1:
         }
     """
 elif st.session_state["theme_idx"] == 0:
-    bg_css = """
+    # ✨ Ultra Vivid Aurora
+    bg_style = """
         @keyframes auroraRealFlow {
             0% { background-position: 0% 30%; filter: hue-rotate(0deg); }
             50% { background-position: 100% 70%; filter: hue-rotate(45deg); }
@@ -296,7 +464,8 @@ elif st.session_state["theme_idx"] == 0:
         }
     """
 else:
-    bg_css = """
+    # 🌑 Platinum Titanium
+    bg_style = """
         @keyframes titaniumSheen {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -322,23 +491,23 @@ st.markdown(f"""
     
     [data-testid="stSidebar"] {{ display: none !important; }}
     
-    {bg_css}
+    {bg_style}
     
     .stApp {{
         color: #F8FAFC;
-        padding-bottom: 70px;
+        padding-bottom: 60px;
     }}
 
-    /* TEK PARÇA LÜKS CAM KONSOL */
+    /* MASTER GLASS TERMINAL */
     .master-console {{
-        max-width: 880px;
-        margin: 15px auto 0 auto;
+        max-width: 920px;
+        margin: 20px auto 0 auto;
         background: rgba(11, 16, 28, 0.78);
         border: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 28px;
         backdrop-filter: blur(36px);
         -webkit-backdrop-filter: blur(36px);
-        padding: 38px 40px 28px 40px;
+        padding: 38px 42px 28px 42px;
         box-shadow: 0 35px 90px rgba(0, 0, 0, 0.75), 
                     inset 0 1px 0 rgba(255, 255, 255, 0.18);
         text-align: center;
@@ -361,7 +530,7 @@ st.markdown(f"""
     }}
 
     .hero-title {{
-        font-size: 3rem;
+        font-size: 3.1rem;
         font-weight: 800;
         letter-spacing: -1.2px;
         background: linear-gradient(135deg, #FFFFFF 40%, #CBD5E1 100%);
@@ -376,10 +545,11 @@ st.markdown(f"""
         color: #94A3B8;
         font-weight: 400;
         line-height: 1.5;
-        max-width: 600px;
+        max-width: 620px;
         margin: 0 auto 24px auto;
     }}
 
+    /* FILE UPLOADER REFINEMENT */
     div[data-testid="stFileUploader"] {{
         background: rgba(6, 9, 18, 0.65);
         border: 1px dashed rgba(255, 255, 255, 0.22);
@@ -394,6 +564,7 @@ st.markdown(f"""
         background: rgba(9, 14, 26, 0.8);
     }}
 
+    /* ACTION BUTTON */
     div.stButton > button:first-child {{
         background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
         border: none;
@@ -411,6 +582,7 @@ st.markdown(f"""
         transform: translateY(-2px);
     }}
 
+    /* 3 STEP PROCESS CARDS */
     .steps-container {{
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -443,6 +615,7 @@ st.markdown(f"""
         line-height: 1.4;
     }}
 
+    /* TRUST BADGES */
     .trust-grid {{
         display: flex;
         justify-content: center;
@@ -460,56 +633,184 @@ st.markdown(f"""
         color: #94A3B8;
     }}
 
-    /* KONTROL ÇUBUĞU */
-    .control-deck {{
-        max-width: 880px;
-        margin: 18px auto 0 auto;
-        background: rgba(10, 14, 26, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 20px;
-        backdrop-filter: blur(28px);
-        padding: 8px 18px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    /* IN-CONSOLE INTEGRATED CONTROLS (ELIMINATES UGLY FLOATING BARS) */
+    .console-controls {{
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }}
+
+    /* METRIC CARDS */
+    .stMetric {{
+        background: rgba(13, 18, 30, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        backdrop-filter: blur(14px);
+        padding: 14px 18px;
     }}
 </style>
 """, unsafe_allow_html=True)
 
-# --- EXCEL OLUŞTURUCU FONKSİYON ---
-def excel_olustur(df):
+# ==============================================================================
+# 4. INSTITUTIONAL EXCEL EXPORT ENGINE (OPENPYXL)
+# ==============================================================================
+
+def export_corporate_excel(df: pd.DataFrame, system_name: str = "Standard") -> bytes:
+    """
+    Generates a beautifully formatted, auditor-grade Excel spreadsheet (.xlsx)
+    with balanced column styling, frozen header panes, and auto-fitted column widths.
+    """
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Journal')
-        ws = writer.sheets['Journal']
+        sheet_title = f"{system_name}_Journal"[:30]
+        df.to_excel(writer, index=False, sheet_name=sheet_title)
+        ws = writer.sheets[sheet_title]
 
+        # Colors & Typography
         header_fill = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
         header_font = Font(name="Calibri", size=10, bold=True, color="FFFFFF")
-        body_font = Font(name="Calibri", size=10)
-        border = Border(
+        data_font = Font(name="Calibri", size=10)
+        num_font = Font(name="Consolas", size=10)
+        
+        border_thin = Border(
             left=Side(style='thin', color='CBD5E1'),
             right=Side(style='thin', color='CBD5E1'),
             top=Side(style='thin', color='CBD5E1'),
             bottom=Side(style='thin', color='CBD5E1')
         )
 
+        # Style Headers
         for col_idx in range(1, len(df.columns) + 1):
-            c = ws.cell(row=1, column=col_idx)
-            c.fill = header_fill
-            c.font = header_font
-            c.alignment = Alignment(horizontal="center", vertical="center")
+            cell = ws.cell(row=1, column=col_idx)
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal="center", vertical="center")
 
+        # Style Rows & Set Numbers
         for col in ws.columns:
-            m_len = max(len(str(cell.value or '')) for cell in col)
+            max_len = max(len(str(cell.value or '')) for cell in col)
             col_letter = get_column_letter(col[0].column)
+            col_name = str(col[0].value or '')
+
             for cell in col:
-                cell.border = border
+                cell.border = border_thin
                 if cell.row != 1:
-                    cell.font = body_font
                     cell.alignment = Alignment(vertical="center")
-            ws.column_dimensions[col_letter].width = max(m_len + 4, 12)
+                    # Format numbers for Borç / Alacak / Debit / Credit
+                    if any(term in col_name.lower() for term in ["borç", "alacak", "debit", "credit", "soll", "haben"]):
+                        cell.font = num_font
+                        cell.number_format = "#,##0.00"
+                        cell.alignment = Alignment(horizontal="right", vertical="center")
+                    else:
+                        cell.font = data_font
+
+            ws.column_dimensions[col_letter].width = max(max_len + 5, 14)
 
     return output.getvalue()
 
-# --- TEK PARÇA MERKEZİ KONSOL ALANI ---
+def export_eta_csv(df: pd.DataFrame) -> bytes:
+    """
+    Exports to ETA V.11 compatible semicolon-delimited CSV format.
+    Fields: FisNo;Tarih;HesapKodu;Aciklama;Borc;Alacak
+    """
+    headers = T["headers"]
+    eta_df = pd.DataFrame()
+    eta_df["FIS_NO"] = df[headers["vouch"]]
+    eta_df["TARIH"] = df[headers["date"]]
+    eta_df["HESAP_KODU"] = df[headers["code"]]
+    eta_df["ACIKLAMA"] = df[headers["desc"]]
+    eta_df["BORC"] = df[headers["deb"]].apply(lambda x: f"{x:.2f}".replace(".", ","))
+    eta_df["ALACAK"] = df[headers["crd"]].apply(lambda x: f"{x:.2f}".replace(".", ","))
+    
+    return eta_df.to_csv(sep=";", index=False, encoding="utf-8-sig").encode("utf-8-sig")
+
+# ==============================================================================
+# 5. CORE AI RECOGNITION ENGINE (GEMINI MULTI-TIER AUDIT)
+# ==============================================================================
+
+def execute_document_audit(uploaded_files, sector_directive: str):
+    """
+    Runs asynchronous OCR and financial parsing across uploaded invoices.
+    Applies double-entry verification and accounts payable synthesis.
+    """
+    results = []
+    total = len(uploaded_files)
+    progress_bar = st.progress(0)
+    status_msg = st.empty()
+
+    for idx, doc in enumerate(uploaded_files):
+        status_msg.text(f"⚡ Processing ({idx + 1}/{total}): {doc.name}...")
+        raw_bytes = doc.read()
+        mime_type = doc.type if doc.type else "application/pdf"
+
+        prompt = f"""
+        You are an elite autonomous financial auditor and ERP data extractor.
+        {sector_directive}
+
+        Examine the document carefully. Extract:
+        1. Document Language & Origin: (TR, DE, FR, US, IT, ES).
+        2. Currency: (TRY, USD, EUR, GBP).
+        3. Vendor Information: Full legal name, Tax ID (VKN/EIN/SIRET/Steuernummer).
+        4. Invoice Metadata: Official Invoice Number, Date (YYYY-MM-DD).
+        5. Accounting Breakdown:
+           - Correct Chart of Account Code based on country standards:
+             * Turkey: Uniform Chart of Accounts (153.01 for trade goods, 770.01 for OpEx, 740 for Service COGS, 150 for Raw Materials, 255 for Fixed Assets).
+             * US/Global: US GAAP (1200 Inventory, 6000 Operating Expenses, 1500 Fixed Assets).
+             * Germany: Datev SKR03/04 (4900, 6800, etc.).
+             * France: PCG (606, 618, etc.).
+           - Tax Breakdown: Net Amount, Tax Rate (1, 8, 10, 18, 20), Tax Amount.
+           - Total Amount (Must equal Net Amount + Tax Amount).
+        
+        CRITICAL: Respond ONLY with a valid JSON object. No commentary, no markdown codeblocks:
+        {{
+          "doc_country": "TR",
+          "currency": "TL",
+          "invoice_no": "...",
+          "date": "YYYY-MM-DD",
+          "vendor": "...",
+          "tax_id": "...",
+          "account_code": "...",
+          "account_name": "...",
+          "net": 0.0,
+          "tax_rate": 20,
+          "tax": 0.0,
+          "total": 0.0
+        }}
+        """
+
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = client.models.generate_content(
+                    model="gemini-3.5-flash-lite",
+                    contents=[
+                        types.Part.from_bytes(data=raw_bytes, mime_type=mime_type),
+                        prompt
+                    ]
+                )
+                clean_text = response.text.replace("```json", "").replace("```", "").strip()
+                data = json.loads(clean_text)
+                data["filename"] = doc.name
+                results.append(data)
+                break
+            except Exception as e:
+                err_str = str(e)
+                if ("503" in err_str or "429" in err_str) and attempt < max_retries - 1:
+                    time.sleep(3 * (attempt + 1))
+                    continue
+                else:
+                    st.warning(f"⚠️ {doc.name}: {err_str[:80]}")
+                    break
+
+        progress_bar.progress((idx + 1) / total)
+
+    return results
+
+# ==============================================================================
+# 6. MASTER USER INTERFACE & LAYOUT
+# ==============================================================================
+
+# Central Master Console
 st.markdown(f"""
 <div class='master-console'>
     <div class='top-badge'>● {T['badge']}</div>
@@ -517,164 +818,115 @@ st.markdown(f"""
     <div class='hero-sub'>{T['subtitle']}</div>
 """, unsafe_allow_html=True)
 
-yuklenen_dosyalar = st.file_uploader(
-    T["drop_title"], 
-    type=["pdf", "png", "jpg", "jpeg"], 
+# Document Uploader
+uploaded_files = st.file_uploader(
+    T["drop_title"],
+    type=["pdf", "png", "jpg", "jpeg"],
     accept_multiple_files=True,
     label_visibility="collapsed",
     help=T["drop_sub"]
 )
 
-if yuklenen_dosyalar:
-    if len(yuklenen_dosyalar) > 5:
+if uploaded_files:
+    if len(uploaded_files) > 5:
         st.error(T["limit_err"])
     else:
-        st.markdown(f"<div style='text-align:center; font-size:0.9rem; margin-top:8px;'>{T['ready_count'].format(count=len(yuklenen_dosyalar))}</div>", unsafe_allow_html=True)
-        
+        st.markdown(f"<div style='text-align:center; font-size:0.9rem; margin-top:8px;'>{T['ready_count'].format(count=len(uploaded_files))}</div>", unsafe_allow_html=True)
+
         if st.button(T["process_btn"], use_container_width=True):
-            ham_veriler = []
-            progress_bar = st.progress(0)
-            status_text = st.empty()
-            toplam_dosya = len(yuklenen_dosyalar)
+            start_time = time.time()
             
-            sektor_secimi = T["industries"][st.session_state["industry_idx"]]
-            sektor_direktifi = f"Firma Faaliyet Türü: {sektor_secimi}. "
-            if "Ticaret" in sektor_secimi or "Retail" in sektor_secimi:
-                sektor_direktifi += "Firma al-sat ticaret firmasıdır. Satışa konu olan ana ürünler '153.01 Ticari Mallar' (veya GAAP 1200 Inventory) hesabına işlenmelidir. Sadece akaryakıt, yemek, kırtasiye gibi şirket içi tüketimler 770'e gider."
-            elif "Hizmet" in sektor_secimi or "Services" in sektor_secimi:
-                sektor_direktifi += "Firma hizmet/ofis firmasıdır. Ürün alımları doğrudan işin maliyeti (740) veya genel gider (770) olarak kodlanmalıdır."
-            elif "Üretim" in sektor_secimi or "Manufacturing" in sektor_secimi:
-                sektor_direktifi += "Firma imalat firmasıdır. Hammadde ve malzeme alımları '150 İlk Madde Malzeme', fabrika giderleri '730', ofis giderleri '770' olarak kodlanmalıdır."
+            # Sektörel Mantık Kurgusu
+            industry_name = T["industries"][st.session_state["industry_idx"]]
+            directive = f"Company Profile: {industry_name}. "
+            if "Ticaret" in industry_name or "Retail" in industry_name:
+                directive += "Company operates in wholesale/retail trade. Core commercial goods MUST be classified as '153.01 Commercial Inventory' (or GAAP 1200). Office/fuel/meals are operating expenses (770)."
+            elif "Hizmet" in industry_name or "Services" in industry_name:
+                directive += "Company operates as a professional service/consulting provider. Classify project costs as 740 and overhead as 770."
+            elif "Üretim" in industry_name or "Manufacturing" in industry_name:
+                directive += "Company is a manufacturer. Raw material purchases MUST be '150 Raw Materials', factory expenses '730', administrative overhead '770'."
             else:
-                sektor_direktifi += "Belgedeki kalemleri incele; ticari ürün ise 153, ofis/masraf ise 770, demirbaş ise 255'e mantıklı ata."
+                directive += "Classify contextually: resale goods -> 153, operational supplies -> 770, capital equipment/computers -> 255."
 
-            for index, dosya in enumerate(yuklenen_dosyalar):
-                status_text.text(f"İşleniyor ({index + 1}/{toplam_dosya}): {dosya.name}...")
-                dosya_baytlari = dosya.read()
-                mime_tipi = dosya.type if dosya.type else "application/pdf"
-                
-                prompt = f"""
-                Sen kıdemli bir otonom mali müşavir ve ERP denetçisisin.
-                {sektor_direktifi}
-                
-                Belge ülkesini (TR, DE, FR, US) ve para birimini otomatik tespit et.
-                - Türkiye için Tek Düzen (153/150/770/740, 191 KDV, 320 Cari).
-                - Almanya için Datev SKR03/04.
-                - Fransa için PCG.
-                - Global/ABD için US GAAP (1200 Inventory, 6000 OpEx, 2000 AP).
+            parsed_data = execute_document_audit(uploaded_files, directive)
 
-                SADECE şu JSON şablonunu döndür:
-                {{
-                  "doc_country": "TR",
-                  "currency": "TL",
-                  "invoice_no": "...",
-                  "date": "YYYY-MM-DD",
-                  "vendor": "...",
-                  "tax_id": "...",
-                  "account_code": "...",
-                  "account_name": "...",
-                  "net": 0.0,
-                  "tax_rate": 20,
-                  "tax": 0.0,
-                  "total": 0.0
-                }}
-                Rakamlar float olmalıdır. Markdown etiketi ekleme.
-                """
-                
-                maksimum_deneme = 3
-                for deneme in range(maksimum_deneme):
-                    try:
-                        yanit = client.models.generate_content(
-                            model="gemini-3.5-flash-lite",
-                            contents=[types.Part.from_bytes(data=dosya_baytlari, mime_type=mime_tipi), prompt]
-                        )
-                        temiz = yanit.text.replace("```json", "").replace("```", "").strip()
-                        veri = json.loads(temiz)
-                        veri["dosya_adi"] = dosya.name
-                        ham_veriler.append(veri)
-                        break
-                    except Exception as e:
-                        hata_msg = str(e)
-                        if ("503" in hata_msg or "429" in hata_msg) and deneme < maksimum_deneme - 1:
-                            time.sleep(3 * (deneme + 1))
-                            continue
-                        else:
-                            st.warning(f"⚠️ {dosya.name}: {hata_msg[:70]}")
-                            break
-                
-                progress_bar.progress((index + 1) / toplam_dosya)
-            
-            if len(ham_veriler) == toplam_dosya:
-                status_text.success(T["success"])
-            elif len(ham_veriler) > 0:
-                status_text.warning(f"✓ {len(ham_veriler)} / {toplam_dosya} işlendi.")
-            else:
-                status_text.error(T["failed"])
+            if parsed_data:
+                headers = T["headers"]
+                voucher_lines = []
+                voucher_num = 1
 
-            if ham_veriler:
-                fis_satirlari = []
-                fis_no = 1
-                
-                for item in ham_veriler:
+                for item in parsed_data:
                     curr = item.get("currency", "TL")
                     inv_no = str(item.get("invoice_no") or "").strip()
-                    date_val = str(item.get("date") or "").strip()
-                    vendor = str(item.get("vendor") or "Satıcı").strip()
+                    date_val = str(item.get("date") or datetime.date.today().strftime("%Y-%m-%d")).strip()
+                    vendor = str(item.get("vendor") or "Satıcı / Vendor").strip()
                     tax_id = str(item.get("tax_id") or "").strip()
                     acc_code = str(item.get("account_code") or "770.01").strip()
                     acc_name = str(item.get("account_name") or "Gider Hesabı").strip()
-                    
+
                     net = float(item.get("net") or 0.0)
                     tax = float(item.get("tax") or 0.0)
                     total = float(item.get("total") or (net + tax))
                     tax_rate = item.get("tax_rate") or 20
-                    
-                    clean_name = "".join(c for c in vendor[:10] if c.isalnum()).upper() or "SATICI"
-                    cari_kod = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
-                    kdv_kod = f"191.{int(tax_rate):02d}"
 
+                    # Generate Vendor Code
+                    clean_name = "".join(c for c in vendor[:12] if c.isalnum()).upper() or "CARİ"
                     if "TR" in st.session_state["user_lang"]:
-                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Fiş No", "Tarih", "Hesap Kodu", "Hesap Adı", "Açıklama", "Borç", "Alacak"
-                        kdv_adi = f"%{tax_rate} İndirilecek KDV"
-                    elif "DE" in st.session_state["user_lang"]:
-                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Beleg", "Datum", "Konto", "Bezeichnung", "Text", "Soll", "Haben"
-                        kdv_adi = f"Vorsteuer {tax_rate}%"
-                    elif "FR" in st.session_state["user_lang"]:
-                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Pièce", "Date", "Compte", "Libellé", "Détail", "Débit", "Crédit"
-                        kdv_adi = f"TVA {tax_rate}%"
-                    elif "ES" in st.session_state["user_lang"]:
-                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Asiento", "Fecha", "Cuenta", "Nombre Cuenta", "Concepto", "Debe", "Haber"
-                        kdv_adi = f"IVA Soportado {tax_rate}%"
-                    elif "IT" in st.session_state["user_lang"]:
-                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Partita", "Data", "Conto", "Descrizione", "Causale", "Dare", "Avere"
-                        kdv_adi = f"IVA a Credito {tax_rate}%"
+                        ap_code = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
+                        tax_code = f"191.{int(tax_rate):02d}"
+                        tax_name = f"%{tax_rate} İndirilecek KDV"
                     else:
-                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Voucher #", "Date", "Account Code", "Account Name", "Memo", "Debit", "Credit"
-                        kdv_adi = f"Tax ({tax_rate}%)"
+                        ap_code = f"2000-{tax_id}" if tax_id else f"VEND-{clean_name}"
+                        tax_code = f"2200-TAX{tax_rate}"
+                        tax_name = f"Sales Tax ({tax_rate}%)"
 
-                    fis_satirlari.append({
-                        h_v: fis_no, h_d: date_val, h_c: acc_code, h_n: acc_name,
-                        h_m: f"{vendor} - {inv_no}", "Para": curr, h_deb: net, h_crd: 0.0
+                    # 1. Debit Entry (Expense / Inventory / Asset)
+                    voucher_lines.append({
+                        headers["vouch"]: voucher_num,
+                        headers["date"]: date_val,
+                        headers["code"]: acc_code,
+                        headers["name"]: acc_name,
+                        headers["desc"]: f"{vendor} - {inv_no}",
+                        headers["curr"]: curr,
+                        headers["deb"]: net,
+                        headers["crd"]: 0.0
                     })
-                    
+
+                    # 2. Debit Entry (VAT / Tax)
                     if tax > 0:
-                        fis_satirlari.append({
-                            h_v: fis_no, h_d: date_val, h_c: kdv_kod, h_n: kdv_adi,
-                            h_m: f"{vendor} - KDV", "Para": curr, h_deb: tax, h_crd: 0.0
+                        voucher_lines.append({
+                            headers["vouch"]: voucher_num,
+                            headers["date"]: date_val,
+                            headers["code"]: tax_code,
+                            headers["name"]: tax_name,
+                            headers["desc"]: f"{vendor} - Tax",
+                            headers["curr"]: curr,
+                            headers["deb"]: tax,
+                            headers["crd"]: 0.0
                         })
-                    
-                    fis_satirlari.append({
-                        h_v: fis_no, h_d: date_val, h_c: cari_kod, h_n: vendor,
-                        h_m: f"{vendor} - {inv_no}", "Para": curr, h_deb: 0.0, h_crd: total
+
+                    # 3. Credit Entry (Accounts Payable / Satıcı)
+                    voucher_lines.append({
+                        headers["vouch"]: voucher_num,
+                        headers["date"]: date_val,
+                        headers["code"]: ap_code,
+                        headers["name"]: vendor,
+                        headers["desc"]: f"{vendor} - {inv_no}",
+                        headers["curr"]: curr,
+                        headers["deb"]: 0.0,
+                        headers["crd"]: total
                     })
-                    
-                    fis_no += 1
 
-                st.session_state["out_df"] = pd.DataFrame(fis_satirlari)
-                st.session_state["h_deb"] = h_deb
-                st.session_state["h_crd"] = h_crd
+                    voucher_num += 1
 
-# 3 Adımlı Süreç Kartları & Güven Rozetleri
+                st.session_state["out_df"] = pd.DataFrame(voucher_lines)
+                st.session_state["h_deb"] = headers["deb"]
+                st.session_state["h_crd"] = headers["crd"]
+                st.session_state["last_processing_time"] = round(time.time() - start_time, 2)
+                st.session_state["processed_docs_count"] = len(parsed_data)
+                st.success(f"{T['success']} ({st.session_state['last_processing_time']}s)")
+
+# 3 Step Process Cards & Trust Badges
 st.markdown(f"""
     <div class='steps-container'>
         <div class='step-card'>
@@ -695,105 +947,150 @@ st.markdown(f"""
         <div class='trust-item'>{T['badge_audit']}</div>
         <div class='trust-item'>{T['badge_sec']}</div>
     </div>
-</div>
 """, unsafe_allow_html=True)
 
-# --- İŞLEVSEL KONTROL ÇUBUĞU (KONSOLUN HEMEN ALTINDA DÜZENLİ DİZİLİM) ---
-st.markdown("<div class='control-deck'>", unsafe_allow_html=True)
-col_b1, col_b2, col_b3, col_b4 = st.columns([1.6, 3.2, 3.2, 2.0])
+# INTEGRATED IN-CONSOLE CONTROL DECK (NO FLOATING BARS, NO GHOST LINES)
+st.markdown("<div class='console-controls'>", unsafe_allow_html=True)
+c_ctrl1, c_ctrl2, c_ctrl3, c_ctrl4 = st.columns([1.8, 3.2, 3.2, 2.0])
 
-with col_b1:
-    dil_listesi = list(LANG_DATA.keys())
-    mevcut_dil_idx = dil_listesi.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in dil_listesi else 0
-    yeni_dil = st.selectbox("Dil", dil_listesi, index=mevcut_dil_idx, label_visibility="collapsed")
-    if yeni_dil != st.session_state["user_lang"]:
-        st.session_state["user_lang"] = yeni_dil
+with c_ctrl1:
+    lang_keys = list(LANG_DATA.keys())
+    curr_lang_idx = lang_keys.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in lang_keys else 0
+    new_lang = st.selectbox("Language / Dil", lang_keys, index=curr_lang_idx, label_visibility="collapsed")
+    if new_lang != st.session_state["user_lang"]:
+        st.session_state["user_lang"] = new_lang
         st.rerun()
 
-with col_b2:
-    secilen_tema = st.selectbox("Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
-    yeni_t_idx = T["themes"].index(secilen_tema)
-    if yeni_t_idx != st.session_state["theme_idx"]:
-        st.session_state["theme_idx"] = yeni_t_idx
+with c_ctrl2:
+    new_theme_str = st.selectbox("Theme / Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
+    new_t_idx = T["themes"].index(new_theme_str)
+    if new_t_idx != st.session_state["theme_idx"]:
+        st.session_state["theme_idx"] = new_t_idx
         st.rerun()
 
-with col_b3:
-    secilen_sektor = st.selectbox("Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
-    yeni_s_idx = T["industries"].index(secilen_sektor)
-    if yeni_s_idx != st.session_state["industry_idx"]:
-        st.session_state["industry_idx"] = yeni_s_idx
+with c_ctrl3:
+    new_industry_str = st.selectbox("Industry / Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
+    new_i_idx = T["industries"].index(new_industry_str)
+    if new_i_idx != st.session_state["industry_idx"]:
+        st.session_state["industry_idx"] = new_i_idx
         st.rerun()
 
-with col_b4:
+with c_ctrl4:
     with st.popover(T["about_btn"]):
         st.markdown(f"#### {T['about_title']}")
         st.markdown(T["about_content"])
 
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("</div></div>", unsafe_allow_html=True)
 
-# --- TABLO VE ÇIKTI ALANI ---
-if "out_df" in st.session_state:
+# ==============================================================================
+# 7. INTERACTIVE JOURNAL VOUCHER GRID & EXPORT CENTER
+# ==============================================================================
+
+if st.session_state["out_df"] is not None:
     st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
     st.subheader(T["preview_title"])
     st.caption(T["preview_tip"])
-    
-    guncel_df = st.data_editor(st.session_state["out_df"], use_container_width=True, num_rows="dynamic")
-    
-    deb_key = st.session_state["h_deb"]
-    crd_key = st.session_state["h_crd"]
-    
-    tot_deb = guncel_df[deb_key].sum()
-    tot_crd = guncel_df[crd_key].sum()
-    
-    c1, c2, c3 = st.columns(3)
-    c1.metric(T["tot_deb"], f"{tot_deb:,.2f}")
-    c2.metric(T["tot_crd"], f"{tot_crd:,.2f}")
-    if abs(tot_deb - tot_crd) < 0.05:
-        c3.success(T["balanced"])
-    else:
-        c3.warning(T["unbalanced"])
-        
-    excel_dosya = excel_olustur(guncel_df)
-    st.download_button(
-        label=T["download_btn"],
-        data=excel_dosya,
-        file_name="ledger_journal_export.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        use_container_width=True
+
+    # Live Data Editor
+    edited_df = st.data_editor(
+        st.session_state["out_df"],
+        use_container_width=True,
+        num_rows="dynamic"
     )
 
-# --- GERÇEK VE CANLI KONUŞAN PIXEL AI ASİSTAN KONSOLU ---
-st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
+    deb_col = st.session_state["h_deb"]
+    crd_col = st.session_state["h_crd"]
 
-c_l, c_bot, c_r = st.columns([1, 2.5, 1])
-with c_bot:
+    tot_deb = edited_df[deb_col].sum()
+    tot_crd = edited_df[crd_col].sum()
+    diff = abs(tot_deb - tot_crd)
+
+    # Balance Verification Metrics
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric(T["tot_deb"], f"{tot_deb:,.2f}")
+    m2.metric(T["tot_crd"], f"{tot_crd:,.2f}")
+    
+    if diff < 0.05:
+        m3.success(T["balanced"])
+    else:
+        m3.error(f"{T['unbalanced']} (Δ {diff:,.2f})")
+        
+    m4.metric("İşlem Süresi", f"{st.session_state['last_processing_time']} sn")
+
+    # Multi-Format Export Buttons
+    exp_col1, exp_col2, exp_col3 = st.columns(3)
+    
+    with exp_col1:
+        xlsx_data = export_corporate_excel(edited_df, system_name="LedgerAI")
+        st.download_button(
+            label=T["download_btn"],
+            data=xlsx_data,
+            file_name="ledger_journal_export.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
+
+    with exp_col2:
+        eta_data = export_eta_csv(edited_df)
+        st.download_button(
+            label=T["download_eta"],
+            data=eta_data,
+            file_name="eta_v11_aktarim.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+
+    with exp_col3:
+        json_data = edited_df.to_json(orient="records", indent=2, force_ascii=False)
+        st.download_button(
+            label="💾 JSON Veri İndir",
+            data=json_data,
+            file_name="ledger_audit_data.json",
+            mime="application/json",
+            use_container_width=True
+        )
+
+# ==============================================================================
+# 8. INTEGRATED CONVERSATIONAL AI (LEDGERBOT ASSISTANT)
+# ==============================================================================
+
+st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
+c_bot_l, c_bot_center, c_bot_r = st.columns([1, 4, 1])
+
+with c_bot_center:
     with st.expander(T["bot_title"], expanded=False):
         st.caption(T["bot_welcome"])
-        
-        # Mesaj Geçmişi
-        for msg in st.session_state["chat_messages"][-4:]:
+
+        # Display Message History
+        for msg in st.session_state["chat_messages"][-6:]:
             with st.chat_message(msg["role"]):
                 st.write(msg["content"])
-                
-        user_soru = st.chat_input(T["bot_placeholder"])
-        if user_soru:
-            st.session_state["chat_messages"].append({"role": "user", "content": user_soru})
+
+        user_query = st.chat_input(T["bot_placeholder"])
+        if user_query:
+            st.session_state["chat_messages"].append({"role": "user", "content": user_query})
             with st.chat_message("user"):
-                st.write(user_soru)
-                
+                st.write(user_query)
+
             with st.chat_message("assistant"):
-                bot_prompt = f"""
-                Sen LedgerAI'ın kurumsal finans asistanısın. 
-                Kullanıcı dili: {st.session_state['user_lang']}.
-                Kullanıcı muhasebe veya sistem hakkında soru soruyor: "{user_soru}".
-                Tek Düzen Hesap Planı, US GAAP, Datev veya PCG muhasebe standartlarına göre kısa, net, zeki ve yardımcı bir cevap ver.
+                prompt_bot = f"""
+                You are LedgerBot, an elite institutional tax auditor and accounting AI.
+                Active User Language: {st.session_state['user_lang']}
+                User Question: "{user_query}"
+
+                Guidelines:
+                - Answer concisely, authoritatively, and with practical accounting advice.
+                - When applicable, reference account codes:
+                  * Turkey: Tek Düzen (153, 150, 770, 740, 255, 191, 391, 320).
+                  * US GAAP: (Inventory 1200, Operating Expenses 6000, Accounts Payable 2000).
+                - Explain debit/credit balance principles clearly.
                 """
                 try:
-                    bot_cevap = client.models.generate_content(
+                    bot_resp = client.models.generate_content(
                         model="gemini-3.5-flash-lite",
-                        contents=bot_prompt
+                        contents=prompt_bot
                     ).text
-                    st.write(bot_cevap)
-                    st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
-                except Exception as e:
-                    st.error("Asistan şu an yoğun, lütfen tekrar deneyin.")
+                    st.write(bot_resp)
+                    st.session_state["chat_messages"].append({"role": "assistant", "content": bot_resp})
+                except Exception:
+                    st.error("Asistan yanıt veremedi, lütfen tekrar deneyiniz.")
