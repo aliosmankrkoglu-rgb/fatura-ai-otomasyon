@@ -9,7 +9,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 st.set_page_config(
-    page_title="FinAuto AI - Muhasebe Fiş Entegratörü", 
+    page_title="FinAuto AI - Akıllı Muhasebe Motoru", 
     page_icon="💼", 
     layout="wide"
 )
@@ -17,20 +17,6 @@ st.set_page_config(
 # API İstemcisi
 API_KEY = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=API_KEY)
-
-# --- YAN PANEL: FİRMA / PROGRAM AYARLARI ---
-with st.sidebar:
-    st.title("⚙️ Muhasebe Ayarları")
-    program_secimi = st.selectbox(
-        "Aktarım Formatı Seçin",
-        ["ETA / Luca / Zirve Uyumlu (Fiş Aktarımı)", "Standart Fatura Listesi"]
-    )
-    st.markdown("---")
-    st.markdown("#### Varsayılan Hesap Kodları")
-    varsayilan_gider_kodu = st.text_input("Gider / Mal Hesabı", value="770.01.001")
-    varsayilan_kdv_kodu = st.text_input("KDV Hesabı", value="191.20.001")
-    varsayilan_cari_kodu = st.text_input("Satıcı / Kasa Hesabı", value="320.01.001")
-    st.caption("Firma bazlı özel hesap planı eşleştirmesi entegrasyon paketinde otomatik tanımlanır.")
 
 # --- EXCEL OLUŞTURUCU ---
 def excel_tablosu_olustur(df, sheet_name="Muhasebe_Fisi"):
@@ -74,12 +60,12 @@ def excel_tablosu_olustur(df, sheet_name="Muhasebe_Fisi"):
 
     return output.getvalue()
 
-# --- ANA EKRAN ---
-st.title("💼 FinAuto AI - Akıllı Muhasebe Fiş Aktarım Prototipi")
-st.markdown("Faturaları yükleyin; sistem doğrudan muhasebe programınızın aktarım modülüne uygun Borç/Alacak yevmiye fişi üretsin.")
+# --- ARAYÜZ ---
+st.title("💼 FinAuto AI - Akıllı Muhasebe Fiş Motoru")
+st.markdown("Faturaları yükleyin; sistem harcama türünü (Akaryakıt, Yemek, Mal Alışı, Kargo vb.) otomatik tespit edip kurumsal yevmiye fişini çıkarsın.")
 
 yuklenen_dosyalar = st.file_uploader(
-    "Fatura veya makbuz yükleyin (PDF, PNG, JPG)", 
+    "Fatura veya fiş yükleyin (PDF, PNG, JPG)", 
     type=["pdf", "png", "jpg", "jpeg"], 
     accept_multiple_files=True
 )
@@ -90,7 +76,7 @@ if yuklenen_dosyalar:
     else:
         st.info(f"İşlenecek belge sayısı: **{len(yuklenen_dosyalar)}**")
         
-        if st.button("🚀 Muhasebe Fişini Otomatik Oluştur", type="primary"):
+        if st.button("🚀 Akıllı Fiş Analizini Başlat", type="primary"):
             ham_veriler = []
             progress_bar = st.progress(0)
             status_text = st.empty()
@@ -103,25 +89,38 @@ if yuklenen_dosyalar:
                 mime_tipi = dosya.type if dosya.type else "application/pdf"
                 
                 prompt = """
-                Sen uzman bir muhasebe uzmanısın. Belgeyi dikkatle incele ve SADECE saf bir JSON objesi döndür:
+                Sen üst düzey bir mali müşavir ve muhasebe uzmanısın. Belgeyi incele.
+                Harcama türünü ve Tek Düzen Hesap Planı'na göre en uygun hesap kodunu otomatik belirle:
+                - Ticari mal alımı ise: "153.01 Ticari Mallar"
+                - Akaryakıt/Yakıt ise: "770.01 Akaryakıt Giderleri"
+                - Yemek/Temsil/Ağırlama ise: "770.02 Yemek ve Ağırlama"
+                - Kırtasiye/Ofis Malzemesi ise: "770.03 Kırtasiye Giderleri"
+                - Kargo/Nakliye ise: "770.04 Kargo ve Ulaşım"
+                - Demirbaş/Ekipman alımı ise: "255.01 Demirbaşlar"
+                - Diğer genel giderler için: "770.99 Genel Giderler"
+
+                SADECE şu JSON şablonunu döndür:
                 {
                   "Fatura No": "...",
                   "Tarih": "...",
                   "Satıcı": "...",
-                  "Vergi No / TCKN": "...",
+                  "VKN_TCKN": "...",
+                  "Belge Türü": "Alış Faturası / Gider Fişi",
+                  "Önerilen Hesap Kodu": "770.01",
+                  "Hesap Adı": "Akaryakıt Giderleri",
                   "Matrah": 0.0,
                   "KDV Orani": 20,
                   "KDV Tutarı": 0.0,
                   "Genel Toplam": 0.0
                 }
-                Tutar alanlarını kesinlikle sayısal (float) döndür. Markdown etiketi kullanma.
+                Tutar alanlarını float yap. Markdown etiketi ekleme.
                 """
                 
                 maksimum_deneme = 3
                 for deneme in range(maksimum_deneme):
                     try:
                         yanit = client.models.generate_content(
-                           model="gemini-3.5-flash-lite",
+                            model="gemini-3.5-flash-lite",
                             contents=[
                                 types.Part.from_bytes(
                                     data=dosya_baytlari,
@@ -141,7 +140,6 @@ if yuklenen_dosyalar:
                         hata_metni = str(e)
                         if ("503" in hata_metni or "429" in hata_metni) and deneme < maksimum_deneme - 1:
                             bekleme = 3 * (deneme + 1)
-                            status_text.text(f"Hızlı deneme yapılıyor ({bekleme} sn)...")
                             time.sleep(bekleme)
                             continue
                         else:
@@ -151,69 +149,83 @@ if yuklenen_dosyalar:
                 progress_bar.progress((index + 1) / toplam_dosya)
                 time.sleep(1)
             
-            status_text.text("Fiş aktarımı hazırlandı!")
+            status_text.text("Analiz başarıyla tamamlandı!")
             
             if ham_veriler:
-                if program_secimi == "ETA / Luca / Zirve Uyumlu (Fiş Aktarımı)":
-                    fis_satirlari = []
-                    fis_sira_no = 1
+                fis_satirlari = []
+                fis_sira_no = 1
+                
+                for item in ham_veriler:
+                    fatura_no = item.get("Fatura No", "")
+                    tarih = item.get("Tarih", "")
+                    satici = item.get("Satıcı", "")
+                    hesap_kodu = item.get("Önerilen Hesap Kodu", "770.99")
+                    hesap_adi = item.get("Hesap Adı", "Genel Giderler")
+                    kdv_orani = item.get("KDV Orani", 20)
                     
-                    for item in ham_veriler:
-                        fatura_no = item.get("Fatura No", "")
-                        tarih = item.get("Tarih", "")
-                        satici = item.get("Satıcı", "")
-                        matrah = float(item.get("Matrah", 0.0) or 0.0)
-                        kdv = float(item.get("KDV Tutarı", 0.0) or 0.0)
-                        genel_toplam = float(item.get("Genel Toplam", 0.0) or (matrah + kdv))
-                        
-                        # 1. Satır: Matrah (Borç)
+                    matrah = float(item.get("Matrah", 0.0) or 0.0)
+                    kdv = float(item.get("KDV Tutarı", 0.0) or 0.0)
+                    genel_toplam = float(item.get("Genel Toplam", 0.0) or (matrah + kdv))
+                    
+                    # 1. Satır: Akıllı Tespit Edilen Gider veya Mal Hesabı (Borç)
+                    fis_satirlari.append({
+                        "Fiş No": fis_sira_no,
+                        "Tarih": tarih,
+                        "Hesap Kodu": hesap_kodu,
+                        "Hesap Adı": hesap_adi,
+                        "Açıklama": f"{satici} - Ftr No: {fatura_no}",
+                        "Borç": matrah,
+                        "Alacak": 0.0
+                    })
+                    
+                    # 2. Satır: İndirilecek KDV (Borç)
+                    if kdv > 0:
+                        kdv_hesap_kodu = f"191.{int(kdv_orani):02d}" if kdv_orani else "191.20"
                         fis_satirlari.append({
                             "Fiş No": fis_sira_no,
                             "Tarih": tarih,
-                            "Hesap Kodu": varsayilan_gider_kodu,
-                            "Hesap Adı": "Gider / Mal Alış Hesabı",
-                            "Açıklama": f"{satici} - Ftr No: {fatura_no}",
-                            "Borç": matrah,
+                            "Hesap Kodu": kdv_hesap_kodu,
+                            "Hesap Adı": f"%{kdv_orani} İndirilecek KDV",
+                            "Açıklama": f"{satici} - KDV",
+                            "Borç": kdv,
                             "Alacak": 0.0
                         })
-                        
-                        # 2. Satır: KDV (Borç)
-                        if kdv > 0:
-                            fis_satirlari.append({
-                                "Fiş No": fis_sira_no,
-                                "Tarih": tarih,
-                                "Hesap Kodu": varsayilan_kdv_kodu,
-                                "Hesap Adı": "İndirilecek KDV",
-                                "Açıklama": f"{satici} - KDV",
-                                "Borç": kdv,
-                                "Alacak": 0.0
-                            })
-                        
-                        # 3. Satır: Satıcı / Kasa (Alacak)
-                        fis_satirlari.append({
-                            "Fiş No": fis_sira_no,
-                            "Tarih": tarih,
-                            "Hesap Kodu": varsayilan_cari_kodu,
-                            "Hesap Adı": satici,
-                            "Açıklama": f"{satici} - Ftr No: {fatura_no}",
-                            "Borç": 0.0,
-                            "Alacak": genel_toplam
-                        })
-                        
-                        fis_sira_no += 1
                     
-                    df_sonuc = pd.DataFrame(fis_satirlari)
-                else:
-                    df_sonuc = pd.DataFrame(ham_veriler)
-
+                    # 3. Satır: Satıcı / Kasa (Alacak)
+                    fis_satirlari.append({
+                        "Fiş No": fis_sira_no,
+                        "Tarih": tarih,
+                        "Hesap Kodu": "320.01.001",
+                        "Hesap Adı": satici,
+                        "Açıklama": f"{satici} - Ftr No: {fatura_no}",
+                        "Borç": 0.0,
+                        "Alacak": genel_toplam
+                    })
+                    
+                    fis_sira_no += 1
+                
+                df_sonuc = pd.DataFrame(fis_satirlari)
+                
                 st.divider()
-                st.subheader("📊 Oluşturulan Muhasebe Fiş Tablosu")
+                st.subheader("📊 Otomatik Sınıflandırılmış Yevmiye Fişi")
                 st.dataframe(df_sonuc, use_container_width=True)
                 
+                # Bakiye kontrolü
+                toplam_borc = df_sonuc["Borç"].sum()
+                toplam_alacak = df_sonuc["Alacak"].sum()
+                
+                col1, col2, col3 = st.columns(3)
+                col1.metric("Toplam Borç", f"{toplam_borc:,.2f} TL")
+                col2.metric("Toplam Alacak", f"{toplam_alacak:,.2f} TL")
+                if abs(toplam_borc - toplam_alacak) < 0.05:
+                    col3.success("✅ Fiş Bakiyesi Dengeli (Borç = Alacak)")
+                else:
+                    col3.warning("⚠️ Bakiye Farkı Var")
+
                 excel_cikti = excel_tablosu_olustur(df_sonuc, sheet_name="Fis_Aktarim")
                 st.download_button(
-                    label="📥 Muhasebe Aktarım Excel'ini İndir (.xlsx)",
+                    label="📥 Otomatik Muhasebe Fişini İndir (.xlsx)",
                     data=excel_cikti,
-                    file_name="muhasebe_fis_aktarim.xlsx",
+                    file_name="akilli_muhasebe_fisi.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
