@@ -9,153 +9,168 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 st.set_page_config(
-    page_title="LedgerAI - Akıllı Muhasebe Fiş Motoru", 
-    page_icon="💼", 
+    page_title="LedgerAI", 
+    page_icon="⚡", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- DİL SÖZLÜĞÜ ---
-DIL_SECENEKLERI = {
-    "Türkçe 🇹🇷": {
-        "title": "💼 LedgerAI — Otonom Muhasebe & Fiş Motoru",
-        "subtitle": "Faturaları yükleyin; sistem harcama türünü (153, 770, 740 vb.) algılasın, KDV ayrımını yapsın ve dengeli yevmiye fişini çıkarsın.",
-        "upload_label": "Fatura veya Fiş Yükleyin (PDF, PNG, JPG)",
-        "process_btn": "🚀 Muhasebe Fişini Oluştur",
-        "file_limit_err": "🛑 Ücretsiz demo sürümünde aynı anda en fazla 5 fatura işleyebilirsiniz.",
-        "success_msg": "✓ Tüm fişler başarıyla oluşturuldu ve dengelendi.",
-        "partial_msg": "⚠️ {success} belge işlendi, {failed} belge okunamadı.",
-        "failed_msg": "❌ Belgeler işlenemedi. Lütfen dosya netliğini kontrol edin.",
-        "preview_title": "📊 Muhasebe Yevmiye Fişi (Ekranda Düzenlenebilir)",
-        "preview_tip": "💡 Hücrelere çift tıklayarak kod veya tutarları değiştirebilirsiniz. İndirilen Excel'e doğrudan yansır.",
-        "total_deb": "Toplam Borç",
-        "total_crd": "Toplam Alacak",
-        "balanced": "✅ Fiş Bakiyesi Dengeli (Borç = Alacak)",
+# --- DİL SÖZLÜKLERİ (BAYRAKLI & EKSİKSİZ) ---
+LANG_DATA = {
+    "🇹🇷 Türkçe": {
+        "title": "⚡ LedgerAI",
+        "subtitle": "Otonom Fatura & Fiş Muhasebeleştirme Motoru",
+        "upload_label": "Fatura veya fişleri yükleyin (PDF, PNG, JPG)",
+        "process_btn": "⚡ Muhasebe Fişini Oluştur",
+        "limit_err": "🛑 Demo sürümünde aynı anda en fazla 5 fatura işleyebilirsiniz.",
+        "ready_count": "İşlenecek belge sayısı: **{count}**",
+        "success": "✓ Fişler başarıyla oluşturuldu ve Borç/Alacak dengelendi.",
+        "partial": "⚠️ {success} belge işlendi, {failed} belge okunamadı.",
+        "failed": "❌ Belgeler işlenemedi. Lütfen görsel netliğini kontrol edin.",
+        "preview_title": "📊 Muhasebe Yevmiye Fişi (Düzenlenebilir)",
+        "preview_tip": "💡 Kod veya tutarları değiştirmek için hücreye çift tıklayın. İndirilen Excel'e anında yansır.",
+        "tot_deb": "Toplam Borç",
+        "tot_crd": "Toplam Alacak",
+        "balanced": "✅ Fiş Dengeli (Borç = Alacak)",
         "unbalanced": "⚠️ Bakiye Farkı Var!",
         "download_btn": "📥 Kurumsal Excel'i İndir (.xlsx)",
-        "settings_title": "⚙️ Muhasebe & Görünüm Ayarları",
-        "bg_toggle": "🖼️ Arka Plan Görselini Aç",
-        "exp_header": "Hesap Grubu Tercihi (Borç)",
-        "vat_header": "KDV Hesabı Tercihi",
-        "ap_header": "Cari Hesap (320) Formatı",
-        "ap_opt_vkn": "Vergi Numarası Bazlı (Örn: 320.1234567890)",
-        "ap_opt_name": "Firma Adı Bazlı (Örn: 320.SHELL)",
-        "ap_opt_std": "Standart Sıralı (Örn: 320.01.001)",
-        "custom_plan_title": "📁 Özel Hesap Planı Yükle (Opsiyonel)"
+        "theme_header": "🎨 Arayüz Görünümü",
+        "theme_label": "Arka Plan Stili",
+        "opt_image": "🖼️ Finans Görseli",
+        "opt_anim": "✨ Akıcı Animasyon",
+        "opt_dark": "🌑 Minimal Koyu (Sade)"
     },
-    "English 🇺🇸": {
-        "title": "💼 LedgerAI — Autonomous Accounting Engine",
-        "subtitle": "Upload invoices/receipts; AI auto-detects accounts (Inventory, OpEx, Assets), handles VAT/Tax, and balances journal vouchers.",
-        "upload_label": "Upload Invoices or Receipts (PDF, PNG, JPG)",
-        "process_btn": "🚀 Generate Journal Voucher",
-        "file_limit_err": "🛑 Demo allows up to 5 documents per batch.",
-        "success_msg": "✓ All journal vouchers successfully generated and balanced.",
-        "partial_msg": "⚠️ {success} processed, {failed} failed.",
-        "failed_msg": "❌ Files could not be parsed.",
+    "🇺🇸 English": {
+        "title": "⚡ LedgerAI",
+        "subtitle": "Autonomous Invoice & Receipt Accounting Engine",
+        "upload_label": "Upload receipts or invoices (PDF, PNG, JPG)",
+        "process_btn": "⚡ Generate Journal Voucher",
+        "limit_err": "🛑 Demo allows up to 5 documents per batch.",
+        "ready_count": "Documents ready: **{count}**",
+        "success": "✓ Journal vouchers generated and balanced.",
+        "partial": "⚠️ {success} processed, {failed} failed.",
+        "failed": "❌ Documents could not be parsed.",
         "preview_title": "📊 Journal Voucher Table (Editable)",
-        "preview_tip": "💡 Double-click any cell to edit accounts or amounts directly.",
-        "total_deb": "Total Debit",
-        "total_crd": "Total Credit",
-        "balanced": "✅ Voucher Balanced (Debit = Credit)",
+        "preview_tip": "💡 Double-click any cell to edit accounts or values directly.",
+        "tot_deb": "Total Debit",
+        "tot_crd": "Total Credit",
+        "balanced": "✅ Balanced (Debit = Credit)",
         "unbalanced": "⚠️ Unbalanced Voucher!",
-        "download_btn": "📥 Download Formatted Excel (.xlsx)",
-        "settings_title": "⚙️ Accounting & Theme Settings",
-        "bg_toggle": "🖼️ Enable Background Wallpaper",
-        "exp_header": "Primary Account Class (Debit)",
-        "vat_header": "Tax / VAT Account",
-        "ap_header": "Accounts Payable (AP) Format",
-        "ap_opt_vkn": "Tax ID Based (e.g. AP-TAXID)",
-        "ap_opt_name": "Vendor Name Based (e.g. AP-AMAZON)",
-        "ap_opt_std": "Standard Sequential (e.g. 2000-01)",
-        "custom_plan_title": "📁 Custom Chart of Accounts (Optional)"
+        "download_btn": "📥 Download Clean Excel (.xlsx)",
+        "theme_header": "🎨 Interface Appearance",
+        "theme_label": "Background Mode",
+        "opt_image": "🖼️ Finance Image",
+        "opt_anim": "✨ Fluid Animation",
+        "opt_dark": "🌑 Minimal Dark (Clean)"
+    },
+    "🇩🇪 Deutsch": {
+        "title": "⚡ LedgerAI",
+        "subtitle": "Autonome Buchhaltungs- und Beleg-Engine",
+        "upload_label": "Belege oder Rechnungen hochladen (PDF, PNG, JPG)",
+        "process_btn": "⚡ Buchungssatz Generieren",
+        "limit_err": "🛑 Demo-Limit: Maximal 5 Dokumente.",
+        "ready_count": "Bereit: **{count}** Dokumente",
+        "success": "✓ Buchungen erfolgreich erstellt und ausgeglichen.",
+        "partial": "⚠️ {success} verarbeitet, {failed} fehlgeschlagen.",
+        "failed": "❌ Dokumente konnten nicht gelesen werden.",
+        "preview_title": "📊 Buchungszeilen (Bearbeitbar)",
+        "preview_tip": "💡 Doppelklicken Sie auf ein Feld, um Konten oder Beträge zu ändern.",
+        "tot_deb": "Soll Gesamt",
+        "tot_crd": "Haben Gesamt",
+        "balanced": "✅ Ausgeglichen (Soll = Haben)",
+        "unbalanced": "⚠️ Differenz festgestellt!",
+        "download_btn": "📥 Excel-Buchungsdatei Herunterladen (.xlsx)",
+        "theme_header": "🎨 Oberflächendesign",
+        "theme_label": "Hintergrundmodus",
+        "opt_image": "🖼️ Finanz-Bild",
+        "opt_anim": "✨ Fluid-Animation",
+        "opt_dark": "🌑 Minimal Dunkel (Schlicht)"
+    },
+    "🇫🇷 Français": {
+        "title": "⚡ LedgerAI",
+        "subtitle": "Moteur Autonome d'Écritures Comptables",
+        "upload_label": "Déposer des factures ou reçus (PDF, PNG, JPG)",
+        "process_btn": "⚡ Générer les Écritures",
+        "limit_err": "🛑 Limite démo: 5 documents maximum.",
+        "ready_count": "Documents prêts: **{count}**",
+        "success": "✓ Écritures générées et équilibrées.",
+        "partial": "⚠️ {success} traités, {failed} échoués.",
+        "failed": "❌ Impossible de lire les documents.",
+        "preview_title": "📊 Journal Comptable (Modifiable)",
+        "preview_tip": "💡 Double-cliquez sur une cellule pour modifier les comptes ou montants.",
+        "tot_deb": "Total Débit",
+        "tot_crd": "Total Crédit",
+        "balanced": "✅ Équilibré (Débit = Crédit)",
+        "unbalanced": "⚠️ Déséquilibre Détecté!",
+        "download_btn": "📥 Télécharger le Journal Excel (.xlsx)",
+        "theme_header": "🎨 Apparence",
+        "theme_label": "Mode d'arrière-plan",
+        "opt_image": "🖼️ Image Finance",
+        "opt_anim": "✨ Animation Fluide",
+        "opt_dark": "🌑 Sombre Épuré (Simple)"
     }
 }
 
-# --- YAN PANEL YAPILANDIRMASI ---
+# --- YAN PANEL: DİL VE ARKA PLAN YÖNETİMİ ---
 with st.sidebar:
     st.markdown("### 🌐 Dil / Language")
-    secilen_dil = st.selectbox("", list(DIL_SECENEKLERI.keys()), label_visibility="collapsed")
-    L = DIL_SECENEKLERI[secilen_dil]
+    secilen_dil = st.selectbox("", list(LANG_DATA.keys()), label_visibility="collapsed")
+    T = LANG_DATA[secilen_dil]
     
     st.markdown("---")
-    st.markdown(f"### {L['settings_title']}")
-    
-    # Arka plan görseli aç/kapa ayarı
-    arka_plan_aktif = st.toggle(L["bg_toggle"], value=True)
-    
-    st.markdown("---")
-    # Hesap Seçimleri (Anlaşılır ve Butonlu)
-    st.markdown(f"**{L['exp_header']}**")
-    ana_hesap_tercihi = st.selectbox(
-        "",
-        [
-            "⚡ Otomatik (Yapay Zeka Karar Versin)",
-            "153 - Ticari Mallar (Alış)",
-            "770 - Genel Yönetim Giderleri",
-            "740 - Hizmet Üretim Maliyeti",
-            "760 - Pazarlama Satış Dağıtım",
-            "255 - Demirbaşlar (Sabit Kıymet)",
-            "730 - Genel Üretim Gideri"
-        ],
-        label_visibility="collapsed"
-    )
-    
-    st.markdown(f"**{L['vat_header']}**")
-    kdv_hesap_tercihi = st.radio(
-        "",
-        ["191 - İndirilecek KDV (Alışlar için)", "391 - Hesaplanan KDV (Satışlar için)"],
-        label_visibility="collapsed"
-    )
-    
-    st.markdown(f"**{L['ap_header']}**")
-    cari_format = st.radio(
-        "",
-        [L["ap_opt_vkn"], L["ap_opt_name"], L["ap_opt_std"]],
+    st.markdown(f"### {T['theme_header']}")
+    arka_plan_modu = st.radio(
+        T["theme_label"],
+        [T["opt_image"], T["opt_anim"], T["opt_dark"]],
         label_visibility="collapsed"
     )
 
-    with st.expander(L["custom_plan_title"]):
-        hesap_plani = st.file_uploader("Excel/CSV", type=["xlsx", "xls", "csv"], label_visibility="collapsed")
-        hesap_ozeti = ""
-        if hesap_plani:
-            try:
-                df_p = pd.read_csv(hesap_plani) if hesap_plani.name.endswith(".csv") else pd.read_excel(hesap_plani)
-                c = df_p.columns[:2]
-                hesap_ozeti = json.dumps(df_p[c].dropna().head(100).to_dict(orient="records"), ensure_ascii=False)
-                st.success(f"✓ {len(df_p)} hesap listelendi")
-            except:
-                pass
-
-# --- GÖRSEL TEMA VE CSS YÖNETİMİ ---
-bg_css = """
-    .stApp {
-        background: linear-gradient(rgba(10, 15, 29, 0.88), rgba(10, 15, 29, 0.88)), 
-                    url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-    }
-""" if arka_plan_aktif else """
-    .stApp {
-        background-color: #0B1120;
-    }
-"""
+# --- CSS VE TEMA ENJEKSİYONU ---
+if arka_plan_modu == T["opt_image"]:
+    bg_style = """
+        .stApp {
+            background: linear-gradient(rgba(11, 15, 25, 0.88), rgba(11, 15, 25, 0.88)), 
+                        url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    """
+elif arka_plan_modu == T["opt_anim"]:
+    bg_style = """
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .stApp {
+            background: linear-gradient(-45deg, #090D16, #0F172A, #1E1B4B, #090D16);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+    """
+else:
+    bg_style = """
+        .stApp {
+            background-color: #090D16;
+        }
+    """
 
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
-    {bg_css}
-    .stApp {{ color: #F8FAFC; }}
+    {bg_style}
+    .stApp {{ color: #F1F5F9; }}
     div[data-testid="stFileUploader"] {{
-        background: rgba(15, 23, 42, 0.75);
+        background: rgba(15, 23, 42, 0.7);
         border: 2px dashed #3B82F6;
         border-radius: 12px;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(10px);
         padding: 24px;
     }}
     .stMetric {{
-        background: rgba(15, 23, 42, 0.85);
+        background: rgba(15, 23, 42, 0.8);
         border: 1px solid #334155;
         border-radius: 10px;
         padding: 12px 18px;
@@ -171,10 +186,10 @@ client = genai.Client(api_key=API_KEY)
 def excel_olustur(df):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Fis_Aktarim')
-        ws = writer.sheets['Fis_Aktarim']
+        df.to_excel(writer, index=False, sheet_name='Journal')
+        ws = writer.sheets['Journal']
 
-        header_fill = PatternFill(start_color="1E3A8A", end_color="1E3A8A", fill_type="solid")
+        header_fill = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
         header_font = Font(name="Calibri", size=10, bold=True, color="FFFFFF")
         body_font = Font(name="Calibri", size=10)
         border = Border(
@@ -203,76 +218,62 @@ def excel_olustur(df):
     return output.getvalue()
 
 # --- ANA EKRAN ---
-st.title(L["title"])
-st.markdown(L["subtitle"])
+st.title(T["title"])
+st.caption(T["subtitle"])
 
 yuklenen_dosyalar = st.file_uploader(
-    L["upload_label"], 
+    T["upload_label"], 
     type=["pdf", "png", "jpg", "jpeg"], 
     accept_multiple_files=True
 )
 
 if yuklenen_dosyalar:
     if len(yuklenen_dosyalar) > 5:
-        st.error(L["file_limit_err"])
+        st.error(T["limit_err"])
     else:
-        st.write(f"📁 **{len(yuklenen_dosyalar)}** adet belge yüklendi.")
+        st.write(T["ready_count"].format(count=len(yuklenen_dosyalar)))
         
-        if st.button(L["process_btn"], type="primary", use_container_width=True):
+        if st.button(T["process_btn"], type="primary", use_container_width=True):
             ham_veriler = []
             progress_bar = st.progress(0)
             status_text = st.empty()
             toplam_dosya = len(yuklenen_dosyalar)
             
-            # KDV Tercihi
-            kdv_koku = "191" if "191" in kdv_hesap_tercihi else "391"
-            
-            # Hesap Talimatı
-            if "153" in ana_hesap_tercihi:
-                hesap_talimati = "Kullanıcı tercihi gereği gider/mal hesabını kesinlikle '153.01 Ticari Mallar' olarak ata."
-            elif "770" in ana_hesap_tercihi:
-                hesap_talimati = "Kullanıcı tercihi gereği gider hesabını kesinlikle '770.01 Genel Yönetim Giderleri' olarak ata."
-            elif "740" in ana_hesap_tercihi:
-                hesap_talimati = "Kullanıcı tercihi gereği gider hesabını kesinlikle '740.01 Hizmet Üretim Maliyeti' olarak ata."
-            elif "760" in ana_hesap_tercihi:
-                hesap_talimati = "Kullanıcı tercihi gereği gider hesabını kesinlikle '760.01 Pazarlama Satış Dağıtım' olarak ata."
-            elif "255" in ana_hesap_tercihi:
-                hesap_talimati = "Kullanıcı tercihi gereği alımı kesinlikle '255.01 Demirbaşlar' hesabına ata."
-            else:
-                hesap_talimati = """
-                Belgedeki ürünleri inceleyip Tek Düzen Hesap Planına göre mantıklı ata:
-                - Satılacak ticari mal ise: 153.01
-                - Akaryakıt, yemek, kırtasiye, genel ofis masrafı ise: 770 grubu (örn: 770.01, 770.02)
-                - Bilgisayar, telefon, masa gibi demirbaş ise: 255.01
-                - Nakliye, kargo ise: 770.04
-                """
-
-            if hesap_ozeti:
-                hesap_talimati += f"\nÖNCELİK: Firmanın şu özel hesap planından uygun olanı seç: {hesap_ozeti}"
-
             for index, dosya in enumerate(yuklenen_dosyalar):
                 status_text.text(f"İşleniyor ({index + 1}/{toplam_dosya}): {dosya.name}...")
                 dosya_baytlari = dosya.read()
                 mime_tipi = dosya.type if dosya.type else "application/pdf"
                 
-                prompt = f"""
-                Sen uzman bir mali müşavirsin. Faturayı dikkatle oku.
-                {hesap_talimati}
+                prompt = """
+                Sen otonom bir muhasebe denetçisisin. Belgeyi incele:
+                1. Belge ülkesini/dilini tespit et (TR, DE, FR, US).
+                2. Harcama türüne göre uygun hesap kodunu Tek Düzen / Standart Hesap Planına göre otomatik belirle:
+                   - Ticari mal alımı ise: 153.01
+                   - Akaryakıt: 770.01
+                   - Yemek / Ağırlama: 770.02
+                   - Kırtasiye / Ofis: 770.03
+                   - Kargo / Nakliye: 770.04
+                   - Demirbaş / Cihaz: 255.01
+                   - Genel Masraf: 770.99
+                3. KDV oranını ve tutarını doğru ayıkla.
+                4. Satıcı için cari kod türet (Varsayılan: 320.VKN veya 320.AD).
 
-                SADECE şu JSON şablonunu döndür:
-                {{
-                  "fatura_no": "...",
-                  "tarih": "YYYY-MM-DD",
-                  "satici": "...",
-                  "vkn": "...",
-                  "hesap_kodu": "...",
-                  "hesap_adi": "...",
-                  "matrah": 0.0,
-                  "kdv_orani": 20,
-                  "kdv_tutari": 0.0,
-                  "toplam": 0.0
-                }}
-                Tutar alanlarını sayısal (float) döndür. Markdown etiketi kullanma, doğrudan saf JSON dön.
+                SADECE şu saf JSON objesini döndür:
+                {
+                  "doc_country": "TR",
+                  "currency": "TL",
+                  "invoice_no": "...",
+                  "date": "YYYY-MM-DD",
+                  "vendor": "...",
+                  "tax_id": "...",
+                  "account_code": "...",
+                  "account_name": "...",
+                  "net": 0.0,
+                  "tax_rate": 20,
+                  "tax": 0.0,
+                  "total": 0.0
+                }
+                Sayısal alanları float dön. Markdown etiketi kullanma.
                 """
                 
                 maksimum_deneme = 3
@@ -288,82 +289,90 @@ if yuklenen_dosyalar:
                         ham_veriler.append(veri)
                         break
                     except Exception as e:
-                        hata_metni = str(e)
-                        if ("503" in hata_metni or "429" in hata_metni) and deneme < maksimum_deneme - 1:
+                        hata_msg = str(e)
+                        if ("503" in hata_msg or "429" in hata_msg) and deneme < maksimum_deneme - 1:
                             time.sleep(3 * (deneme + 1))
                             continue
                         else:
-                            st.warning(f"⚠️ {dosya.name}: {hata_metni[:80]}")
+                            st.warning(f"⚠️ {dosya.name}: {hata_msg[:70]}")
                             break
                 
                 progress_bar.progress((index + 1) / toplam_dosya)
             
-            # Durum mesajı
+            # Sonuç Mesajı
             if len(ham_veriler) == toplam_dosya:
-                status_text.success(L["success_msg"])
+                status_text.success(T["success"])
             elif len(ham_veriler) > 0:
-                status_text.warning(L["partial_msg"].format(success=len(ham_veriler), failed=toplam_dosya - len(ham_veriler)))
+                status_text.warning(T["partial"].format(success=len(ham_veriler), failed=toplam_dosya - len(ham_veriler)))
             else:
-                status_text.error(L["failed_msg"])
+                status_text.error(T["failed"])
 
             if ham_veriler:
                 fis_satirlari = []
                 fis_no = 1
                 
                 for item in ham_veriler:
-                    f_no = str(item.get("fatura_no") or "").strip()
-                    tarih = str(item.get("tarih") or "").strip()
-                    satici = str(item.get("satici") or "Satıcı").strip()
-                    vkn = str(item.get("vkn") or "").strip()
-                    gider_kodu = str(item.get("hesap_kodu") or "770.01").strip()
-                    hesap_adi = str(item.get("hesap_adi") or "Gider Hesabı").strip()
+                    doc_c = item.get("doc_country", "TR")
+                    curr = item.get("currency", "TL")
+                    inv_no = str(item.get("invoice_no") or "").strip()
+                    date_val = str(item.get("date") or "").strip()
+                    vendor = str(item.get("vendor") or "Satıcı").strip()
+                    tax_id = str(item.get("tax_id") or "").strip()
+                    acc_code = str(item.get("account_code") or "770.01").strip()
+                    acc_name = str(item.get("account_name") or "Gider Hesabı").strip()
                     
-                    matrah = float(item.get("matrah") or 0.0)
-                    kdv = float(item.get("kdv_tutari") or 0.0)
-                    toplam = float(item.get("toplam") or (matrah + kdv))
-                    kdv_orani = item.get("kdv_orani") or 20
+                    net = float(item.get("net") or 0.0)
+                    tax = float(item.get("tax") or 0.0)
+                    total = float(item.get("total") or (net + tax))
+                    tax_rate = item.get("tax_rate") or 20
                     
-                    temiz_ad = "".join(c for c in satici[:10] if c.isalnum()).upper() or "SATICI"
-                    
-                    # Cari Kod Belirleme
-                    if L["ap_opt_vkn"] in cari_format and vkn:
-                        cari_kodu = f"320.{vkn}"
-                    elif L["ap_opt_name"] in cari_format:
-                        cari_kodu = f"320.{temiz_ad}"
+                    clean_name = "".join(c for c in vendor[:10] if c.isalnum()).upper() or "SATICI"
+                    cari_kod = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
+                    kdv_kod = f"191.{int(tax_rate):02d}"
+
+                    # Başlıklar
+                    if "Türkçe" in secilen_dil:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Fiş No", "Tarih", "Hesap Kodu", "Hesap Adı", "Açıklama", "Borç", "Alacak"
+                        kdv_adi = f"%{tax_rate} İndirilecek KDV"
+                    elif "Deutsch" in secilen_dil:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Beleg", "Datum", "Konto", "Bezeichnung", "Text", "Soll", "Haben"
+                        kdv_adi = f"Vorsteuer {tax_rate}%"
+                    elif "Français" in secilen_dil:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Pièce", "Date", "Compte", "Libellé", "Détail", "Débit", "Crédit"
+                        kdv_adi = f"TVA {tax_rate}%"
                     else:
-                        cari_kodu = "320.01.001"
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Voucher #", "Date", "Account Code", "Account Name", "Memo", "Debit", "Credit"
+                        kdv_adi = f"Tax ({tax_rate}%)"
 
                     # 1. Gider/Mal Satırı (Borç)
                     fis_satirlari.append({
-                        "Fiş No": fis_no, "Tarih": tarih, "Hesap Kodu": gider_kodu,
-                        "Hesap Adı": hesap_adi, "Açıklama": f"{satici} - {f_no}",
-                        "Borç": matrah, "Alacak": 0.0
+                        h_v: fis_no, h_d: date_val, h_c: acc_code, h_n: acc_name,
+                        h_m: f"{vendor} - {inv_no}", "Para Birimi": curr, h_deb: net, h_crd: 0.0
                     })
                     
                     # 2. KDV Satırı (Borç)
-                    if kdv > 0:
-                        kdv_kod_tam = f"{kdv_koku}.{int(kdv_orani):02d}"
+                    if tax > 0:
                         fis_satirlari.append({
-                            "Fiş No": fis_no, "Tarih": tarih, "Hesap Kodu": kdv_kod_tam,
-                            "Hesap Adı": f"%{kdv_orani} KDV", "Açıklama": f"{satici} - KDV",
-                            "Borç": kdv, "Alacak": 0.0
+                            h_v: fis_no, h_d: date_val, h_c: kdv_kod, h_n: kdv_adi,
+                            h_m: f"{vendor} - KDV", "Para Birimi": curr, h_deb: tax, h_crd: 0.0
                         })
                     
                     # 3. Satıcı / Cari Satırı (Alacak)
                     fis_satirlari.append({
-                        "Fiş No": fis_no, "Tarih": tarih, "Hesap Kodu": cari_kodu,
-                        "Hesap Adı": satici, "Açıklama": f"{satici} - {f_no}",
-                        "Borç": 0.0, "Alacak": toplam
+                        h_v: fis_no, h_d: date_val, h_c: cari_kod, h_n: vendor,
+                        h_m: f"{vendor} - {inv_no}", "Para Birimi": curr, h_deb: 0.0, h_crd: total
                     })
                     
                     fis_no += 1
 
                 st.session_state["out_df"] = pd.DataFrame(fis_satirlari)
+                st.session_state["h_deb"] = h_deb
+                st.session_state["h_crd"] = h_crd
 
 if "out_df" in st.session_state:
     st.divider()
-    st.subheader(L["preview_title"])
-    st.info(L["preview_tip"])
+    st.subheader(T["preview_title"])
+    st.info(T["preview_tip"])
     
     guncel_df = st.data_editor(
         st.session_state["out_df"],
@@ -371,20 +380,23 @@ if "out_df" in st.session_state:
         num_rows="dynamic"
     )
     
-    toplam_b = guncel_df["Borç"].sum()
-    toplam_a = guncel_df["Alacak"].sum()
+    deb_key = st.session_state["h_deb"]
+    crd_key = st.session_state["h_crd"]
+    
+    tot_deb = guncel_df[deb_key].sum()
+    tot_crd = guncel_df[crd_key].sum()
     
     col1, col2, col3 = st.columns(3)
-    col1.metric(L["total_deb"], f"₺ {toplam_b:,.2f}")
-    col2.metric(L["total_crd"], f"₺ {toplam_a:,.2f}")
-    if abs(toplam_b - toplam_a) < 0.05:
-        col3.success(L["balanced"])
+    col1.metric(T["tot_deb"], f"{tot_deb:,.2f}")
+    col2.metric(T["tot_crd"], f"{tot_crd:,.2f}")
+    if abs(tot_deb - tot_crd) < 0.05:
+        col3.success(T["balanced"])
     else:
-        col3.warning(L["unbalanced"])
+        col3.warning(T["unbalanced"])
         
     excel_dosya = excel_olustur(guncel_df)
     st.download_button(
-        label=L["download_btn"],
+        label=T["download_btn"],
         data=excel_dosya,
         file_name="muhasebe_yevmiye_fisi.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
