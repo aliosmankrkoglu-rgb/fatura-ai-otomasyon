@@ -1,5 +1,6 @@
 import streamlit as st
 import json
+import time
 import pandas as pd
 from google import genai
 from google.genai import types
@@ -13,7 +14,7 @@ st.set_page_config(
 st.title("💼 FinAuto AI - Sıfır Veri Girişi Fatura Ayrıştırıcı")
 st.markdown("Faturalarınızı ve fişlerinizi yükleyin; yapay zeka saniyeler içinde muhasebe tablosuna dönüştürsün.")
 
-# API İstemcisi (Güvenli Kasadan Çeker)
+# API İstemcisi
 API_KEY = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=API_KEY)
 
@@ -30,10 +31,8 @@ if yuklenen_dosyalar:
     if st.button("🚀 Faturaları Otomatik İşle", type="primary"):
         tum_veriler = []
         
-        # İlerleme çubuğu
         progress_bar = st.progress(0)
         status_text = st.empty()
-        
         toplam_dosya = len(yuklenen_dosyalar)
         
         for index, dosya in enumerate(yuklenen_dosyalar):
@@ -44,18 +43,7 @@ if yuklenen_dosyalar:
             
             prompt = """
             Sen uzman bir muhasebe ve finansal veri ayrıştırma uzmanısın. 
-            Görseldeki belgeyi (fatura, perakende satış fişi, makbuz veya dekont olabilir) dikkatle incele.
-
-            Aşağıdaki kurallara göre bilgileri çıkar ve SADECE saf bir JSON objesi döndür:
-            1. "Fatura No": Belgede geçen Fatura No, Fiş No, Belge No veya Belge Seri/Sıra numarasını yaz. Bulamazsan onay kodunu yaz.
-            2. "Tarih": Gün-Ay-Yıl formatında işlem tarihini yaz.
-            3. "Satıcı": Faturayı kesen işletmenin, dükkanın veya şirketin adını yaz (en üstteki başlık).
-            4. "Alıcı": Belge kime kesilmişse yaz. Perakende fiş ise "Nihai Tüketici" yaz.
-            5. "Para Birimi": TRY, USD, EUR vb. para birimini belirt.
-            6. "KDV": Belgedeki toplam KDV tutarını yaz (örn: 130.00). Bulamazsan 0 yaz.
-            7. "Toplam Tutar": Ödenen nihai genel toplam tutarı yaz (örn: 780.00).
-
-            JSON Şablonu:
+            Görseldeki belgeyi incele. Aşağıdaki alanları çıkarıp SADECE saf bir JSON objesi döndür:
             {
               "Dosya Adı": "...",
               "Fatura No": "...",
@@ -66,36 +54,53 @@ if yuklenen_dosyalar:
               "KDV": "...",
               "Toplam Tutar": "..."
             }
-            Asla markdown (```json) veya fazladan açıklama yazma.
+            Markdown etiketi kullanma, doğrudan saf JSON döndür.
             """
             
-            try:
-                yanit = client.models.generate_content(
-                    model="gemini-3.8-flash",
-                    contents=[
-                        types.Part.from_bytes(
-                            data=dosya_baytlari,
-                            mime_type=mime_tipi
-                        ),
-                        prompt
-                    ]
-                )
-                
-                temiz_metin = yanit.text.replace("```json", "").replace("```", "").strip()
-                veri = json.loads(temiz_metin)
-                veri["Dosya Adı"] = dosya.name
-                tum_veriler.append(veri)
-            except Exception as e:
-                st.error(f"{dosya.name} okunurken bir hata oluştu: {e}")
+            # Hataya dayanıklı yeniden deneme döngüsü (Retry)
+            maksimum_deneme = 3
+            basarili = False
             
-            # Çubuğu güncelle
+            for deneme in range(maksimum_deneme):
+                try:
+                    yanit = client.models.generate_content(
+                        model="gemini-3.8-flash",
+                        contents=[
+                            types.Part.from_bytes(
+                                data=dosya_baytlari,
+                                mime_type=mime_tipi
+                            ),
+                            prompt
+                        ]
+                    )
+                    
+                    temiz_metin = yanit.text.replace("```json", "").replace("```", "").strip()
+                    veri = json.loads(temiz_metin)
+                    veri["Dosya Adı"] = dosya.name
+                    tum_veriler.append(veri)
+                    basarili = True
+                    break
+                    
+                except Exception as e:
+                    hata_metni = str(e)
+                    # 503 Yoğunluk veya 429 Kota uyarısında bekle ve tekrar dene
+                    if ("503" in hata_metni or "429" in hata_metni) and deneme < maksimum_deneme - 1:
+                        bekleme_suresi = 10 * (deneme + 1)
+                        status_text.text(f"Sunucu yoğunluğu/kota sınırı. {bekleme_suresi} sn bekleniyor...")
+                        time.sleep(bekleme_suresi)
+                        continue
+                    else:
+                        st.error(f"{dosya.name} işlenirken bir sorun oluştu: {hata_metni[:150]}...")
+                        break
+            
             progress_bar.progress((index + 1) / toplam_dosya)
+            # Çoklu yüklemelerde dakikalık kota sınırına takılmamak için kısa bir nefes payı
+            time.sleep(1)
         
-        status_text.text("İşlem başarıyla tamamlandı!")
+        status_text.text("İşlem tamamlandı!")
         
         if tum_veriler:
             df = pd.DataFrame(tum_veriler)
-            
             st.divider()
             st.subheader("📊 Ayrıştırılan Veri Tablosu")
             st.dataframe(df, use_container_width=True)
@@ -107,28 +112,3 @@ if yuklenen_dosyalar:
                 file_name="muhasebe_aktarim_listesi.csv",
                 mime="text/csv"
             )
-            import time
-
-# İstek gönderme kısmını döngüye alıyoruz:
-maksimum_deneme = 3
-yanit = None
-
-for deneme in range(maksimum_deneme):
-    try:
-        yanit = client.models.generate_content(
-            model="gemini-3.8-flash",
-            contents=[
-                types.Part.from_bytes(
-                    data=dosya_baytlari,
-                    mime_type=mime_tipi
-                ),
-                prompt
-            ]
-        )
-        break  # Başarılı olursa döngüden çık
-    except Exception as e:
-        if "503" in str(e) and deneme < maksimum_deneme - 1:
-            time.sleep(2)  # 2 saniye bekle ve tekrar dene
-            continue
-        else:
-            raise e
