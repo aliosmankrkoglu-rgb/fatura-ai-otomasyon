@@ -110,10 +110,13 @@ if yuklenen_dosyalar:
                 """
                 
                 maksimum_deneme = 3
+                modeller = ["gemini-2.5-flash", "gemini-3.8-flash"]
+                
                 for deneme in range(maksimum_deneme):
+                    aktif_model = modeller[deneme % len(modeller)]
                     try:
                         yanit = client.models.generate_content(
-                            model="gemini-3.8-flash",
+                            model=aktif_model,
                             contents=[
                                 types.Part.from_bytes(
                                     data=dosya_baytlari,
@@ -128,6 +131,17 @@ if yuklenen_dosyalar:
                         veri["Dosya Adı"] = dosya.name
                         tum_veriler.append(veri)
                         break
+                        
+                    except Exception as e:
+                        hata_metni = str(e)
+                        if ("503" in hata_metni or "429" in hata_metni) and deneme < maksimum_deneme - 1:
+                            bekleme = 2 * (deneme + 1)
+                            status_text.text(f"Hızlı yeniden deneme yapılıyor ({bekleme} sn)...")
+                            time.sleep(bekleme)
+                            continue
+                        else:
+                            st.error(f"{dosya.name} işlenemedi: {hata_metni[:120]}")
+                            break
                         
                     except Exception as e:
                         hata_metni = str(e)
