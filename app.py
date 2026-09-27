@@ -107,3 +107,28 @@ if yuklenen_dosyalar:
                 file_name="muhasebe_aktarim_listesi.csv",
                 mime="text/csv"
             )
+            import time
+
+# İstek gönderme kısmını döngüye alıyoruz:
+maksimum_deneme = 3
+yanit = None
+
+for deneme in range(maksimum_deneme):
+    try:
+        yanit = client.models.generate_content(
+            model="gemini-3.8-flash",
+            contents=[
+                types.Part.from_bytes(
+                    data=dosya_baytlari,
+                    mime_type=mime_tipi
+                ),
+                prompt
+            ]
+        )
+        break  # Başarılı olursa döngüden çık
+    except Exception as e:
+        if "503" in str(e) and deneme < maksimum_deneme - 1:
+            time.sleep(2)  # 2 saniye bekle ve tekrar dene
+            continue
+        else:
+            raise e
