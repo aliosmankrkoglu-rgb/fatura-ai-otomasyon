@@ -301,27 +301,42 @@ if yuklenen_dosyalar:
                 fis_sira_no = 1
                 
                 for item in ham_veriler:
-                    fatura_no = item.get("invoice_no", "")
-                    tarih = item.get("date", "")
-                    satici = item.get("vendor", "")
-                    vkn = str(item.get("tax_id", "")).strip()
-                    gider_kodu = item.get("account_code", "6000" if is_global else "770.01")
-                    hesap_adi = item.get("account_name", "Operating Expense" if is_global else "Genel Gider")
-                    para_birimi = item.get("currency", "USD" if is_global else "TL")
+                    fatura_no = str(item.get("invoice_no") or "").strip()
+                    tarih = str(item.get("date") or "").strip()
+                    satici = str(item.get("vendor") or "Bilinmeyen Satıcı").strip()
+                    vkn = str(item.get("tax_id") or "").strip()
+                    gider_kodu = str(item.get("account_code") or ("6000" if is_global else "770.01")).strip()
+                    hesap_adi = str(item.get("account_name") or ("Operating Expense" if is_global else "Genel Gider")).strip()
+                    para_birimi = str(item.get("currency") or ("USD" if is_global else "TL")).strip()
                     
-                    net = float(item.get("net_amount", 0.0) or 0.0)
-                    tax = float(item.get("tax_amount", 0.0) or 0.0)
-                    total = float(item.get("total_amount", 0.0) or (net + tax))
-                    tax_rate = item.get("tax_rate", 0)
+                    try:
+                        net = float(item.get("net_amount") or 0.0)
+                    except (ValueError, TypeError):
+                        net = 0.0
+
+                    try:
+                        tax = float(item.get("tax_amount") or 0.0)
+                    except (ValueError, TypeError):
+                        tax = 0.0
+
+                    try:
+                        total = float(item.get("total_amount") or (net + tax))
+                    except (ValueError, TypeError):
+                        total = net + tax
+
+                    tax_rate = item.get("tax_rate") or 0
+
+                    # Güvenli Temiz İsim Çıkarımı
+                    temiz_ad = "".join(c for c in satici[:12] if c.isalnum()).upper()
+                    if not temiz_ad:
+                        temiz_ad = "VENDOR"
 
                     # Cari Kod Belirleme Mantığı
                     if secilen_kural == T["rule_custom"] and ozel_sablon:
-                        temiz_ad = "".join(c for c in satici[:12] if c.isalnum()).upper()
                         cari_kod = ozel_sablon.replace("{NAME}", temiz_ad).replace("{AD}", temiz_ad).replace("{ID}", vkn).replace("{VKN}", vkn)
                     elif secilen_kural == T["rule_auto_tax"] and vkn:
                         cari_kod = f"2000-{vkn}" if is_global else f"320.{vkn}"
                     elif secilen_kural == T["rule_auto_name"] and satici:
-                        temiz_ad = "".join(c for c in satici[:10] if c.isalnum()).upper()
                         cari_kod = f"VEND-{temiz_ad}" if is_global else f"320.{temiz_ad}"
                     else:
                         cari_kod = "2000-01" if is_global else "320.01.001"
