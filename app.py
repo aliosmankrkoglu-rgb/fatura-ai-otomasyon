@@ -123,13 +123,12 @@ LANG_DATA = {
     }
 }
 
-# --- DURUM YÖNETİMİ ---
-if "user_lang" not in st.session_state:
-    st.session_state["user_lang"] = "🇹🇷 TR"
+# --- DURUM YÖNETİMİ (GÜVENLİ VE HATASIZ) ---
+if "user_lang" not in st.session_state or st.session_state["user_lang"] not in LANG_DATA:
+    st.session_state["user_lang"] = list(LANG_DATA.keys())[0]
+
 if "industry_choice" not in st.session_state:
     st.session_state["industry_choice"] = 0
-if "theme_mode" not in st.session_state:
-    st.session_state["theme_mode"] = "aurora"
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
@@ -509,10 +508,12 @@ st.markdown("<div class='dock-wrapper'><div class='dock-box'>", unsafe_allow_htm
 col_d1, col_d2, col_d3 = st.columns([1.5, 3.5, 1.5])
 
 with col_d1:
+    dil_listesi = list(LANG_DATA.keys())
+    mevcut_idx = dil_listesi.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in dil_listesi else 0
     yeni_dil = st.selectbox(
         "", 
-        list(LANG_DATA.keys()), 
-        index=list(LANG_DATA.keys()).index(st.session_state["user_lang"]),
+        dil_listesi, 
+        index=mevcut_idx,
         label_visibility="collapsed"
     )
     if yeni_dil != st.session_state["user_lang"]:
