@@ -9,256 +9,350 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 st.set_page_config(
-    page_title="LedgerAI — Autonomous Accounting", 
+    page_title="LedgerAI — Institutional Autonomous Accounting", 
     page_icon="⚡", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- ÇOK DİLLİ GLOBAL SÖZLÜK ---
+# --- 6 DİLLİ VE KUSURSUZ ÇEVİRİ MERKEZİ ---
 LANG_DATA = {
     "🇹🇷 TR": {
-        "badge": "OTONOM MUHASEBE MOTORU",
+        "badge": "INSTITUTIONAL AI ENGINE",
         "title": "LedgerAI",
-        "subtitle": "Belgeleri yükleyin; firma yapınıza ve ülkenize göre otomatik kodlanmış yevmiye fişini alın.",
-        "upload_label": "Fatura veya fişleri sürükleyin ya da seçin (PDF, PNG, JPG)",
-        "process_btn": "⚡ Fişi Oluştur",
-        "limit_err": "🛑 Demo sürümünde en fazla 5 fatura işlenebilir.",
-        "ready_count": "İşlenecek belge: **{count}**",
-        "success": "✓ Fişler başarıyla oluşturuldu.",
-        "failed": "❌ Belgeler işlenemedi.",
-        "preview_title": "📊 Yevmiye Fişi (Canlı Düzenlenebilir)",
-        "preview_tip": "💡 Hücrelere çift tıklayarak kod veya açıklamaları değiştirebilirsiniz.",
+        "subtitle": "Otonom Belge Denetimi • Sektörel Kodlama • ERP Yevmiye Fişi",
+        "upload_label": "Faturaları buraya sürükleyin (PDF, PNG, JPG)",
+        "upload_hint": "Kurumsal ERP aktarımına hazır yevmiye fişleri otomatik üretilir",
+        "process_btn": "⚡ Fişleri Otonom Muhasebeleştir",
+        "limit_err": "🛑 Demo sürümünde oturum başına en fazla 5 belge işlenebilir.",
+        "ready_count": "İşlenecek belge sayısı: **{count}**",
+        "success": "✓ Fişler başarıyla oluşturuldu ve Borç/Alacak dengelendi.",
+        "failed": "❌ Belgeler işlenemedi. Lütfen görsel netliğini kontrol edin.",
+        "preview_title": "📊 Muhasebe Yevmiye Fişi (Canlı Hücre Düzenleme)",
+        "preview_tip": "💡 Hücrelere çift tıklayarak kod veya açıklamaları değiştirebilirsiniz. İndirilen Excel'e anında yansır.",
         "tot_deb": "Toplam Borç",
         "tot_crd": "Toplam Alacak",
         "balanced": "✅ Fiş Dengeli (Borç = Alacak)",
         "unbalanced": "⚠️ Bakiye Farkı Var!",
-        "download_btn": "📥 Excel'i İndir (.xlsx)",
-        "industry_label": "Firma Türü:",
-        "industries": ["⚡ Otomatik (AI)", "🛒 Ticaret / Al-Sat (153 Ağırlıklı)", "🏢 Hizmet & Danışmanlık (770/740)", "🏭 Üretim & İmalat (150/730)"],
-        "about_btn": "ℹ️ Nasıl Çalışır?",
-        "about_title": "LedgerAI Mimarisi",
+        "download_btn": "📥 Kurumsal Excel'i İndir (.xlsx)",
+        "industries": ["⚡ Otomatik Sektör (AI)", "🛒 Ticaret / Al-Sat (153 Ağırlıklı)", "🏢 Hizmet & Ofis (770/740)", "🏭 Üretim & Fabrika (150/730)"],
+        "themes": ["✨ Ultra Aurora Mesh", "🖼️ Finans Görseli", "🌑 Saf Titanyum Koyu"],
+        "about_btn": "ℹ️ Mimari",
+        "about_title": "LedgerAI Kurumsal Mimarisi",
         "about_content": """
-        **LedgerAI**, fatura ve fişleri doğrudan muhasebe programınızın aktarım formatına çevirir.
+        **LedgerAI**, kurumların ön muhasebe ve fiş giriş maliyetlerini sıfıra indiren yeni nesil finans motorudur.
         
-        * **Sektörel Mantık:** Firma türünüze göre ürünleri mal alışı (153), üretim hammaddesi (150) veya masraf (770) olarak dinamik ayırır.
-        * **Çoklu Ülke Uyumu:** Belgenin diline ve para birimine göre (TR Tek Düzen, Almanya Datev, Fransa PCG, ABD GAAP) otonom çalışır.
-        * **Kusursuz Bakiye:** Borç = Alacak eşitliğini kontrol etmeden aktarım vermez.
+        * **Sektörel Zeka:** Faturadaki mal alımını şirketin yapısına göre (Ticarette 153, Üretimde 150, Hizmette 770/740) dinamik eşler.
+        * **Kusursuz Bakiye:** Borç = Alacak matematiksel denetimini kuruşu kuruşuna yapar.
+        * **Doğrudan Entegrasyon:** ETA, Luca, Zirve, Logo, Datev ve QuickBooks sistemlerine hazır Excel üretir.
         """
     },
     "🇺🇸 EN": {
-        "badge": "AUTONOMOUS ACCOUNTING ENGINE",
+        "badge": "INSTITUTIONAL AI ENGINE",
         "title": "LedgerAI",
-        "subtitle": "Upload documents; get balanced ERP journal vouchers mapped to your business model.",
+        "subtitle": "Autonomous Document Audit • Industry Mapping • Balanced ERP Vouchers",
         "upload_label": "Drag and drop receipts or invoices (PDF, PNG, JPG)",
-        "process_btn": "⚡ Process & Generate",
+        "upload_hint": "Instant generation of balanced, ERP-ready journal vouchers",
+        "process_btn": "⚡ Generate Balanced Vouchers",
         "limit_err": "🛑 Demo allows up to 5 documents per batch.",
-        "ready_count": "Documents: **{count}**",
-        "success": "✓ Journal vouchers generated successfully.",
-        "failed": "❌ Documents could not be parsed.",
-        "preview_title": "📊 Journal Voucher (Live Editable)",
-        "preview_tip": "💡 Double-click any cell to adjust accounts or amounts directly.",
+        "ready_count": "Ready to audit: **{count}**",
+        "success": "✓ Journal vouchers generated and balanced.",
+        "failed": "❌ Documents could not be processed.",
+        "preview_title": "📊 Journal Voucher Grid (Live Editable)",
+        "preview_tip": "💡 Double-click any cell to adjust accounts or descriptions before export.",
         "tot_deb": "Total Debit",
         "tot_crd": "Total Credit",
         "balanced": "✅ Balanced (Debit = Credit)",
         "unbalanced": "⚠️ Unbalanced Voucher!",
-        "download_btn": "📥 Download Excel (.xlsx)",
-        "industry_label": "Industry:",
-        "industries": ["⚡ Auto (AI)", "🛒 Retail / Wholesale (Inventory)", "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"],
-        "about_btn": "ℹ️ How it Works?",
-        "about_title": "LedgerAI Architecture",
+        "download_btn": "📥 Download Clean Excel (.xlsx)",
+        "industries": ["⚡ Auto Industry (AI)", "🛒 Retail / Inventory (1200)", "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"],
+        "themes": ["✨ Ultra Aurora Mesh", "🖼️ Finance Image", "🌑 Pure Titanium Dark"],
+        "about_btn": "ℹ️ Architecture",
+        "about_title": "LedgerAI Core Engine",
         "about_content": """
-        **LedgerAI** transforms incoming receipts directly into balanced journal vouchers.
+        **LedgerAI** eliminates manual bookkeeping for modern enterprises.
         
-        * **Business Context:** Differentiates inventory from operational expenses based on your business type.
-        * **Multi-GAAP:** Supports US GAAP, German Datev (SKR03/04), French PCG, and Turkish standards.
-        * **Zero Discrepancy:** Verifies Total Debit = Total Credit before generating export.
+        * **Contextual Mapping:** Distinguishes inventory from operating expenses based on entity profile.
+        * **Dual Verification:** Guarantees Debit = Credit parity before release.
+        * **Global Formats:** Direct compatibility with QuickBooks, Xero, NetSuite, SAP, and Datev.
         """
     },
     "🇩🇪 DE": {
-        "badge": "AUTONOME BUCHHALTUNGS-ENGINE",
+        "badge": "INSTITUTIONELLE KI-ENGINE",
         "title": "LedgerAI",
-        "subtitle": "Belege automatisch erfassen und Datev-konform kontieren.",
-        "upload_label": "Belege oder Rechnungen hier ablegen (PDF, PNG, JPG)",
-        "process_btn": "⚡ Buchungssatz Generieren",
+        "subtitle": "Autonome Belegerfassung • Branchenspezifische Kontierung • Datev Export",
+        "upload_label": "Belege oder Rechnungen ablegen (PDF, PNG, JPG)",
+        "upload_hint": "Datev- und ERP-konforme Buchungssätze in Echtzeit",
+        "process_btn": "⚡ Buchungssätze Erstellen",
         "limit_err": "🛑 Maximal 5 Dokumente im Demo-Modus.",
         "ready_count": "Bereit: **{count}**",
         "success": "✓ Buchungen erfolgreich erstellt.",
-        "failed": "❌ Belege konnten nicht gelesen werden.",
-        "preview_title": "📊 Buchungszeilen (Bearbeitbar)",
-        "preview_tip": "💡 Doppelklick auf Zellen zum Bearbeiten.",
+        "failed": "❌ Dokumente konnten nicht verarbeitet werden.",
+        "preview_title": "📊 Buchungszeilen (Live Bearbeitbar)",
+        "preview_tip": "💡 Doppelklick zum Anpassen von Konten oder Beträgen.",
         "tot_deb": "Soll Gesamt",
         "tot_crd": "Haben Gesamt",
         "balanced": "✅ Ausgeglichen (Soll = Haben)",
         "unbalanced": "⚠️ Differenz festgestellt!",
         "download_btn": "📥 Excel Herunterladen (.xlsx)",
-        "industry_label": "Branche:",
         "industries": ["⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf", "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"],
-        "about_btn": "ℹ️ Info",
+        "themes": ["✨ Ultra Aurora Mesh", "🖼️ Finanz-Bild", "🌑 Reines Titan Dunkel"],
+        "about_btn": "ℹ️ Architektur",
         "about_title": "LedgerAI Architektur",
         "about_content": "Vollautomatische Belegkontierung nach Datev SKR03/04 Richtlinien."
     },
     "🇫🇷 FR": {
-        "badge": "MOTEUR COMPTABLE AUTONOME",
+        "badge": "MOTEUR COMPTABLE INSTITUTIONNEL",
         "title": "LedgerAI",
-        "subtitle": "Écritures comptables générées selon votre secteur d'activité.",
-        "upload_label": "Déposer les factures (PDF, PNG, JPG)",
+        "subtitle": "Audit Documentaire • Imputation Sectorielle • Journal ERP",
+        "upload_label": "Déposer vos pièces comptables (PDF, PNG, JPG)",
+        "upload_hint": "Écritures équilibrées prêtes pour votre logiciel comptable",
         "process_btn": "⚡ Générer les Écritures",
-        "limit_err": "🛑 Limite: 5 documents maximum.",
+        "limit_err": "🛑 Limite: 5 documents par lot.",
         "ready_count": "Prêts: **{count}**",
         "success": "✓ Écritures générées avec succès.",
-        "failed": "❌ Impossible de lire les documents.",
-        "preview_title": "📊 Journal Comptable (Modifiable)",
-        "preview_tip": "💡 Double-cliquez pour modifier une cellule.",
+        "failed": "❌ Échec du traitement.",
+        "preview_title": "📊 Journal Comptable (Édition Directe)",
+        "preview_tip": "💡 Double-cliquez pour ajuster les comptes ou libellés.",
         "tot_deb": "Total Débit",
         "tot_crd": "Total Crédit",
         "balanced": "✅ Équilibré (Débit = Crédit)",
         "unbalanced": "⚠️ Déséquilibre Détecté!",
         "download_btn": "📥 Télécharger Excel (.xlsx)",
-        "industry_label": "Secteur:",
-        "industries": ["⚡ Auto (IA)", "🛒 Négoce / Vente", "🏢 Services / Conseil", "🏭 Production / Industrie"],
-        "about_btn": "ℹ️ Info",
+        "industries": ["⚡ Auto (IA)", "🛒 Négoce / Stock", "🏢 Services / Conseil", "🏭 Production / Industrie"],
+        "themes": ["✨ Ultra Aurora Mesh", "🖼️ Image Finance", "🌑 Titane Pur Sombre"],
+        "about_btn": "ℹ️ Architecture",
         "about_title": "Architecture LedgerAI",
-        "about_content": "Génération d'écritures conforme au Plan Comptable Général (PCG)."
+        "about_content": "Génération conforme au Plan Comptable Général (PCG)."
+    },
+    "🇪🇸 ES": {
+        "badge": "MOTOR CONTABLE INSTITUCIONAL",
+        "title": "LedgerAI",
+        "subtitle": "Auditoría Autónoma • Clasificación Sectorial • Asientos ERP",
+        "upload_label": "Arrastra facturas o recibos aquí (PDF, PNG, JPG)",
+        "upload_hint": "Asientos contables cuadrados listos para importar",
+        "process_btn": "⚡ Generar Asientos",
+        "limit_err": "🛑 Máximo 5 documentos por lote.",
+        "ready_count": "Documentos: **{count}**",
+        "success": "✓ Asientos generados y equilibrados.",
+        "failed": "❌ Error al procesar documentos.",
+        "preview_title": "📊 Libro Diario (Editable)",
+        "preview_tip": "💡 Doble clic en cualquier celda para editar.",
+        "tot_deb": "Total Debe",
+        "tot_crd": "Total Haber",
+        "balanced": "✅ Asiento Cuadrado (Debe = Haber)",
+        "unbalanced": "⚠️ Asiento Descuadrado!",
+        "download_btn": "📥 Descargar Excel (.xlsx)",
+        "industries": ["⚡ Automático (IA)", "🛒 Comercio / Inventario", "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"],
+        "themes": ["✨ Ultra Aurora Mesh", "🖼️ Imagen Finanzas", "🌑 Titanio Puro Oscuro"],
+        "about_btn": "ℹ️ Arquitectura",
+        "about_title": "Arquitectura LedgerAI",
+        "about_content": "Automatización contable con validación estricta Debe = Haber."
+    },
+    "🇮🇹 IT": {
+        "badge": "MOTORE CONTABILE ISTITUZIONALE",
+        "title": "LedgerAI",
+        "subtitle": "Controllo Documenti • Riconciliazione Settoriale • Prima Nota ERP",
+        "upload_label": "Trascina fatture o ricevute qui (PDF, PNG, JPG)",
+        "upload_hint": "Scritture contabili bilanciate pronte per il gestionale",
+        "process_btn": "⚡ Genera Scritture",
+        "limit_err": "🛑 Limite demo: 5 documenti per sessione.",
+        "ready_count": "Documenti pronti: **{count}**",
+        "success": "✓ Scritture generate e bilanciate.",
+        "failed": "❌ Impossibile elaborare i documenti.",
+        "preview_title": "📊 Prima Nota (Modifica Diretta)",
+        "preview_tip": "💡 Fai doppio clic su una cella per modificare.",
+        "tot_deb": "Totale Dare",
+        "tot_crd": "Totale Avere",
+        "balanced": "✅ Quadratura Perfetta (Dare = Avere)",
+        "unbalanced": "⚠️ Sbilancio Rilevato!",
+        "download_btn": "📥 Scarica Excel (.xlsx)",
+        "industries": ["⚡ Automatico (IA)", "🛒 Commercio / Magazzino", "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"],
+        "themes": ["✨ Ultra Aurora Mesh", "🖼️ Immagine Finanza", "🌑 Titanio Puro Scuro"],
+        "about_btn": "ℹ️ Architettura",
+        "about_title": "Architettura LedgerAI",
+        "about_content": "Generazione automatizzata di prima nota con quadratura fiscale."
     }
 }
 
-# --- DURUM YÖNETİMİ (GÜVENLİ VE HATASIZ) ---
+# --- GÜVENLİ DURUM YÖNETİMİ ---
 if "user_lang" not in st.session_state or st.session_state["user_lang"] not in LANG_DATA:
-    st.session_state["user_lang"] = list(LANG_DATA.keys())[0]
-
-if "industry_choice" not in st.session_state:
-    st.session_state["industry_choice"] = 0
+    st.session_state["user_lang"] = "🇹🇷 TR"
+if "theme_idx" not in st.session_state:
+    st.session_state["theme_idx"] = 0
+if "industry_idx" not in st.session_state:
+    st.session_state["industry_idx"] = 0
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
-# --- CSS VE HAFİF SÜZÜLEN IŞILTI DALGALARI ---
-st.markdown("""
+# --- REVOLUT ULTRA x DYNAMIC MESH CSS ---
+if st.session_state["theme_idx"] == 1:
+    # 🖼️ Lüks Metalik Finans Arka Planı
+    bg_css = """
+        .stApp {
+            background: linear-gradient(rgba(7, 10, 19, 0.84), rgba(7, 10, 19, 0.92)), 
+                        url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    """
+elif st.session_state["theme_idx"] == 0:
+    # ✨ Ultra Canlı Aurora Mesh (Revolut Ultra & Linear Havası)
+    bg_css = """
+        @keyframes dynamicMesh {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .stApp {
+            background: radial-gradient(circle at 10% 15%, rgba(99, 102, 241, 0.28), transparent 35%),
+                        radial-gradient(circle at 88% 25%, rgba(6, 182, 212, 0.22), transparent 40%),
+                        radial-gradient(circle at 50% 85%, rgba(139, 92, 246, 0.18), transparent 45%),
+                        linear-gradient(135deg, #05070D, #080D18, #0B1426, #05070D);
+            background-size: 260% 260%;
+            animation: dynamicMesh 22s ease infinite;
+            background-attachment: fixed;
+        }
+    """
+else:
+    # 🌑 Saf Titanyum Minimal Koyu
+    bg_css = """
+        .stApp {
+            background-color: #05070D;
+        }
+    """
+
+st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     
-    html, body, [class*="css"] {
+    html, body, [class*="css"] {{
         font-family: 'Plus Jakarta Sans', sans-serif;
-    }
+    }}
     
-    [data-testid="stSidebar"] { display: none !important; }
+    [data-testid="stSidebar"] {{ display: none !important; }}
     
-    /* Canlı, Derin ve Ultra Lüks Mesh Gradient */
-    @keyframes floatLight {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+    {bg_css}
     
-    .stApp {
-        background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.22), transparent 40%),
-                    radial-gradient(circle at 90% 30%, rgba(6, 182, 212, 0.18), transparent 45%),
-                    radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.15), transparent 50%),
-                    linear-gradient(135deg, #05070E, #090E1A, #0C1527, #05070E);
-        background-size: 250% 250%;
-        animation: floatLight 20s ease infinite;
-        background-attachment: fixed;
+    .stApp {{
         color: #F8FAFC;
-        padding-bottom: 90px;
-    }
+        padding-bottom: 95px;
+    }}
 
-    /* Üst İnce Rozet */
-    .top-badge {
+    /* Lüks Kompakt Hero */
+    .hero-container {{
+        text-align: center;
+        padding: 10px 0 20px 0;
+        max-width: 650px;
+        margin: 0 auto;
+    }}
+
+    .top-badge {{
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 4px 12px;
-        background: rgba(99, 102, 241, 0.12);
-        border: 1px solid rgba(99, 102, 241, 0.3);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 99px;
-        font-size: 0.72rem;
+        font-size: 0.7rem;
         font-weight: 700;
-        letter-spacing: 1px;
-        color: #A5B4FC;
-        margin-bottom: 8px;
-    }
+        letter-spacing: 1.2px;
+        color: #94A3B8;
+        margin-bottom: 10px;
+        backdrop-filter: blur(12px);
+    }}
 
-    .hero-title {
-        font-size: 2.4rem;
+    .hero-title {{
+        font-size: 2.3rem;
         font-weight: 800;
-        letter-spacing: -0.8px;
-        background: linear-gradient(135deg, #FFFFFF 40%, #94A3B8 100%);
+        letter-spacing: -0.6px;
+        background: linear-gradient(135deg, #FFFFFF 40%, #A1A1AA 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 4px;
-    }
+        line-height: 1.1;
+    }}
     
-    .hero-sub {
-        font-size: 0.95rem;
+    .hero-sub {{
+        font-size: 0.92rem;
         color: #94A3B8;
-        margin-bottom: 22px;
-    }
+        font-weight: 400;
+        line-height: 1.4;
+    }}
 
-    /* Minimal Cam Dosya Yükleyici */
-    div[data-testid="stFileUploader"] {
-        background: rgba(13, 19, 33, 0.65);
-        border: 1px dashed rgba(99, 102, 241, 0.4);
+    /* Cam Dosya Yükleme Paneli */
+    div[data-testid="stFileUploader"] {{
+        background: rgba(13, 18, 30, 0.65);
+        border: 1px dashed rgba(255, 255, 255, 0.18);
         border-radius: 16px;
-        backdrop-filter: blur(16px);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         padding: 24px;
         transition: all 0.3s ease;
-    }
-    div[data-testid="stFileUploader"]:hover {
-        border-color: #818CF8;
-        box-shadow: 0 8px 30px rgba(99, 102, 241, 0.2);
-    }
-    
-    /* İşlem Butonu */
-    div.stButton > button:first-child {
-        background: linear-gradient(135deg, #4F46E5, #0EA5E9);
-        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }}
+    div[data-testid="stFileUploader"]:hover {{
+        border-color: rgba(99, 102, 241, 0.6);
+        box-shadow: 0 12px 35px rgba(99, 102, 241, 0.2);
+    }}
+
+    /* Titan / Neon Buton */
+    div.stButton > button:first-child {{
+        background: linear-gradient(135deg, #4F46E5, #0284C7);
+        border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 10px;
         font-weight: 600;
+        font-size: 0.92rem;
         padding: 10px 22px;
+        color: #FFFFFF;
         box-shadow: 0 4px 20px rgba(79, 70, 229, 0.35);
         transition: all 0.25s;
-    }
-    div.stButton > button:first-child:hover {
+    }}
+    div.stButton > button:first-child:hover {{
         box-shadow: 0 6px 28px rgba(79, 70, 229, 0.55);
         transform: translateY(-1px);
-    }
+    }}
 
-    /* MİNİMAL LİKİT CAM ALT DOCK (YÜZEN BAR) */
-    .dock-wrapper {
+    /* Metrik Kartları */
+    .stMetric {{
+        background: rgba(13, 18, 30, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        backdrop-filter: blur(14px);
+        padding: 14px 18px;
+    }}
+
+    /* KUSURSUZ SABİT LİKİT CAM ALT DOCK */
+    .bottom-dock-fixed {{
         position: fixed;
-        bottom: 16px;
+        bottom: 18px;
         left: 0;
         right: 0;
-        margin: auto;
+        margin: 0 auto;
         width: fit-content;
-        max-width: 90vw;
+        max-width: 94vw;
         z-index: 999999;
-    }
-    
-    .dock-box {
-        background: rgba(13, 19, 33, 0.78);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 50px;
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        padding: 4px 14px;
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    /* Alt bardaki selectbox ve butonları mikro boyuta indirme */
-    .dock-box div[data-testid="stSelectbox"] > div {
+        background: rgba(13, 18, 30, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 40px;
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        padding: 5px 14px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }}
+
+    /* Alt Dock Giriş Kontrolleri */
+    .bottom-dock-fixed div[data-testid="stSelectbox"] > div {{
         min-height: 32px !important;
         height: 32px !important;
         font-size: 0.8rem !important;
         border-radius: 20px !important;
         background: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
-    
-    .dock-box div.stButton > button {
+    }}
+    .bottom-dock-fixed div.stButton > button {{
         height: 32px !important;
         padding: 4px 12px !important;
         font-size: 0.78rem !important;
@@ -266,7 +360,7 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.08) !important;
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
         box-shadow: none !important;
-    }
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -309,17 +403,22 @@ def excel_olustur(df):
 
     return output.getvalue()
 
-# --- HERO ALANI ---
-st.markdown(f"<div class='top-badge'>● {T['badge']}</div>", unsafe_allow_html=True)
-st.markdown(f"<div class='hero-title'>{T['title']}</div>", unsafe_allow_html=True)
-st.markdown(f"<div class='hero-sub'>{T['subtitle']}</div>", unsafe_allow_html=True)
+# --- KOMPAKT HERO ALANI ---
+st.markdown(f"""
+<div class='hero-container'>
+    <div class='top-badge'>● {T['badge']}</div>
+    <div class='hero-title'>{T['title']}</div>
+    <div class='hero-sub'>{T['subtitle']}</div>
+</div>
+""", unsafe_allow_html=True)
 
-# --- YÜKLEME ALANI ---
+# --- DOSYA YÜKLEME ALANI ---
 yuklenen_dosyalar = st.file_uploader(
     T["upload_label"], 
     type=["pdf", "png", "jpg", "jpeg"], 
     accept_multiple_files=True,
-    label_visibility="collapsed"
+    label_visibility="collapsed",
+    help=T["upload_hint"]
 )
 
 if yuklenen_dosyalar:
@@ -335,7 +434,7 @@ if yuklenen_dosyalar:
             toplam_dosya = len(yuklenen_dosyalar)
             
             # Seçilen sektör mantığı direktifi
-            sektor_secimi = T["industries"][st.session_state["industry_choice"]]
+            sektor_secimi = T["industries"][st.session_state["industry_idx"]]
             sektor_direktifi = f"Firma Faaliyet Türü: {sektor_secimi}. "
             if "Ticaret" in sektor_secimi or "Retail" in sektor_secimi:
                 sektor_direktifi += "Firma al-sat ticaret firmasıdır. Satışa konu olan ana ürünler '153.01 Ticari Mallar' (veya GAAP 1200 Inventory) hesabına işlenmelidir. Sadece akaryakıt, yemek, kırtasiye gibi şirket içi tüketimler 770'e gider."
@@ -441,6 +540,12 @@ if yuklenen_dosyalar:
                     elif "FR" in st.session_state["user_lang"]:
                         h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Pièce", "Date", "Compte", "Libellé", "Détail", "Débit", "Crédit"
                         kdv_adi = f"TVA {tax_rate}%"
+                    elif "ES" in st.session_state["user_lang"]:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Asiento", "Fecha", "Cuenta", "Nombre Cuenta", "Concepto", "Debe", "Haber"
+                        kdv_adi = f"IVA Soportado {tax_rate}%"
+                    elif "IT" in st.session_state["user_lang"]:
+                        h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Partita", "Data", "Conto", "Descrizione", "Causale", "Dare", "Avere"
+                        kdv_adi = f"IVA a Credito {tax_rate}%"
                     else:
                         h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Voucher #", "Date", "Account Code", "Account Name", "Memo", "Debit", "Credit"
                         kdv_adi = f"Tax ({tax_rate}%)"
@@ -501,40 +606,50 @@ if "out_df" in st.session_state:
         use_container_width=True
     )
 
-# --- MİKRO VE ŞIK LİKİT CAM ALT DOCK (FLOATING BAR) ---
-st.markdown("<div style='height: 70px;'></div>", unsafe_allow_html=True)
-st.markdown("<div class='dock-wrapper'><div class='dock-box'>", unsafe_allow_html=True)
+# --- KUSURSUZ LİKİT CAM ALT DOCK (FLOATING BAR) ---
+st.markdown("<div class='bottom-dock-fixed'>", unsafe_allow_html=True)
+col_b1, col_b2, col_b3, col_b4 = st.columns([1.8, 3.2, 3.2, 1.8])
 
-col_d1, col_d2, col_d3 = st.columns([1.5, 3.5, 1.5])
-
-with col_d1:
+with col_b1:
     dil_listesi = list(LANG_DATA.keys())
-    mevcut_idx = dil_listesi.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in dil_listesi else 0
+    mevcut_dil_idx = dil_listesi.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in dil_listesi else 0
     yeni_dil = st.selectbox(
-        "", 
-        dil_listesi, 
-        index=mevcut_idx,
+        "Dil",
+        dil_listesi,
+        index=mevcut_dil_idx,
         label_visibility="collapsed"
     )
     if yeni_dil != st.session_state["user_lang"]:
         st.session_state["user_lang"] = yeni_dil
         st.rerun()
 
-with col_d2:
-    secilen_sektor = st.selectbox(
-        "", 
-        T["industries"],
-        index=st.session_state["industry_choice"],
+with col_b2:
+    secilen_tema = st.selectbox(
+        "Görünüm",
+        T["themes"],
+        index=st.session_state["theme_idx"],
         label_visibility="collapsed"
     )
-    yeni_sektor_idx = T["industries"].index(secilen_sektor)
-    if yeni_sektor_idx != st.session_state["industry_choice"]:
-        st.session_state["industry_choice"] = yeni_sektor_idx
+    yeni_t_idx = T["themes"].index(secilen_tema)
+    if yeni_t_idx != st.session_state["theme_idx"]:
+        st.session_state["theme_idx"] = yeni_t_idx
         st.rerun()
 
-with col_d3:
+with col_b3:
+    secilen_sektor = st.selectbox(
+        "Sektör",
+        T["industries"],
+        index=st.session_state["industry_idx"],
+        label_visibility="collapsed"
+    )
+    yeni_s_idx = T["industries"].index(secilen_sektor)
+    if yeni_s_idx != st.session_state["industry_idx"]:
+        st.session_state["industry_idx"] = yeni_s_idx
+        st.rerun()
+
+with col_b4:
     with st.popover(T["about_btn"]):
         st.markdown(f"#### {T['about_title']}")
         st.markdown(T["about_content"])
 
-st.markdown("</div></div>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
