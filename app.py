@@ -9,41 +9,36 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 st.set_page_config(
-    page_title="LedgerAI", 
+    page_title="LedgerAI — Autonomous Accounting", 
     page_icon="⚡", 
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# --- DİL SÖZLÜKLERİ (BAYRAKLI & EKSİKSİZ) ---
+# --- DİL SÖZLÜKLERİ ---
 LANG_DATA = {
     "🇹🇷 Türkçe": {
         "title": "⚡ LedgerAI",
-        "subtitle": "Otonom Fatura & Fiş Muhasebeleştirme Motoru",
-        "upload_label": "Fatura veya fişleri yükleyin (PDF, PNG, JPG)",
+        "subtitle": "Otonom Belge Okuma • Akıllı Hesap Eşleme • Yevmiye Fişi",
+        "upload_label": "Faturaları veya fişleri buraya bırakın",
         "process_btn": "⚡ Muhasebe Fişini Oluştur",
         "limit_err": "🛑 Demo sürümünde aynı anda en fazla 5 fatura işleyebilirsiniz.",
         "ready_count": "İşlenecek belge sayısı: **{count}**",
         "success": "✓ Fişler başarıyla oluşturuldu ve Borç/Alacak dengelendi.",
         "partial": "⚠️ {success} belge işlendi, {failed} belge okunamadı.",
-        "failed": "❌ Belgeler işlenemedi. Lütfen görsel netliğini kontrol edin.",
-        "preview_title": "📊 Muhasebe Yevmiye Fişi (Düzenlenebilir)",
+        "failed": "❌ Belgeler işlenemedi. Lütfen dosya netliğini kontrol edin.",
+        "preview_title": "📊 Muhasebe Yevmiye Fişi (Ekranda Düzenlenebilir)",
         "preview_tip": "💡 Kod veya tutarları değiştirmek için hücreye çift tıklayın. İndirilen Excel'e anında yansır.",
         "tot_deb": "Toplam Borç",
         "tot_crd": "Toplam Alacak",
         "balanced": "✅ Fiş Dengeli (Borç = Alacak)",
         "unbalanced": "⚠️ Bakiye Farkı Var!",
-        "download_btn": "📥 Kurumsal Excel'i İndir (.xlsx)",
-        "theme_header": "🎨 Arayüz Görünümü",
-        "theme_label": "Arka Plan Stili",
-        "opt_image": "🖼️ Finans Görseli",
-        "opt_anim": "✨ Akıcı Animasyon",
-        "opt_dark": "🌑 Minimal Koyu (Sade)"
+        "download_btn": "📥 Kurumsal Excel'i İndir (.xlsx)"
     },
     "🇺🇸 English": {
         "title": "⚡ LedgerAI",
-        "subtitle": "Autonomous Invoice & Receipt Accounting Engine",
-        "upload_label": "Upload receipts or invoices (PDF, PNG, JPG)",
+        "subtitle": "Autonomous Receipt Parsing • Smart Mapping • Balanced Journal",
+        "upload_label": "Drop receipts or invoices here",
         "process_btn": "⚡ Generate Journal Voucher",
         "limit_err": "🛑 Demo allows up to 5 documents per batch.",
         "ready_count": "Documents ready: **{count}**",
@@ -56,17 +51,12 @@ LANG_DATA = {
         "tot_crd": "Total Credit",
         "balanced": "✅ Balanced (Debit = Credit)",
         "unbalanced": "⚠️ Unbalanced Voucher!",
-        "download_btn": "📥 Download Clean Excel (.xlsx)",
-        "theme_header": "🎨 Interface Appearance",
-        "theme_label": "Background Mode",
-        "opt_image": "🖼️ Finance Image",
-        "opt_anim": "✨ Fluid Animation",
-        "opt_dark": "🌑 Minimal Dark (Clean)"
+        "download_btn": "📥 Download Clean Excel (.xlsx)"
     },
     "🇩🇪 Deutsch": {
         "title": "⚡ LedgerAI",
-        "subtitle": "Autonome Buchhaltungs- und Beleg-Engine",
-        "upload_label": "Belege oder Rechnungen hochladen (PDF, PNG, JPG)",
+        "subtitle": "Autonome Belegerfassung • Intelligente Kontierung • Buchungssätze",
+        "upload_label": "Belege oder Rechnungen hier ablegen",
         "process_btn": "⚡ Buchungssatz Generieren",
         "limit_err": "🛑 Demo-Limit: Maximal 5 Dokumente.",
         "ready_count": "Bereit: **{count}** Dokumente",
@@ -79,17 +69,12 @@ LANG_DATA = {
         "tot_crd": "Haben Gesamt",
         "balanced": "✅ Ausgeglichen (Soll = Haben)",
         "unbalanced": "⚠️ Differenz festgestellt!",
-        "download_btn": "📥 Excel-Buchungsdatei Herunterladen (.xlsx)",
-        "theme_header": "🎨 Oberflächendesign",
-        "theme_label": "Hintergrundmodus",
-        "opt_image": "🖼️ Finanz-Bild",
-        "opt_anim": "✨ Fluid-Animation",
-        "opt_dark": "🌑 Minimal Dunkel (Schlicht)"
+        "download_btn": "📥 Excel-Buchungsdatei Herunterladen (.xlsx)"
     },
     "🇫🇷 Français": {
         "title": "⚡ LedgerAI",
-        "subtitle": "Moteur Autonome d'Écritures Comptables",
-        "upload_label": "Déposer des factures ou reçus (PDF, PNG, JPG)",
+        "subtitle": "Lecture Autonome • Imputation Intelligente • Écritures Comptables",
+        "upload_label": "Déposez vos factures ou reçus ici",
         "process_btn": "⚡ Générer les Écritures",
         "limit_err": "🛑 Limite démo: 5 documents maximum.",
         "ready_count": "Documents prêts: **{count}**",
@@ -102,78 +87,127 @@ LANG_DATA = {
         "tot_crd": "Total Crédit",
         "balanced": "✅ Équilibré (Débit = Crédit)",
         "unbalanced": "⚠️ Déséquilibre Détecté!",
-        "download_btn": "📥 Télécharger le Journal Excel (.xlsx)",
-        "theme_header": "🎨 Apparence",
-        "theme_label": "Mode d'arrière-plan",
-        "opt_image": "🖼️ Image Finance",
-        "opt_anim": "✨ Animation Fluide",
-        "opt_dark": "🌑 Sombre Épuré (Simple)"
+        "download_btn": "📥 Télécharger le Journal Excel (.xlsx)"
     }
 }
 
-# --- YAN PANEL: DİL VE ARKA PLAN YÖNETİMİ ---
-with st.sidebar:
-    st.markdown("### 🌐 Dil / Language")
-    secilen_dil = st.selectbox("", list(LANG_DATA.keys()), label_visibility="collapsed")
-    T = LANG_DATA[secilen_dil]
-    
-    st.markdown("---")
-    st.markdown(f"### {T['theme_header']}")
-    arka_plan_modu = st.radio(
-        T["theme_label"],
-        [T["opt_image"], T["opt_anim"], T["opt_dark"]],
-        label_visibility="collapsed"
-    )
+# --- ALT YÜZEN BAR DURUM YÖNETİMİ ---
+if "active_lang" not in st.session_state:
+    st.session_state["active_lang"] = "🇹🇷 Türkçe"
+if "active_theme" not in st.session_state:
+    st.session_state["active_theme"] = "✨ Aurora Animasyon"
 
-# --- CSS VE TEMA ENJEKSİYONU ---
-if arka_plan_modu == T["opt_image"]:
+# --- LÜKS ARKA PLAN TEMA CSS ---
+if st.session_state["active_theme"] == "🖼️ Finans Görseli":
     bg_style = """
         .stApp {
-            background: linear-gradient(rgba(11, 15, 25, 0.88), rgba(11, 15, 25, 0.88)), 
+            background: linear-gradient(rgba(7, 11, 22, 0.85), rgba(7, 11, 22, 0.90)), 
                         url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
     """
-elif arka_plan_modu == T["opt_anim"]:
+elif st.session_state["active_theme"] == "✨ Aurora Animasyon":
     bg_style = """
-        @keyframes gradientBG {
+        @keyframes auroraWave {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
         .stApp {
-            background: linear-gradient(-45deg, #090D16, #0F172A, #1E1B4B, #090D16);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: radial-gradient(at 0% 0%, rgba(30, 27, 75, 0.8) 0px, transparent 50%),
+                        radial-gradient(at 100% 0%, rgba(15, 23, 42, 0.9) 0px, transparent 50%),
+                        radial-gradient(at 50% 100%, rgba(20, 83, 45, 0.3) 0px, transparent 50%),
+                        linear-gradient(135deg, #070A12, #0E1726, #111C35, #070A12);
+            background-size: 300% 300%;
+            animation: auroraWave 18s ease infinite;
+            background-attachment: fixed;
         }
     """
 else:
     bg_style = """
         .stApp {
-            background-color: #090D16;
+            background-color: #070A12;
         }
     """
 
+# --- GLOBAL STİL VE YÜZEN ALT DOCK ---
 st.markdown(f"""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
-    {bg_style}
-    .stApp {{ color: #F1F5F9; }}
-    div[data-testid="stFileUploader"] {{
-        background: rgba(15, 23, 42, 0.7);
-        border: 2px dashed #3B82F6;
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-        padding: 24px;
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    
+    html, body, [class*="css"] {{
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }}
+    
+    {bg_style}
+    
+    /* Yan paneli tamamen görünmez yap */
+    [data-testid="stSidebar"] {{
+        display: none !important;
+    }}
+    
+    .stApp {{
+        color: #F8FAFC;
+        padding-bottom: 110px; /* Alt bar için boşluk */
+    }}
+    
+    /* Modern Kartlar & Yükleme Alanı */
+    div[data-testid="stFileUploader"] {{
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px dashed rgba(99, 102, 241, 0.5);
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        padding: 30px;
+        transition: all 0.3s ease;
+    }}
+    div[data-testid="stFileUploader"]:hover {{
+        border-color: #6366F1;
+        box-shadow: 0 0 25px rgba(99, 102, 241, 0.2);
+    }}
+    
     .stMetric {{
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid #334155;
-        border-radius: 10px;
-        padding: 12px 18px;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        backdrop-filter: blur(10px);
+        padding: 14px 20px;
+    }}
+    
+    /* Buton Tasarımı */
+    div.stButton > button:first-child {{
+        background: linear-gradient(135deg, #4F46E5, #3B82F6);
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        padding: 12px 24px;
+        box-shadow: 0 4px 20px rgba(79, 70, 229, 0.35);
+        transition: all 0.3s;
+    }}
+    div.stButton > button:first-child:hover {{
+        box-shadow: 0 6px 28px rgba(79, 70, 229, 0.55);
+        transform: translateY(-1px);
+    }}
+
+    /* Alt Yüzen Cam Bar (Dock) */
+    .dock-container {{
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999999;
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 40px;
+        padding: 8px 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 16px;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -217,7 +251,10 @@ def excel_olustur(df):
 
     return output.getvalue()
 
-# --- ANA EKRAN ---
+# Aktif Dil Tanımı
+T = LANG_DATA[st.session_state["active_lang"]]
+
+# --- ANA MERKEZİ EKRAN ---
 st.title(T["title"])
 st.caption(T["subtitle"])
 
@@ -247,18 +284,18 @@ if yuklenen_dosyalar:
                 prompt = """
                 Sen otonom bir muhasebe denetçisisin. Belgeyi incele:
                 1. Belge ülkesini/dilini tespit et (TR, DE, FR, US).
-                2. Harcama türüne göre uygun hesap kodunu Tek Düzen / Standart Hesap Planına göre otomatik belirle:
-                   - Ticari mal alımı ise: 153.01
+                2. Harcama türüne göre Tek Düzen / GAAP kodunu otomatik ata:
+                   - Ticari mal alımı: 153.01
                    - Akaryakıt: 770.01
                    - Yemek / Ağırlama: 770.02
                    - Kırtasiye / Ofis: 770.03
                    - Kargo / Nakliye: 770.04
-                   - Demirbaş / Cihaz: 255.01
+                   - Demirbaş: 255.01
                    - Genel Masraf: 770.99
                 3. KDV oranını ve tutarını doğru ayıkla.
-                4. Satıcı için cari kod türet (Varsayılan: 320.VKN veya 320.AD).
+                4. Satıcı için cari kod türet (320.VKN veya 320.AD).
 
-                SADECE şu saf JSON objesini döndür:
+                SADECE şu JSON objesini döndür:
                 {
                   "doc_country": "TR",
                   "currency": "TL",
@@ -273,7 +310,7 @@ if yuklenen_dosyalar:
                   "tax": 0.0,
                   "total": 0.0
                 }
-                Sayısal alanları float dön. Markdown etiketi kullanma.
+                Sayısal alanlar float olmalı. Markdown etiketi ekleme.
                 """
                 
                 maksimum_deneme = 3
@@ -299,7 +336,6 @@ if yuklenen_dosyalar:
                 
                 progress_bar.progress((index + 1) / toplam_dosya)
             
-            # Sonuç Mesajı
             if len(ham_veriler) == toplam_dosya:
                 status_text.success(T["success"])
             elif len(ham_veriler) > 0:
@@ -312,7 +348,6 @@ if yuklenen_dosyalar:
                 fis_no = 1
                 
                 for item in ham_veriler:
-                    doc_c = item.get("doc_country", "TR")
                     curr = item.get("currency", "TL")
                     inv_no = str(item.get("invoice_no") or "").strip()
                     date_val = str(item.get("date") or "").strip()
@@ -331,33 +366,33 @@ if yuklenen_dosyalar:
                     kdv_kod = f"191.{int(tax_rate):02d}"
 
                     # Başlıklar
-                    if "Türkçe" in secilen_dil:
+                    if "Türkçe" in st.session_state["active_lang"]:
                         h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Fiş No", "Tarih", "Hesap Kodu", "Hesap Adı", "Açıklama", "Borç", "Alacak"
                         kdv_adi = f"%{tax_rate} İndirilecek KDV"
-                    elif "Deutsch" in secilen_dil:
+                    elif "Deutsch" in st.session_state["active_lang"]:
                         h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Beleg", "Datum", "Konto", "Bezeichnung", "Text", "Soll", "Haben"
                         kdv_adi = f"Vorsteuer {tax_rate}%"
-                    elif "Français" in secilen_dil:
+                    elif "Français" in st.session_state["active_lang"]:
                         h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Pièce", "Date", "Compte", "Libellé", "Détail", "Débit", "Crédit"
                         kdv_adi = f"TVA {tax_rate}%"
                     else:
                         h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Voucher #", "Date", "Account Code", "Account Name", "Memo", "Debit", "Credit"
                         kdv_adi = f"Tax ({tax_rate}%)"
 
-                    # 1. Gider/Mal Satırı (Borç)
+                    # 1. Gider/Mal Satırı
                     fis_satirlari.append({
                         h_v: fis_no, h_d: date_val, h_c: acc_code, h_n: acc_name,
                         h_m: f"{vendor} - {inv_no}", "Para Birimi": curr, h_deb: net, h_crd: 0.0
                     })
                     
-                    # 2. KDV Satırı (Borç)
+                    # 2. KDV Satırı
                     if tax > 0:
                         fis_satirlari.append({
                             h_v: fis_no, h_d: date_val, h_c: kdv_kod, h_n: kdv_adi,
                             h_m: f"{vendor} - KDV", "Para Birimi": curr, h_deb: tax, h_crd: 0.0
                         })
                     
-                    # 3. Satıcı / Cari Satırı (Alacak)
+                    # 3. Satıcı Satırı
                     fis_satirlari.append({
                         h_v: fis_no, h_d: date_val, h_c: cari_kod, h_n: vendor,
                         h_m: f"{vendor} - {inv_no}", "Para Birimi": curr, h_deb: 0.0, h_crd: total
@@ -402,3 +437,31 @@ if "out_df" in st.session_state:
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         use_container_width=True
     )
+
+# --- ALT YÜZEN KONTROL DOCK'U (FLOATING GLASS DOCK) ---
+st.markdown("<div style='height: 80px;'></div>", unsafe_allow_html=True)
+
+# Alt barı sayfaya sabitleyen kapsayıcı kolonlar
+dock_col1, dock_col2, dock_col3, dock_col4 = st.columns([2, 3, 3, 2])
+
+with dock_col2:
+    yeni_dil = st.selectbox(
+        "🌐 Dil",
+        list(LANG_DATA.keys()),
+        index=list(LANG_DATA.keys()).index(st.session_state["active_lang"]),
+        label_visibility="collapsed"
+    )
+    if yeni_dil != st.session_state["active_lang"]:
+        st.session_state["active_lang"] = yeni_dil
+        st.rerun()
+
+with dock_col3:
+    yeni_tema = st.selectbox(
+        "🎨 Görünüm",
+        ["✨ Aurora Animasyon", "🖼️ Finans Görseli", "🌑 Minimal Koyu"],
+        index=["✨ Aurora Animasyon", "🖼️ Finans Görseli", "🌑 Minimal Koyu"].index(st.session_state["active_theme"]),
+        label_visibility="collapsed"
+    )
+    if yeni_tema != st.session_state["active_theme"]:
+        st.session_state["active_theme"] = yeni_tema
+        st.rerun()
