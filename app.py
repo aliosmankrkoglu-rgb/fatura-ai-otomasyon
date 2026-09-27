@@ -9,58 +9,68 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 st.set_page_config(
-    page_title="LedgerAI — Autonomous Accounting", 
+    page_title="LedgerAI — Institutional Autonomous Accounting", 
     page_icon="⚡", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- 6 DİLLİ GLOBAL SÖZLÜK ---
+# --- 6 DİLLİ VE KAPSAMLI KURUMSAL SÖZLÜK ---
 LANG_DATA = {
     "🇹🇷 TR": {
-        "badge": "YAPAY ZEKA FİNANS TERMİNALİ",
+        "badge": "KURUMSAL OTONOM FİNANS MOTORU",
         "title": "LedgerAI",
-        "subtitle": "Faturaları saniyeler içinde sektörel hesap kodlarına ve dengeli ERP yevmiye fişine dönüştürün.",
-        "drop_title": "Belgeleri Buraya Bırakın",
-        "drop_sub": "PDF, PNG, JPG formatında fatura veya fişler",
+        "subtitle": "Faturaları ve fişleri saniyeler içinde sektörel hesap kodlarına ve dengeli ERP yevmiye fişine dönüştürün.",
+        "drop_title": "Belgeleri Buraya Sürükleyin veya Seçin",
+        "drop_sub": "PDF, PNG, JPG • Oturum başına maksimum 5 belge",
         "process_btn": "⚡ Otonom Muhasebeleştir",
         "limit_err": "🛑 Demo sürümünde oturum başına en fazla 5 fatura işlenebilir.",
         "ready_count": "İşlenecek belge sayısı: **{count}**",
         "success": "✓ Fişler başarıyla oluşturuldu ve Borç/Alacak dengelendi.",
         "failed": "❌ Belgeler işlenemedi. Lütfen görsel netliğini kontrol edin.",
-        "preview_title": "📊 Muhasebe Yevmiye Fişi (Canlı Düzenlenebilir)",
-        "preview_tip": "💡 Hücrelere çift tıklayarak kod veya açıklamaları değiştirebilirsiniz.",
+        "preview_title": "📊 Muhasebe Yevmiye Fişi (Canlı Hücre Düzenleme)",
+        "preview_tip": "💡 Hücrelere çift tıklayarak kod veya açıklamaları değiştirebilirsiniz. İndirilen Excel'e anında yansır.",
         "tot_deb": "Toplam Borç",
         "tot_crd": "Toplam Alacak",
         "balanced": "✅ Fiş Dengeli (Borç = Alacak)",
         "unbalanced": "⚠️ Bakiye Farkı Var!",
         "download_btn": "📥 Kurumsal Excel'i İndir (.xlsx)",
         "industries": ["⚡ Otomatik Sektör (AI)", "🛒 Ticaret / Al-Sat (153 Ağırlıklı)", "🏢 Hizmet & Ofis (770/740)", "🏭 Üretim & Fabrika (150/730)"],
-        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Gece", "🌑 Platin Titanyum"],
-        "about_btn": "ℹ️ Mimari",
-        "about_title": "LedgerAI Mimarisi",
+        "themes": ["✨ Ultra Canlı Aurora", "🌌 Cyberpunk Gece", "🌑 Platin Titanyum"],
+        "about_btn": "ℹ️ İşleyiş & Güvenlik",
+        "about_title": "LedgerAI Otonom Sistem İşleyişi",
         "about_content": """
-        **LedgerAI**, kurumların fiş giriş maliyetlerini sıfıra indiren yeni nesil finans motorudur.
-        * **Sektörel Mantık:** Faturadaki mal alımını şirketin faaliyetine göre (153, 150 veya 770) dinamik ayırır.
-        * **Kusursuz Bakiye:** Borç = Alacak matematiksel denetimini kuruşu kuruşuna yapar.
-        * **ERP Hazır:** ETA, Luca, Zirve, Logo, Datev ve QuickBooks'a doğrudan aktarılabilir Excel üretir.
+        ### 🛡️ Kurumsal Finans & Güvenlik Mimarisi
+        
+        **LedgerAI**, kurumların ve mali müşavirlik ofislerinin veri giriş yükünü sıfırlamak üzere tasarlanmış uçtan uca otonom bir muhasebe terminalidir.
+        
+        * **1. Çok Katmanlı OCR & Semantik Çıkarım:** Yüklenen fatura ve fişler; satıcı unvanı, VKN/TCKN, vergi dairesi, fatura numarası, KDV oranları (%1, %10, %20) ve matrah bazında ayrıştırılır.
+        * **2. Şirket Faaliyetine Duyarlı Akıllı Kodlama:** Satın alınan bir bilgisayar ticaret firması için `153 Ticari Mal`, üretim şirketi için `255 Demirbaş`, yazılım ofisi için `770/740` maliyeti olarak sisteme otomatik atanır.
+        * **3. Çift Taraflı Denetim Güvencesi:** Sistem, faturanın genel toplamı ile satır matrahları ve KDV'leri arasındaki matematiksel eşitliği kuruşu kuruşuna doğrular. `Borç = Alacak` eşitliği sağlanmadan aktarım tablosu üretilmez.
+        * **4. Evrensel ERP Entegrasyonu:** İndirilen `.xlsx` dosyaları ETA V.11, Luca, Logo, Zirve, Mikro, SAP ve Datev yazılımlarının şablonlarına doğrudan uyumludur.
         """,
+        "step1_title": "1. Belge Analizi",
+        "step1_desc": "OCR ile çoklu KDV, matrah ve satıcı bilgisi hatasız okunur.",
+        "step2_title": "2. Sektörel Kodlama",
+        "step2_desc": "Şirket türüne göre 153, 150 veya 770 hesapları atanır.",
+        "step3_title": "3. Çift Taraflı Bakiye",
+        "step3_desc": "Borç = Alacak denkliği kuruşu kuruşuna denetlenir.",
         "badge_erp": "✓ ETA • LUCA • DATEV • QUICKBOOKS UYUMLU",
         "badge_audit": "✓ %100 BORÇ/ALACAK DENGE GARANTİSİ",
-        "badge_sec": "✓ OTONOM OCR & TEK DÜZEN HARİTALAMA"
+        "badge_sec": "✓ BANKA STANDARTLARINDA GÜVENLİK"
     },
     "🇺🇸 EN": {
-        "badge": "AI FINANCIAL TERMINAL",
+        "badge": "INSTITUTIONAL AI FINANCIAL ENGINE",
         "title": "LedgerAI",
-        "subtitle": "Convert raw invoices into balanced, multi-GAAP ERP journal vouchers autonomously.",
-        "drop_title": "Drop Financial Documents Here",
-        "drop_sub": "Invoices or receipts in PDF, PNG, JPG",
-        "process_btn": "⚡ Generate Journal Vouchers",
+        "subtitle": "Convert raw invoices and receipts into balanced, multi-GAAP ERP journal vouchers autonomously.",
+        "drop_title": "Drop Financial Documents Here or Browse",
+        "drop_sub": "PDF, PNG, JPG • Maximum 5 documents per session",
+        "process_btn": "⚡ Process & Generate Vouchers",
         "limit_err": "🛑 Demo limit is 5 documents per batch.",
         "ready_count": "Documents ready: **{count}**",
         "success": "✓ Journal vouchers generated and balanced.",
         "failed": "❌ Documents could not be parsed.",
-        "preview_title": "📊 Journal Voucher Table (Live Editable)",
+        "preview_title": "📊 Journal Voucher Grid (Live Editable)",
         "preview_tip": "💡 Double-click any cell to adjust accounts or descriptions before export.",
         "tot_deb": "Total Debit",
         "tot_crd": "Total Credit",
@@ -68,19 +78,34 @@ LANG_DATA = {
         "unbalanced": "⚠️ Unbalanced Voucher!",
         "download_btn": "📥 Download Clean Excel (.xlsx)",
         "industries": ["⚡ Auto Industry (AI)", "🛒 Retail / Inventory (1200)", "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"],
-        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platinum Titanium"],
-        "about_btn": "ℹ️ Architecture",
-        "about_title": "LedgerAI Architecture",
-        "about_content": "Autonomous double-entry journal voucher generator compatible with US GAAP, Datev and PCG.",
+        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platinum Titanium"],
+        "about_btn": "ℹ️ How it Works & Security",
+        "about_title": "LedgerAI Autonomous Architecture",
+        "about_content": """
+        ### 🛡️ Institutional Financial Architecture
+        
+        **LedgerAI** is an autonomous accounting terminal engineered to eliminate manual bookkeeping for global enterprises.
+        
+        * **1. Multi-Tier Semantic OCR:** Automatically extracts Vendor, Tax ID/EIN, Line Items, Multi-tier Sales Tax/VAT, and Currencies (USD, EUR, GBP, TRY).
+        * **2. Context-Aware Chart of Accounts:** Differentiates inventory from operational expenses based on entity classification (US GAAP, Datev SKR03/04, PCG).
+        * **3. Strict Dual-Audit Parity:** Enforces `Total Debit = Total Credit` balance down to the exact cent before releasing the journal voucher.
+        * **4. ERP Interoperability:** Generated spreadsheets import directly into QuickBooks, Xero, NetSuite, SAP, and Datev.
+        """,
+        "step1_title": "1. Document Audit",
+        "step1_desc": "Sub-millisecond OCR extraction of tax rates, net amounts, and vendor metadata.",
+        "step2_title": "2. Contextual Mapping",
+        "step2_desc": "Automated account mapping to OpEx, Inventory, or Capital Assets.",
+        "step3_title": "3. Double-Entry Balance",
+        "step3_desc": "Mathematical verification guaranteeing Total Debit equals Total Credit.",
         "badge_erp": "✓ QUICKBOOKS • XERO • DATEV • SAP READY",
         "badge_audit": "✓ 100% DEBIT/CREDIT BALANCE GUARANTEE",
-        "badge_sec": "✓ AUTONOMOUS OCR & GAAP MAPPING"
+        "badge_sec": "✓ SOC2 & BANK-GRADE DATA ENCRYPTION"
     },
     "🇩🇪 DE": {
-        "badge": "KI FINANZTERMINAL",
+        "badge": "KI FINANZTERMINAL & BUCHHALTUNG",
         "title": "LedgerAI",
         "subtitle": "Autonome Belegerfassung und Datev-konforme Kontierung in Echtzeit.",
-        "drop_title": "Belege hier ablegen",
+        "drop_title": "Belege hier ablegen oder durchsuchen",
         "drop_sub": "PDF, PNG, JPG • Rechnungen & Quittungen",
         "process_btn": "⚡ Buchungssätze Erstellen",
         "limit_err": "🛑 Maximal 5 Dokumente im Demo-Modus.",
@@ -95,19 +120,34 @@ LANG_DATA = {
         "unbalanced": "⚠️ Differenz festgestellt!",
         "download_btn": "📥 Excel Herunterladen (.xlsx)",
         "industries": ["⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf", "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"],
-        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platin Titan"],
-        "about_btn": "ℹ️ Info",
-        "about_title": "LedgerAI Architektur",
-        "about_content": "Vollautomatisierte Buchungssatzerstellung nach Datev SKR03/04 Richtlinien.",
+        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platin Titan"],
+        "about_btn": "ℹ️ Funktionsweise & Sicherheit",
+        "about_title": "LedgerAI Architektur & Datev-Standard",
+        "about_content": """
+        ### 🛡️ Sichere Autonome Vorkontierung
+        
+        **LedgerAI** automatisiert die buchhalterische Erfassung von Eingangsrechnungen nach deutschen Standards.
+        
+        * **1. OCR-Belegprüfung:** Erkennt USt-IdNr, Steuersätze (7%, 19%), Rechnungsbeträge und Ausstellungsdaten lückenlos.
+        * **2. Kontenrahmen-Zuordnung:** Ordnet Kosten automatisch den Sachkonten nach SKR03 oder SKR04 zu.
+        * **3. Soll/Haben-Gleichgewicht:** Gewährleistet vor dem Export die absolute mathematische Ausgeglichenheit der Buchungssätze.
+        * **4. Nahtloser Export:** Generiert strukturierte Dateien zur sofortigen Übernahme in Datev Unternehmen online oder SAP.
+        """,
+        "step1_title": "1. Belegprüfung",
+        "step1_desc": "Präzise Vorsteueraufteilung und USt-IdNr Validierung in Sekunden.",
+        "step2_title": "2. SKR03/04 Zuordnung",
+        "step2_desc": "Automatische Kontierung nach Wareneinkauf, Kosten oder Anlagevermögen.",
+        "step3_title": "3. Soll/Haben-Check",
+        "step3_desc": "Revisionssichere Prüfung auf mathematische Ausgeglichenheit.",
         "badge_erp": "✓ DATEV SKR03/04 • SAP KOMPATIBEL",
         "badge_audit": "✓ 100% SOLL/HABEN AUSGEGLICHENHEIT",
-        "badge_sec": "✓ INTELLIGENTE VORKONTIERUNG"
+        "badge_sec": "✓ DSGVO-KONFORME DATENVERARBEITUNG"
     },
     "🇫🇷 FR": {
-        "badge": "TERMINAL FINANCIER IA",
+        "badge": "TERMINAL FINANCIER AUTONOME IA",
         "title": "LedgerAI",
-        "subtitle": "Génération d'écritures comptables équilibrées et ventilées par secteur.",
-        "drop_title": "Déposer les pièces comptables",
+        "subtitle": "Génération d'écritures comptables équilibrées et ventilées par secteur d'activité.",
+        "drop_title": "Déposer les pièces comptables ici",
         "drop_sub": "Factures et reçus (PDF, PNG, JPG)",
         "process_btn": "⚡ Générer les Écritures",
         "limit_err": "🛑 Limite: 5 documents par lot.",
@@ -122,19 +162,34 @@ LANG_DATA = {
         "unbalanced": "⚠️ Déséquilibre Détecté!",
         "download_btn": "📥 Télécharger Excel (.xlsx)",
         "industries": ["⚡ Auto (IA)", "🛒 Négoce / Stock", "🏢 Services / Conseil", "🏭 Production / Industrie"],
-        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platine Titane"],
-        "about_btn": "ℹ️ Info",
-        "about_title": "Architecture LedgerAI",
-        "about_content": "Conformité Plan Comptable Général (PCG) avec vérification Débit = Crédit.",
-        "badge_erp": "✓ CONFORME PCG & ERP STANDARDS",
+        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platine Titane"],
+        "about_btn": "ℹ️ Fonctionnement & Sécurité",
+        "about_title": "Architecture Comptable LedgerAI",
+        "about_content": """
+        ### 🛡️ Automatisation et Conformité PCG
+        
+        **LedgerAI** traite et comptabilise vos factures fournisseurs selon les normes comptables françaises.
+        
+        * **1. Extraction Multitaxe:** Détection précise du SIREN/TVA Intra, des taux de TVA (5.5%, 10%, 20%) et du montant HT/TTC.
+        * **2. Ventilation PCG:** Imputation intelligente entre les comptes de charges (classe 6), TVA déductible (44566) et fournisseurs (401).
+        * **3. Équilibre Débit/Crédit:** Contrôle rigoureux garantissant l'égalité stricte Débit = Crédit avant exportation.
+        * **4. Export Universel:** Fichiers configurés pour Sage, Cegid, Pennylane et QuickBooks.
+        """,
+        "step1_title": "1. Lecture OCR",
+        "step1_desc": "Extraction des montants HT, TVA et identification du fournisseur.",
+        "step2_title": "2. Ventilation PCG",
+        "step2_desc": "Affectation automatique aux comptes de classe 6 selon l'activité.",
+        "step3_title": "3. Contrôle Débit/Crédit",
+        "step3_desc": "Vérification stricte de l'équilibre de chaque écriture de journal.",
+        "badge_erp": "✓ CONFORME PCG • SAGE & CEGID READY",
         "badge_audit": "✓ ÉQUILIBRE DÉBIT/CRÉDIT GARANTI",
-        "badge_sec": "✓ VENTILATION AUTOMATIQUE DES TAXES"
+        "badge_sec": "✓ SÉCURITÉ CONFORME RGPD"
     },
     "🇪🇸 ES": {
-        "badge": "TERMINAL FINANCIERO IA",
+        "badge": "TERMINAL FINANCIERO INTELIGENTE",
         "title": "LedgerAI",
         "subtitle": "Asientos contables equilibrados listos para ERP según el sector empresarial.",
-        "drop_title": "Arrastra los documentos aquí",
+        "drop_title": "Arrastra los documentos aquí o examina",
         "drop_sub": "PDF, PNG, JPG • Facturas y recibos",
         "process_btn": "⚡ Generar Asientos",
         "limit_err": "🛑 Máximo 5 documentos por lote.",
@@ -149,19 +204,34 @@ LANG_DATA = {
         "unbalanced": "⚠️ Descuadre Detectado!",
         "download_btn": "📥 Descargar Excel (.xlsx)",
         "industries": ["⚡ Automático (IA)", "🛒 Comercio / Inventario", "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"],
-        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
-        "about_btn": "ℹ️ Info",
-        "about_title": "Arquitectura LedgerAI",
-        "about_content": "Contabilidad autónoma con cuadre de Debe y Haber garantizado.",
-        "badge_erp": "✓ COMPATIBLE ERP & SOFTWARE FISCAL",
+        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
+        "about_btn": "ℹ️ Funcionamiento y Seguridad",
+        "about_title": "Arquitectura y Seguridad LedgerAI",
+        "about_content": """
+        ### 🛡️ Automatización Contable Segura
+        
+        **LedgerAI** transforma facturas y recibos en asientos de libro diario para empresas y despachos profesionales.
+        
+        * **1. Extracción Integral:** Captura de CIF/NIF, bases imponibles, tramos de IVA (4%, 10%, 21%) e importes totales.
+        * **2. Cuadro de Cuentas (PGC):** Clasificación automática en cuentas de gastos (grupo 6), IVA soportado (472) y proveedores (400).
+        * **3. Cuadre Contable Garantizado:** Verificación matemática estricta asegurando que `Debe = Haber`.
+        * **4. Compatibilidad:** Exportación directa compatible con A3, Sage y programas contables modernos.
+        """,
+        "step1_title": "1. Análisis de Factura",
+        "step1_desc": "Lectura OCR avanzada de bases imponibles y tipos impositivos.",
+        "step2_title": "2. Asignación PGC",
+        "step2_desc": "Distribución en cuentas de gastos o existencias según la empresa.",
+        "step3_title": "3. Cuadre de Asiento",
+        "step3_desc": "Garantía matemática de que el Debe coincide con el Haber.",
+        "badge_erp": "✓ COMPATIBLE A3 • SAGE • SOFTWARE FISCAL",
         "badge_audit": "✓ CUADRE DEBE = HABER GARANTIZADO",
-        "badge_sec": "✓ ASIGNACIÓN DE ASIENTOS CON IA"
+        "badge_sec": "✓ CIFRADO DE DATOS BANCARIO"
     },
     "🇮🇹 IT": {
-        "badge": "TERMINALE FINANZIARIO IA",
+        "badge": "TERMINALE FINANZIARIO AUTONOMO",
         "title": "LedgerAI",
-        "subtitle": "Scritture contabili in partita doppia bilanciate per qualsiasi ERP.",
-        "drop_title": "Trascina qui le fatture",
+        "subtitle": "Scritture contabili in partita doppia bilanciate per qualsiasi software gestionale ERP.",
+        "drop_title": "Trascina qui le fatture o cerca file",
         "drop_sub": "PDF, PNG, JPG • Ricevute e fatture",
         "process_btn": "⚡ Genera Scritture",
         "limit_err": "🛑 Massimo 5 documenti.",
@@ -176,13 +246,28 @@ LANG_DATA = {
         "unbalanced": "⚠️ Sbilancio!",
         "download_btn": "📥 Scarica Excel (.xlsx)",
         "industries": ["⚡ Automatico (IA)", "🛒 Commercio / Magazzino", "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"],
-        "themes": ["✨ Ultra Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
-        "about_btn": "ℹ️ Info",
-        "about_title": "Architettura LedgerAI",
-        "about_content": "Generazione automatica di prima nota conforme ai principi contabili.",
-        "badge_erp": "✓ PRONTO PER GESTIONALI ERP",
+        "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
+        "about_btn": "ℹ️ Funzionamento e Sicurezza",
+        "about_title": "Architettura di Sicurezza LedgerAI",
+        "about_content": """
+        ### 🛡️ Registrazione Contabile Intelligente
+        
+        **LedgerAI** digitalizza e registra automaticamente le fatture passive in partita doppia.
+        
+        * **1. Acquisizione Fiscale:** Riconoscimento di Partita IVA/Codice Fiscale, imponibili, aliquote IVA (4%, 10%, 22%) e totale documento.
+        * **2. Piano dei Conti:** Assegnazione automatica a conti di costo, IVA a credito e debiti verso fornitori.
+        * **3. Quadratura Fiscale:** Controllo rigoroso prima dell'export affinché `Dare = Avere`.
+        * **4. Integrazione ERP:** File Excel strutturato pronto per Zucchetti, Teamsystem e SAP.
+        """,
+        "step1_title": "1. Acquisizione Dati",
+        "step1_desc": "Scansione OCR di aliquote IVA, imponibili e fornitore.",
+        "step2_title": "2. Piano dei Conti",
+        "step2_desc": "Classificazione tra costi di gestione, merci o cespiti ammortizzabili.",
+        "step3_title": "3. Quadratura Dare/Avere",
+        "step3_desc": "Verifica della perfetta parità contabile della scrittura.",
+        "badge_erp": "✓ PRONTO PER ZUCCHETTI • TEAMSYSTEM • SAP",
         "badge_audit": "✓ QUADRATURA DARE/AVERE GARANTITA",
-        "badge_sec": "✓ CLASSIFICAZIONE CONTO AVANZATA"
+        "badge_sec": "✓ PROTEZIONE DATI STANDARD BANCARIO"
     }
 }
 
@@ -196,9 +281,9 @@ if "industry_idx" not in st.session_state:
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
-# --- GERÇEK VE FARK EDİLİR 3 FARKLI ANİMASYON / TEMA CSS ---
+# --- GERÇEK VE GÖZ ALICI 3 FARKLI TEMA MOTORU ---
 if st.session_state["theme_idx"] == 1:
-    # 🌌 Cyberpunk Gece (Radikal Neon Fuşya, Mor ve Lazer Mavisi Işık Patlamaları)
+    # 🌌 Cyberpunk Gece (Canlı Neon Fuşya ve Lazer Mavisi Işık Hüzmeleri)
     bg_css = """
         @keyframes cyberpunkPulse {
             0% { 
@@ -225,7 +310,7 @@ if st.session_state["theme_idx"] == 1:
         }
     """
 elif st.session_state["theme_idx"] == 0:
-    # ✨ Ultra Aurora (Zümrüt Yeşili, Safir Mavisi ve Altın Işık Hüzmeleri)
+    # ✨ Ultra Aurora (Zümrüt Yeşili, Safir Mavisi ve Altın Işık Dalgaları)
     bg_css = """
         @keyframes auroraRealFlow {
             0% { 
@@ -253,7 +338,7 @@ elif st.session_state["theme_idx"] == 0:
         }
     """
 else:
-    # 🌑 Platin Titanyum (Apple Pro / Metalik Gümüş & Saf Antrasit)
+    # 🌑 Platin Titanyum (Apple Pro Metalik Gümüş & Derin Antrasit)
     bg_css = """
         @keyframes titaniumSheen {
             0% { background-position: 0% 50%; }
@@ -284,19 +369,19 @@ st.markdown(f"""
     
     .stApp {{
         color: #F8FAFC;
-        padding-bottom: 120px;
+        padding-bottom: 125px;
     }}
 
     /* TEK PARÇA LÜKS CAM KONSOL */
     .master-console {{
-        max-width: 820px;
-        margin: 25px auto 0 auto;
-        background: rgba(11, 16, 28, 0.72);
+        max-width: 860px;
+        margin: 20px auto 0 auto;
+        background: rgba(11, 16, 28, 0.75);
         border: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 28px;
         backdrop-filter: blur(36px);
         -webkit-backdrop-filter: blur(36px);
-        padding: 36px 40px 32px 40px;
+        padding: 38px 40px 32px 40px;
         box-shadow: 0 35px 90px rgba(0, 0, 0, 0.75), 
                     inset 0 1px 0 rgba(255, 255, 255, 0.18);
         text-align: center;
@@ -319,7 +404,7 @@ st.markdown(f"""
     }}
 
     .hero-title {{
-        font-size: 2.9rem;
+        font-size: 3rem;
         font-weight: 800;
         letter-spacing: -1.2px;
         background: linear-gradient(135deg, #FFFFFF 40%, #CBD5E1 100%);
@@ -330,11 +415,11 @@ st.markdown(f"""
     }}
     
     .hero-sub {{
-        font-size: 0.96rem;
+        font-size: 0.98rem;
         color: #94A3B8;
         font-weight: 400;
         line-height: 1.5;
-        max-width: 580px;
+        max-width: 600px;
         margin: 0 auto 24px auto;
     }}
 
@@ -371,7 +456,43 @@ st.markdown(f"""
         transform: translateY(-2px);
     }}
 
-    /* GÜVEN ROZETLERİ (BOŞLUĞU DOLDURAN ALAN) */
+    /* 3 ADIMLI İŞLEYİŞ KARTLARI (SAYFAYI ZENGİNLEŞTİREN ALAN) */
+    .steps-container {{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin: 24px auto 0 auto;
+        text-align: left;
+    }}
+    .step-card {{
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 14px 16px;
+        backdrop-filter: blur(12px);
+        transition: all 0.25s;
+    }}
+    .step-card:hover {{
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(99, 102, 241, 0.4);
+        transform: translateY(-2px);
+    }}
+    .step-title {{
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }}
+    .step-desc {{
+        font-size: 0.72rem;
+        color: #94A3B8;
+        line-height: 1.4;
+    }}
+
+    /* GÜVEN ROZETLERİ */
     .trust-grid {{
         display: flex;
         justify-content: center;
@@ -395,18 +516,18 @@ st.markdown(f"""
     /* EK DÜZENLEMELER: DOCK'U SAYFANIN EN ALTINA SABİTLEME */
     .dock-fixed-outer {{
         position: fixed;
-        bottom: 22px;
+        bottom: 18px;
         left: 0;
         right: 0;
         margin: 0 auto;
         width: fit-content;
-        max-width: 92vw;
+        max-width: 94vw;
         z-index: 999999;
-        background: rgba(10, 14, 26, 0.86);
+        background: rgba(10, 14, 26, 0.88);
         border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 50px;
-        backdrop-filter: blur(30px);
-        -webkit-backdrop-filter: blur(30px);
+        backdrop-filter: blur(32px);
+        -webkit-backdrop-filter: blur(32px);
         padding: 4px 14px;
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.18);
     }}
@@ -642,8 +763,22 @@ if yuklenen_dosyalar:
                 st.session_state["h_deb"] = h_deb
                 st.session_state["h_crd"] = h_crd
 
-# Konsolun altındaki güven rozetleri (boşluğu kapatan alan)
+# 3 Adımlı Süreç Kartları & Güven Rozetleri
 st.markdown(f"""
+    <div class='steps-container'>
+        <div class='step-card'>
+            <div class='step-title'>⚡ {T['step1_title']}</div>
+            <div class='step-desc'>{T['step1_desc']}</div>
+        </div>
+        <div class='step-card'>
+            <div class='step-title'>🎯 {T['step2_title']}</div>
+            <div class='step-desc'>{T['step2_desc']}</div>
+        </div>
+        <div class='step-card'>
+            <div class='step-title'>⚖️ {T['step3_title']}</div>
+            <div class='step-desc'>{T['step3_desc']}</div>
+        </div>
+    </div>
     <div class='trust-grid'>
         <div class='trust-item'>{T['badge_erp']}</div>
         <div class='trust-item'>{T['badge_audit']}</div>
@@ -683,9 +818,9 @@ if "out_df" in st.session_state:
         use_container_width=True
     )
 
-# --- EN ALTA SABİTLENMİŞ TEK PARÇA LİKİT CAM DOCK ---
+# --- EN ALTA SABİTLENMİŞ İŞLEVSEL LİKİT CAM DOCK ---
 st.markdown("<div class='dock-fixed-outer'>", unsafe_allow_html=True)
-col_b1, col_b2, col_b3, col_b4 = st.columns([1.6, 3.2, 3.2, 1.6])
+col_b1, col_b2, col_b3, col_b4 = st.columns([1.6, 3.2, 3.2, 2.2])
 
 with col_b1:
     dil_listesi = list(LANG_DATA.keys())
