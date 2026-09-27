@@ -15,13 +15,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 6 DİLLİ VE KAPSAMLI KURUMSAL SÖZLÜK ---
+# --- 6 DİLLİ GLOBAL SÖZLÜK ---
 LANG_DATA = {
     "🇹🇷 TR": {
-        "badge": "KURUMSAL OTONOM FİNANS MOTORU",
+        "badge": "KURUMSAL OTONOM FİNANS TERMİNALİ",
         "title": "LedgerAI",
-        "subtitle": "Faturaları ve fişleri saniyeler içinde sektörel hesap kodlarına ve dengeli ERP yevmiye fişine dönüştürün.",
-        "drop_title": "Belgeleri Buraya Sürükleyin veya Seçin",
+        "subtitle": "Faturaları saniyeler içinde sektörel hesap kodlarına ve dengeli ERP yevmiye fişine dönüştürün.",
+        "drop_title": "Belgeleri Buraya Bırakın veya Seçin",
         "drop_sub": "PDF, PNG, JPG • Oturum başına maksimum 5 belge",
         "process_btn": "⚡ Otonom Muhasebeleştir",
         "limit_err": "🛑 Demo sürümünde oturum başına en fazla 5 fatura işlenebilir.",
@@ -38,16 +38,15 @@ LANG_DATA = {
         "industries": ["⚡ Otomatik Sektör (AI)", "🛒 Ticaret / Al-Sat (153 Ağırlıklı)", "🏢 Hizmet & Ofis (770/740)", "🏭 Üretim & Fabrika (150/730)"],
         "themes": ["✨ Ultra Canlı Aurora", "🌌 Cyberpunk Gece", "🌑 Platin Titanyum"],
         "about_btn": "ℹ️ İşleyiş & Güvenlik",
-        "about_title": "LedgerAI Otonom Sistem İşleyişi",
+        "about_title": "LedgerAI Otonom Sistem Mimarisi",
         "about_content": """
         ### 🛡️ Kurumsal Finans & Güvenlik Mimarisi
         
-        **LedgerAI**, kurumların ve mali müşavirlik ofislerinin veri giriş yükünü sıfırlamak üzere tasarlanmış uçtan uca otonom bir muhasebe terminalidir.
-        
-        * **1. Çok Katmanlı OCR & Semantik Çıkarım:** Yüklenen fatura ve fişler; satıcı unvanı, VKN/TCKN, vergi dairesi, fatura numarası, KDV oranları (%1, %10, %20) ve matrah bazında ayrıştırılır.
-        * **2. Şirket Faaliyetine Duyarlı Akıllı Kodlama:** Satın alınan bir bilgisayar ticaret firması için `153 Ticari Mal`, üretim şirketi için `255 Demirbaş`, yazılım ofisi için `770/740` maliyeti olarak sisteme otomatik atanır.
-        * **3. Çift Taraflı Denetim Güvencesi:** Sistem, faturanın genel toplamı ile satır matrahları ve KDV'leri arasındaki matematiksel eşitliği kuruşu kuruşuna doğrular. `Borç = Alacak` eşitliği sağlanmadan aktarım tablosu üretilmez.
-        * **4. Evrensel ERP Entegrasyonu:** İndirilen `.xlsx` dosyaları ETA V.11, Luca, Logo, Zirve, Mikro, SAP ve Datev yazılımlarının şablonlarına doğrudan uyumludur.
+        **LedgerAI**, kurumların fiş giriş maliyetlerini sıfıra indiren yeni nesil finans motorudur.
+        * **1. Semantik OCR:** VKN, vergi dairesi, çoklu KDV oranları ve matrahlar kuruşu kuruşuna ayıklanır.
+        * **2. Sektörel Mantık:** Alınan ürün; ticaret firmasında `153`, üretimde `150`, ofiste `770` olarak dinamik atanır.
+        * **3. Çift Bakiye Garantisi:** Borç = Alacak denkliği sağlanmadan yevmiye fişi üretilmez.
+        * **4. ERP Entegrasyonu:** ETA, Luca, Logo, Zirve, Datev ve QuickBooks'a doğrudan aktarılabilir formatta Excel çıkar.
         """,
         "step1_title": "1. Belge Analizi",
         "step1_desc": "OCR ile çoklu KDV, matrah ve satıcı bilgisi hatasız okunur.",
@@ -57,10 +56,12 @@ LANG_DATA = {
         "step3_desc": "Borç = Alacak denkliği kuruşu kuruşuna denetlenir.",
         "badge_erp": "✓ ETA • LUCA • DATEV • QUICKBOOKS UYUMLU",
         "badge_audit": "✓ %100 BORÇ/ALACAK DENGE GARANTİSİ",
-        "badge_sec": "✓ BANKA STANDARTLARINDA GÜVENLİK"
+        "badge_sec": "✓ OTONOM OCR & ÇİFT BAKİYE DENETİMİ",
+        "bot_name": "LedgerBot (Finans Asistanı)",
+        "bot_bubble": "Selam! Ben yapay zeka denetçinim. Belgelerini yükle; 153/770 ayrımını ve Borç/Alacak dengesini senin yerine kurayım! 👾"
     },
     "🇺🇸 EN": {
-        "badge": "INSTITUTIONAL AI FINANCIAL ENGINE",
+        "badge": "INSTITUTIONAL AI FINANCIAL TERMINAL",
         "title": "LedgerAI",
         "subtitle": "Convert raw invoices and receipts into balanced, multi-GAAP ERP journal vouchers autonomously.",
         "drop_title": "Drop Financial Documents Here or Browse",
@@ -81,16 +82,7 @@ LANG_DATA = {
         "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platinum Titanium"],
         "about_btn": "ℹ️ How it Works & Security",
         "about_title": "LedgerAI Autonomous Architecture",
-        "about_content": """
-        ### 🛡️ Institutional Financial Architecture
-        
-        **LedgerAI** is an autonomous accounting terminal engineered to eliminate manual bookkeeping for global enterprises.
-        
-        * **1. Multi-Tier Semantic OCR:** Automatically extracts Vendor, Tax ID/EIN, Line Items, Multi-tier Sales Tax/VAT, and Currencies (USD, EUR, GBP, TRY).
-        * **2. Context-Aware Chart of Accounts:** Differentiates inventory from operational expenses based on entity classification (US GAAP, Datev SKR03/04, PCG).
-        * **3. Strict Dual-Audit Parity:** Enforces `Total Debit = Total Credit` balance down to the exact cent before releasing the journal voucher.
-        * **4. ERP Interoperability:** Generated spreadsheets import directly into QuickBooks, Xero, NetSuite, SAP, and Datev.
-        """,
+        "about_content": "Autonomous double-entry journal voucher generator compatible with US GAAP, Datev and PCG.",
         "step1_title": "1. Document Audit",
         "step1_desc": "Sub-millisecond OCR extraction of tax rates, net amounts, and vendor metadata.",
         "step2_title": "2. Contextual Mapping",
@@ -99,7 +91,9 @@ LANG_DATA = {
         "step3_desc": "Mathematical verification guaranteeing Total Debit equals Total Credit.",
         "badge_erp": "✓ QUICKBOOKS • XERO • DATEV • SAP READY",
         "badge_audit": "✓ 100% DEBIT/CREDIT BALANCE GUARANTEE",
-        "badge_sec": "✓ SOC2 & BANK-GRADE DATA ENCRYPTION"
+        "badge_sec": "✓ SOC2 & BANK-GRADE DATA ENCRYPTION",
+        "bot_name": "LedgerBot (Finance AI)",
+        "bot_bubble": "Hi! I am your autonomous AI auditor. Drop your receipts and I will balance debit & credit down to the cent! 👾"
     },
     "🇩🇪 DE": {
         "badge": "KI FINANZTERMINAL & BUCHHALTUNG",
@@ -123,16 +117,7 @@ LANG_DATA = {
         "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platin Titan"],
         "about_btn": "ℹ️ Funktionsweise & Sicherheit",
         "about_title": "LedgerAI Architektur & Datev-Standard",
-        "about_content": """
-        ### 🛡️ Sichere Autonome Vorkontierung
-        
-        **LedgerAI** automatisiert die buchhalterische Erfassung von Eingangsrechnungen nach deutschen Standards.
-        
-        * **1. OCR-Belegprüfung:** Erkennt USt-IdNr, Steuersätze (7%, 19%), Rechnungsbeträge und Ausstellungsdaten lückenlos.
-        * **2. Kontenrahmen-Zuordnung:** Ordnet Kosten automatisch den Sachkonten nach SKR03 oder SKR04 zu.
-        * **3. Soll/Haben-Gleichgewicht:** Gewährleistet vor dem Export die absolute mathematische Ausgeglichenheit der Buchungssätze.
-        * **4. Nahtloser Export:** Generiert strukturierte Dateien zur sofortigen Übernahme in Datev Unternehmen online oder SAP.
-        """,
+        "about_content": "Vollautomatisierte Buchungssatzerstellung nach Datev SKR03/04 Richtlinien.",
         "step1_title": "1. Belegprüfung",
         "step1_desc": "Präzise Vorsteueraufteilung und USt-IdNr Validierung in Sekunden.",
         "step2_title": "2. SKR03/04 Zuordnung",
@@ -141,7 +126,9 @@ LANG_DATA = {
         "step3_desc": "Revisionssichere Prüfung auf mathematische Ausgeglichenheit.",
         "badge_erp": "✓ DATEV SKR03/04 • SAP KOMPATIBEL",
         "badge_audit": "✓ 100% SOLL/HABEN AUSGEGLICHENHEIT",
-        "badge_sec": "✓ DSGVO-KONFORME DATENVERARBEITUNG"
+        "badge_sec": "✓ DSGVO-KONFORME DATENVERARBEITUNG",
+        "bot_name": "LedgerBot (Buchhaltungs-KI)",
+        "bot_bubble": "Hallo! Ich bin dein KI-Buchhalter. Belege hochladen und Datev-Buchungssätze sofort erhalten! 👾"
     },
     "🇫🇷 FR": {
         "badge": "TERMINAL FINANCIER AUTONOME IA",
@@ -165,16 +152,7 @@ LANG_DATA = {
         "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platine Titane"],
         "about_btn": "ℹ️ Fonctionnement & Sécurité",
         "about_title": "Architecture Comptable LedgerAI",
-        "about_content": """
-        ### 🛡️ Automatisation et Conformité PCG
-        
-        **LedgerAI** traite et comptabilise vos factures fournisseurs selon les normes comptables françaises.
-        
-        * **1. Extraction Multitaxe:** Détection précise du SIREN/TVA Intra, des taux de TVA (5.5%, 10%, 20%) et du montant HT/TTC.
-        * **2. Ventilation PCG:** Imputation intelligente entre les comptes de charges (classe 6), TVA déductible (44566) et fournisseurs (401).
-        * **3. Équilibre Débit/Crédit:** Contrôle rigoureux garantissant l'égalité stricte Débit = Crédit avant exportation.
-        * **4. Export Universel:** Fichiers configurés pour Sage, Cegid, Pennylane et QuickBooks.
-        """,
+        "about_content": "Conformité Plan Comptable Général (PCG) avec vérification Débit = Crédit.",
         "step1_title": "1. Lecture OCR",
         "step1_desc": "Extraction des montants HT, TVA et identification du fournisseur.",
         "step2_title": "2. Ventilation PCG",
@@ -183,7 +161,9 @@ LANG_DATA = {
         "step3_desc": "Vérification stricte de l'équilibre de chaque écriture de journal.",
         "badge_erp": "✓ CONFORME PCG • SAGE & CEGID READY",
         "badge_audit": "✓ ÉQUILIBRE DÉBIT/CRÉDIT GARANTI",
-        "badge_sec": "✓ SÉCURITÉ CONFORME RGPD"
+        "badge_sec": "✓ SÉCURITÉ CONFORME RGPD",
+        "bot_name": "LedgerBot (Assistant IA)",
+        "bot_bubble": "Bonjour! Déposez vos factures pour générer vos écritures comptables conformes au PCG! 👾"
     },
     "🇪🇸 ES": {
         "badge": "TERMINAL FINANCIERO INTELIGENTE",
@@ -207,16 +187,7 @@ LANG_DATA = {
         "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
         "about_btn": "ℹ️ Funcionamiento y Seguridad",
         "about_title": "Arquitectura y Seguridad LedgerAI",
-        "about_content": """
-        ### 🛡️ Automatización Contable Segura
-        
-        **LedgerAI** transforma facturas y recibos en asientos de libro diario para empresas y despachos profesionales.
-        
-        * **1. Extracción Integral:** Captura de CIF/NIF, bases imponibles, tramos de IVA (4%, 10%, 21%) e importes totales.
-        * **2. Cuadro de Cuentas (PGC):** Clasificación automática en cuentas de gastos (grupo 6), IVA soportado (472) y proveedores (400).
-        * **3. Cuadre Contable Garantizado:** Verificación matemática estricta asegurando que `Debe = Haber`.
-        * **4. Compatibilidad:** Exportación directa compatible con A3, Sage y programas contables modernos.
-        """,
+        "about_content": "Contabilidad autónoma con cuadre de Debe y Haber garantizado.",
         "step1_title": "1. Análisis de Factura",
         "step1_desc": "Lectura OCR avanzada de bases imponibles y tipos impositivos.",
         "step2_title": "2. Asignación PGC",
@@ -225,7 +196,9 @@ LANG_DATA = {
         "step3_desc": "Garantía matemática de que el Debe coincide con el Haber.",
         "badge_erp": "✓ COMPATIBLE A3 • SAGE • SOFTWARE FISCAL",
         "badge_audit": "✓ CUADRE DEBE = HABER GARANTIZADO",
-        "badge_sec": "✓ CIFRADO DE DATOS BANCARIO"
+        "badge_sec": "✓ CIFRADO DE DATOS BANCARIO",
+        "bot_name": "LedgerBot (Asistente IA)",
+        "bot_bubble": "¡Hola! Sube tus facturas y cuadraré los asientos contables al céntimo. 👾"
     },
     "🇮🇹 IT": {
         "badge": "TERMINALE FINANZIARIO AUTONOMO",
@@ -249,16 +222,7 @@ LANG_DATA = {
         "themes": ["✨ Ultra Vivid Aurora", "🌌 Cyberpunk Night", "🌑 Platino Titanio"],
         "about_btn": "ℹ️ Funzionamento e Sicurezza",
         "about_title": "Architettura di Sicurezza LedgerAI",
-        "about_content": """
-        ### 🛡️ Registrazione Contabile Intelligente
-        
-        **LedgerAI** digitalizza e registra automaticamente le fatture passive in partita doppia.
-        
-        * **1. Acquisizione Fiscale:** Riconoscimento di Partita IVA/Codice Fiscale, imponibili, aliquote IVA (4%, 10%, 22%) e totale documento.
-        * **2. Piano dei Conti:** Assegnazione automatica a conti di costo, IVA a credito e debiti verso fornitori.
-        * **3. Quadratura Fiscale:** Controllo rigoroso prima dell'export affinché `Dare = Avere`.
-        * **4. Integrazione ERP:** File Excel strutturato pronto per Zucchetti, Teamsystem e SAP.
-        """,
+        "about_content": "Generazione automatica di prima nota conforme ai principi contabili.",
         "step1_title": "1. Acquisizione Dati",
         "step1_desc": "Scansione OCR di aliquote IVA, imponibili e fornitore.",
         "step2_title": "2. Piano dei Conti",
@@ -267,7 +231,9 @@ LANG_DATA = {
         "step3_desc": "Verifica della perfetta parità contabile della scrittura.",
         "badge_erp": "✓ PRONTO PER ZUCCHETTI • TEAMSYSTEM • SAP",
         "badge_audit": "✓ QUADRATURA DARE/AVERE GARANTITA",
-        "badge_sec": "✓ PROTEZIONE DATI STANDARD BANCARIO"
+        "badge_sec": "✓ PROTEZIONE DATI STANDARD BANCARIO",
+        "bot_name": "LedgerBot (Assistente IA)",
+        "bot_bubble": "Ciao! Carica le fatture e creerò la tua prima nota perfettamente quadrata. 👾"
     }
 }
 
@@ -286,18 +252,9 @@ if st.session_state["theme_idx"] == 1:
     # 🌌 Cyberpunk Gece (Canlı Neon Fuşya ve Lazer Mavisi Işık Hüzmeleri)
     bg_css = """
         @keyframes cyberpunkPulse {
-            0% { 
-                background-position: 0% 0%, 100% 100%, 50% 10%; 
-                filter: brightness(1) contrast(1.1); 
-            }
-            50% { 
-                background-position: 100% 100%, 0% 0%, 50% 90%; 
-                filter: brightness(1.25) contrast(1.25); 
-            }
-            100% { 
-                background-position: 0% 0%, 100% 100%, 50% 10%; 
-                filter: brightness(1) contrast(1.1); 
-            }
+            0% { background-position: 0% 0%, 100% 100%, 50% 10%; filter: brightness(1) contrast(1.1); }
+            50% { background-position: 100% 100%, 0% 0%, 50% 90%; filter: brightness(1.25) contrast(1.25); }
+            100% { background-position: 0% 0%, 100% 100%, 50% 10%; filter: brightness(1) contrast(1.1); }
         }
         .stApp {
             background: radial-gradient(circle at 15% 15%, rgba(217, 70, 239, 0.45) 0%, transparent 45%),
@@ -313,18 +270,9 @@ elif st.session_state["theme_idx"] == 0:
     # ✨ Ultra Aurora (Zümrüt Yeşili, Safir Mavisi ve Altın Işık Dalgaları)
     bg_css = """
         @keyframes auroraRealFlow {
-            0% { 
-                background-position: 0% 30%; 
-                filter: hue-rotate(0deg); 
-            }
-            50% { 
-                background-position: 100% 70%; 
-                filter: hue-rotate(45deg); 
-            }
-            100% { 
-                background-position: 0% 30%; 
-                filter: hue-rotate(0deg); 
-            }
+            0% { background-position: 0% 30%; filter: hue-rotate(0deg); }
+            50% { background-position: 100% 70%; filter: hue-rotate(45deg); }
+            100% { background-position: 0% 30%; filter: hue-rotate(0deg); }
         }
         .stApp {
             background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.45) 0%, transparent 45%),
@@ -357,7 +305,7 @@ else:
 
 st.markdown(f"""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Press+Start+2P&display=swap');
     
     html, body, [class*="css"] {{
         font-family: 'Plus Jakarta Sans', sans-serif;
@@ -369,13 +317,13 @@ st.markdown(f"""
     
     .stApp {{
         color: #F8FAFC;
-        padding-bottom: 125px;
+        padding-bottom: 110px;
     }}
 
     /* TEK PARÇA LÜKS CAM KONSOL */
     .master-console {{
         max-width: 860px;
-        margin: 20px auto 0 auto;
+        margin: 15px auto 0 auto;
         background: rgba(11, 16, 28, 0.75);
         border: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 28px;
@@ -423,7 +371,6 @@ st.markdown(f"""
         margin: 0 auto 24px auto;
     }}
 
-    /* Konsol İçi Bütünleşik Yükleme Alanı */
     div[data-testid="stFileUploader"] {{
         background: rgba(6, 9, 18, 0.65);
         border: 1px dashed rgba(255, 255, 255, 0.22);
@@ -438,7 +385,6 @@ st.markdown(f"""
         background: rgba(9, 14, 26, 0.8);
     }}
 
-    /* İşlem Butonu */
     div.stButton > button:first-child {{
         background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
         border: none;
@@ -456,7 +402,6 @@ st.markdown(f"""
         transform: translateY(-2px);
     }}
 
-    /* 3 ADIMLI İŞLEYİŞ KARTLARI (SAYFAYI ZENGİNLEŞTİREN ALAN) */
     .steps-container {{
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -492,7 +437,6 @@ st.markdown(f"""
         line-height: 1.4;
     }}
 
-    /* GÜVEN ROZETLERİ */
     .trust-grid {{
         display: flex;
         justify-content: center;
@@ -513,42 +457,50 @@ st.markdown(f"""
         gap: 6px;
     }}
 
-    /* EK DÜZENLEMELER: DOCK'U SAYFANIN EN ALTINA SABİTLEME */
-    .dock-fixed-outer {{
-        position: fixed;
-        bottom: 18px;
-        left: 0;
-        right: 0;
-        margin: 0 auto;
-        width: fit-content;
-        max-width: 94vw;
-        z-index: 999999;
-        background: rgba(10, 14, 26, 0.88);
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        border-radius: 50px;
-        backdrop-filter: blur(32px);
-        -webkit-backdrop-filter: blur(32px);
-        padding: 4px 14px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    /* KONTROL ÇUBUĞU */
+    .control-deck {{
+        max-width: 860px;
+        margin: 18px auto 0 auto;
+        background: rgba(10, 14, 26, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        backdrop-filter: blur(28px);
+        padding: 8px 18px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
     }}
 
-    .dock-fixed-outer div[data-testid="stSelectbox"] > div {{
-        min-height: 32px !important;
-        height: 32px !important;
-        font-size: 0.8rem !important;
-        border-radius: 20px !important;
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    /* PIXEL AI ASİSTAN (SAĞ ALT KÖŞE) */
+    .pixel-bot-wrapper {{
+        position: fixed;
+        bottom: 24px;
+        right: 28px;
+        z-index: 9999999;
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
     }}
-    .dock-fixed-outer div.stButton > button {{
-        height: 32px !important;
-        padding: 4px 12px !important;
-        font-size: 0.78rem !important;
-        border-radius: 20px !important;
-        background: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        box-shadow: none !important;
-        margin-top: 0 !important;
+    .pixel-bot {{
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(135deg, #6366F1, #06B6D4);
+        border: 2px solid #FFFFFF;
+        border-radius: 14px;
+        box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        cursor: pointer;
+        animation: botFloat 3s ease-in-out infinite;
+        transition: transform 0.2s;
+    }}
+    .pixel-bot:hover {{
+        transform: scale(1.1) rotate(5deg);
+    }}
+    @keyframes botFloat {{
+        0% {{ transform: translateY(0px); }}
+        50% {{ transform: translateY(-8px); }}
+        100% {{ transform: translateY(0px); }}
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -621,7 +573,6 @@ if yuklenen_dosyalar:
             status_text = st.empty()
             toplam_dosya = len(yuklenen_dosyalar)
             
-            # Seçilen sektör mantığı direktifi
             sektor_secimi = T["industries"][st.session_state["industry_idx"]]
             sektor_direktifi = f"Firma Faaliyet Türü: {sektor_secimi}. "
             if "Ticaret" in sektor_secimi or "Retail" in sektor_secimi:
@@ -718,7 +669,6 @@ if yuklenen_dosyalar:
                     cari_kod = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
                     kdv_kod = f"191.{int(tax_rate):02d}"
 
-                    # Başlıklar
                     if "TR" in st.session_state["user_lang"]:
                         h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Fiş No", "Tarih", "Hesap Kodu", "Hesap Adı", "Açıklama", "Borç", "Alacak"
                         kdv_adi = f"%{tax_rate} İndirilecek KDV"
@@ -738,20 +688,17 @@ if yuklenen_dosyalar:
                         h_v, h_d, h_c, h_n, h_m, h_deb, h_crd = "Voucher #", "Date", "Account Code", "Account Name", "Memo", "Debit", "Credit"
                         kdv_adi = f"Tax ({tax_rate}%)"
 
-                    # 1. Gider/Mal Satırı
                     fis_satirlari.append({
                         h_v: fis_no, h_d: date_val, h_c: acc_code, h_n: acc_name,
                         h_m: f"{vendor} - {inv_no}", "Para": curr, h_deb: net, h_crd: 0.0
                     })
                     
-                    # 2. KDV Satırı
                     if tax > 0:
                         fis_satirlari.append({
                             h_v: fis_no, h_d: date_val, h_c: kdv_kod, h_n: kdv_adi,
                             h_m: f"{vendor} - KDV", "Para": curr, h_deb: tax, h_crd: 0.0
                         })
                     
-                    # 3. Satıcı Satırı
                     fis_satirlari.append({
                         h_v: fis_no, h_d: date_val, h_c: cari_kod, h_n: vendor,
                         h_m: f"{vendor} - {inv_no}", "Para": curr, h_deb: 0.0, h_crd: total
@@ -787,6 +734,39 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+# --- İŞLEVSEL KONTROL ÇUBUĞU (KONSOLUN HEMEN ALTINDA DÜZENLİ DİZİLİM) ---
+st.markdown("<div class='control-deck'>", unsafe_allow_html=True)
+col_b1, col_b2, col_b3, col_b4 = st.columns([1.6, 3.2, 3.2, 2.0])
+
+with col_b1:
+    dil_listesi = list(LANG_DATA.keys())
+    mevcut_dil_idx = dil_listesi.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in dil_listesi else 0
+    yeni_dil = st.selectbox("Dil", dil_listesi, index=mevcut_dil_idx, label_visibility="collapsed")
+    if yeni_dil != st.session_state["user_lang"]:
+        st.session_state["user_lang"] = yeni_dil
+        st.rerun()
+
+with col_b2:
+    secilen_tema = st.selectbox("Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
+    yeni_t_idx = T["themes"].index(secilen_tema)
+    if yeni_t_idx != st.session_state["theme_idx"]:
+        st.session_state["theme_idx"] = yeni_t_idx
+        st.rerun()
+
+with col_b3:
+    secilen_sektor = st.selectbox("Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
+    yeni_s_idx = T["industries"].index(secilen_sektor)
+    if yeni_s_idx != st.session_state["industry_idx"]:
+        st.session_state["industry_idx"] = yeni_s_idx
+        st.rerun()
+
+with col_b4:
+    with st.popover(T["about_btn"]):
+        st.markdown(f"#### {T['about_title']}")
+        st.markdown(T["about_content"])
+
+st.markdown("</div>", unsafe_allow_html=True)
+
 # --- TABLO VE ÇIKTI ALANI ---
 if "out_df" in st.session_state:
     st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
@@ -818,50 +798,13 @@ if "out_df" in st.session_state:
         use_container_width=True
     )
 
-# --- EN ALTA SABİTLENMİŞ İŞLEVSEL LİKİT CAM DOCK ---
-st.markdown("<div class='dock-fixed-outer'>", unsafe_allow_html=True)
-col_b1, col_b2, col_b3, col_b4 = st.columns([1.6, 3.2, 3.2, 2.2])
+# --- SAĞ ALT KÖŞEDE KONUŞAN PIXEL AI ASİSTAN ---
+with st.sidebar:
+    pass
 
-with col_b1:
-    dil_listesi = list(LANG_DATA.keys())
-    mevcut_dil_idx = dil_listesi.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in dil_listesi else 0
-    yeni_dil = st.selectbox(
-        "Dil",
-        dil_listesi,
-        index=mevcut_dil_idx,
-        label_visibility="collapsed"
-    )
-    if yeni_dil != st.session_state["user_lang"]:
-        st.session_state["user_lang"] = yeni_dil
-        st.rerun()
-
-with col_b2:
-    secilen_tema = st.selectbox(
-        "Görünüm",
-        T["themes"],
-        index=st.session_state["theme_idx"],
-        label_visibility="collapsed"
-    )
-    yeni_t_idx = T["themes"].index(secilen_tema)
-    if yeni_t_idx != st.session_state["theme_idx"]:
-        st.session_state["theme_idx"] = yeni_t_idx
-        st.rerun()
-
-with col_b3:
-    secilen_sektor = st.selectbox(
-        "Sektör",
-        T["industries"],
-        index=st.session_state["industry_idx"],
-        label_visibility="collapsed"
-    )
-    yeni_s_idx = T["industries"].index(secilen_sektor)
-    if yeni_s_idx != st.session_state["industry_idx"]:
-        st.session_state["industry_idx"] = yeni_s_idx
-        st.rerun()
-
-with col_b4:
-    with st.popover(T["about_btn"]):
-        st.markdown(f"#### {T['about_title']}")
-        st.markdown(T["about_content"])
-
+st.markdown("<div class='pixel-bot-wrapper'>", unsafe_allow_html=True)
+with st.popover("👾", help=T["bot_name"]):
+    st.markdown(f"**🤖 {T['bot_name']}**")
+    st.info(T["bot_bubble"])
+    st.caption("• Canlı Bakiye Denetimi Aktif\n• ETA / Luca / Datev Şablon Motoru Hazır")
 st.markdown("</div>", unsafe_allow_html=True)
