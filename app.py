@@ -18,7 +18,52 @@ st.set_page_config(
 API_KEY = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=API_KEY)
 
-# --- EXCEL OLUŞTURUCU ---
+# --- YAN PANEL: ESNEK HESAP PLANI VE KURAL AYARLARI ---
+with st.sidebar:
+    st.title("⚙️ Hesap Planı & Format")
+    
+    st.markdown("### 1. Özel Hesap Planı Yükleme (Opsiyonel)")
+    hesap_plani_dosyasi = st.file_uploader(
+        "Firma Hesap Planı (Excel veya CSV)", 
+        type=["xlsx", "xls", "csv"],
+        help="Hesap Kodu ve Hesap Adı sütunlarını içeren dosyanızı yükleyin."
+    )
+    
+    firma_hesap_ozeti = ""
+    if hesap_plani_dosyasi:
+        try:
+            if hesap_plani_dosyasi.name.endswith(".csv"):
+                df_plan = pd.read_csv(hesap_plani_dosyasi)
+            else:
+                df_plan = pd.read_excel(hesap_plani_dosyasi)
+            
+            # İlk 2 sütunu baz alarak hızlı özet çıkar
+            cols = df_plan.columns[:2]
+            ornek_kodlar = df_plan[cols].dropna().head(100).to_dict(orient="records")
+            firma_hesap_ozeti = json.dumps(ornek_kodlar, ensure_ascii=False)
+            st.success(f"✅ {len(df_plan)} satırlık hesap planı yüklendi!")
+        except Exception as e:
+            st.error(f"Hesap planı okunamadı: {str(e)[:60]}")
+    
+    st.markdown("---")
+    st.markdown("### 2. Standart Format Ayarları")
+    st.caption("Hesap planı yüklemediyseniz veya listede eşleşme yoksa bu kurallar uygulanır:")
+    
+    cari_kodlama_tipi = st.selectbox(
+        "Cari (320) Kodlama Formatı",
+        [
+            "Vergi Numarası Bazlı (Örn: 320.VKN)", 
+            "Firma Adı Bazlı (Örn: 320.SHELL)", 
+            "Standart Sıralı (320.01.001)"
+        ]
+    )
+    
+    alt_hesap_stili = st.selectbox(
+        "Gider Kodlama Formatı",
+        ["3 Kademeli (770.01.001)", "2 Kademeli (770.01)", "Ana Hesap (770)"]
+    )
+
+# --- EXCEL OLUŞTURUCU (KURUMSAL FORMAT) ---
 def excel_tablosu_olustur(df, sheet_name="Muhasebe_Fisi"):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -60,9 +105,9 @@ def excel_tablosu_olustur(df, sheet_name="Muhasebe_Fisi"):
 
     return output.getvalue()
 
-# --- ARAYÜZ ---
-st.title("💼 FinAuto AI - Akıllı Muhasebe Fiş Motoru")
-st.markdown("Faturaları yükleyin; sistem harcama türünü (Akaryakıt, Yemek, Mal Alışı, Kargo vb.) otomatik tespit edip kurumsal yevmiye fişini çıkarsın.")
+# --- ANA EKRAN ---
+st.title("💼 FinAuto AI - Esnek Muhasebe Motoru")
+st.markdown("Belgeleri yükleyin; yapay zeka firmanızın hesap planı yapısına göre Borç/Alacak yevmiye fişini çıkarsın.")
 
 yuklenen_dosyalar = st.file_uploader(
     "Fatura veya fiş yükleyin (PDF, PNG, JPG)", 
@@ -88,32 +133,31 @@ if yuklenen_dosyalar:
                 dosya_baytlari = dosya.read()
                 mime_tipi = dosya.type if dosya.type else "application/pdf"
                 
-                prompt = """
-                Sen üst düzey bir mali müşavir ve muhasebe uzmanısın. Belgeyi incele.
-                Harcama türünü ve Tek Düzen Hesap Planı'na göre en uygun hesap kodunu otomatik belirle:
-                - Ticari mal alımı ise: "153.01 Ticari Mallar"
-                - Akaryakıt/Yakıt ise: "770.01 Akaryakıt Giderleri"
-                - Yemek/Temsil/Ağırlama ise: "770.02 Yemek ve Ağırlama"
-                - Kırtasiye/Ofis Malzemesi ise: "770.03 Kırtasiye Giderleri"
-                - Kargo/Nakliye ise: "770.04 Kargo ve Ulaşım"
-                - Demirbaş/Ekipman alımı ise: "255.01 Demirbaşlar"
-                - Diğer genel giderler için: "770.99 Genel Giderler"
+                ek_talimat = ""
+                if firma_hesap_ozeti:
+                    ek_talimat = f"ÖNCELİK: Firmanın özel hesap planı listesinden en uygun kodu seç: {firma_hesap_ozeti}"
+                else:
+                    ek_talimat = f"Format Tercihleri: Gider kodlarını {alt_hesap_stili} formatında aç. Cari hesap formatı: {cari_kodlama_tipi}."
 
-                SADECE şu JSON şablonunu döndür:
-                {
+                prompt = f"""
+                Sen üst düzey bir muhasebe denetçisisin. Belgeyi incele ve bilgileri çıkar.
+                {ek_talimat}
+
+                SADECE şu JSON objesini döndür:
+                {{
                   "Fatura No": "...",
                   "Tarih": "...",
                   "Satıcı": "...",
                   "VKN_TCKN": "...",
-                  "Belge Türü": "Alış Faturası / Gider Fişi",
-                  "Önerilen Hesap Kodu": "770.01",
-                  "Hesap Adı": "Akaryakıt Giderleri",
+                  "Gider Türü": "Akaryakıt / Ticari Mal / Yemek / Kırtasiye / Diğer",
+                  "Önerilen Hesap Kodu": "...",
+                  "Hesap Adı": "...",
                   "Matrah": 0.0,
                   "KDV Orani": 20,
                   "KDV Tutarı": 0.0,
                   "Genel Toplam": 0.0
-                }
-                Tutar alanlarını float yap. Markdown etiketi ekleme.
+                }}
+                Tutar alanlarını kesinlikle float döndür. Markdown etiketi kullanma, doğrudan saf JSON dön.
                 """
                 
                 maksimum_deneme = 3
@@ -159,45 +203,55 @@ if yuklenen_dosyalar:
                     fatura_no = item.get("Fatura No", "")
                     tarih = item.get("Tarih", "")
                     satici = item.get("Satıcı", "")
-                    hesap_kodu = item.get("Önerilen Hesap Kodu", "770.99")
-                    hesap_adi = item.get("Hesap Adı", "Genel Giderler")
+                    vkn = item.get("VKN_TCKN", "").strip()
+                    gider_kodu = item.get("Önerilen Hesap Kodu", "770.01")
+                    hesap_adi = item.get("Hesap Adı", "Genel Gider")
                     kdv_orani = item.get("KDV Orani", 20)
                     
                     matrah = float(item.get("Matrah", 0.0) or 0.0)
                     kdv = float(item.get("KDV Tutarı", 0.0) or 0.0)
                     genel_toplam = float(item.get("Genel Toplam", 0.0) or (matrah + kdv))
                     
-                    # 1. Satır: Akıllı Tespit Edilen Gider veya Mal Hesabı (Borç)
+                    # Cari Kod Belirleme
+                    if "Vergi Numarası" in cari_kodlama_tipi and vkn:
+                        cari_kod = f"320.{vkn}"
+                    elif "Firma Adı" in cari_kodlama_tipi and satici:
+                        temiz_isim = "".join(ch for ch in satici[:10] if ch.isalnum()).upper()
+                        cari_kod = f"320.{temiz_isim}"
+                    else:
+                        cari_kod = "320.01.001"
+                    
+                    # 1. Gider/Mal Satırı (Borç)
                     fis_satirlari.append({
                         "Fiş No": fis_sira_no,
                         "Tarih": tarih,
-                        "Hesap Kodu": hesap_kodu,
+                        "Hesap Kodu": gider_kodu,
                         "Hesap Adı": hesap_adi,
-                        "Açıklama": f"{satici} - Ftr No: {fatura_no}",
+                        "Açıklama": f"{satici} - Ftr: {fatura_no}",
                         "Borç": matrah,
                         "Alacak": 0.0
                     })
                     
-                    # 2. Satır: İndirilecek KDV (Borç)
+                    # 2. KDV Satırı (Borç)
                     if kdv > 0:
-                        kdv_hesap_kodu = f"191.{int(kdv_orani):02d}" if kdv_orani else "191.20"
+                        kdv_kodu = f"191.{int(kdv_orani):02d}" if kdv_orani else "191.20"
                         fis_satirlari.append({
                             "Fiş No": fis_sira_no,
                             "Tarih": tarih,
-                            "Hesap Kodu": kdv_hesap_kodu,
+                            "Hesap Kodu": kdv_kodu,
                             "Hesap Adı": f"%{kdv_orani} İndirilecek KDV",
                             "Açıklama": f"{satici} - KDV",
                             "Borç": kdv,
                             "Alacak": 0.0
                         })
                     
-                    # 3. Satır: Satıcı / Kasa (Alacak)
+                    # 3. Satıcı/Cari Satırı (Alacak)
                     fis_satirlari.append({
                         "Fiş No": fis_sira_no,
                         "Tarih": tarih,
-                        "Hesap Kodu": "320.01.001",
+                        "Hesap Kodu": cari_kod,
                         "Hesap Adı": satici,
-                        "Açıklama": f"{satici} - Ftr No: {fatura_no}",
+                        "Açıklama": f"{satici} - Ftr: {fatura_no}",
                         "Borç": 0.0,
                         "Alacak": genel_toplam
                     })
@@ -205,27 +259,35 @@ if yuklenen_dosyalar:
                     fis_sira_no += 1
                 
                 df_sonuc = pd.DataFrame(fis_satirlari)
-                
-                st.divider()
-                st.subheader("📊 Otomatik Sınıflandırılmış Yevmiye Fişi")
-                st.dataframe(df_sonuc, use_container_width=True)
-                
-                # Bakiye kontrolü
-                toplam_borc = df_sonuc["Borç"].sum()
-                toplam_alacak = df_sonuc["Alacak"].sum()
-                
-                col1, col2, col3 = st.columns(3)
-                col1.metric("Toplam Borç", f"{toplam_borc:,.2f} TL")
-                col2.metric("Toplam Alacak", f"{toplam_alacak:,.2f} TL")
-                if abs(toplam_borc - toplam_alacak) < 0.05:
-                    col3.success("✅ Fiş Bakiyesi Dengeli (Borç = Alacak)")
-                else:
-                    col3.warning("⚠️ Bakiye Farkı Var")
+                st.session_state["sonuc_tablosu"] = df_sonuc
 
-                excel_cikti = excel_tablosu_olustur(df_sonuc, sheet_name="Fis_Aktarim")
-                st.download_button(
-                    label="📥 Otomatik Muhasebe Fişini İndir (.xlsx)",
-                    data=excel_cikti,
-                    file_name="akilli_muhasebe_fisi.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+if "sonuc_tablosu" in st.session_state:
+    st.divider()
+    st.subheader("📊 Oluşturulan Muhasebe Fiş Tablosu (Düzenlenebilir)")
+    st.info("💡 Tablodaki herhangi bir hücreye çift tıklayarak kod veya açıklamaları manuel olarak değiştirebilirsiniz. Değişiklikler anında Excel çıktısına yansır.")
+    
+    # Ekranda interaktif Excel düzenleyici
+    guncel_df = st.data_editor(
+        st.session_state["sonuc_tablosu"], 
+        use_container_width=True, 
+        num_rows="dynamic"
+    )
+    
+    toplam_borc = guncel_df["Borç"].sum()
+    toplam_alacak = guncel_df["Alacak"].sum()
+    
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Toplam Borç", f"{toplam_borc:,.2f} TL")
+    col2.metric("Toplam Alacak", f"{toplam_alacak:,.2f} TL")
+    if abs(toplam_borc - toplam_alacak) < 0.05:
+        col3.success("✅ Fiş Dengeli (Borç = Alacak)")
+    else:
+        col3.warning("⚠️ Bakiye Farkı Var!")
+
+    excel_cikti = excel_tablosu_olustur(guncel_df, sheet_name="Fis_Aktarim")
+    st.download_button(
+        label="📥 Düzenlenmiş Muhasebe Excel'ini İndir (.xlsx)",
+        data=excel_cikti,
+        file_name="akilli_muhasebe_fisi.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
