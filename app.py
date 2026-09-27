@@ -15,7 +15,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 6 DİLLİ GLOBAL SÖZLÜK ---
+# API İstemcisi
+API_KEY = st.secrets["GEMINI_API_KEY"]
+client = genai.Client(api_key=API_KEY)
+
+# --- 6 DİLLİ VE KAPSAMLI KURUMSAL SÖZLÜK ---
 LANG_DATA = {
     "🇹🇷 TR": {
         "badge": "KURUMSAL OTONOM FİNANS TERMİNALİ",
@@ -57,8 +61,9 @@ LANG_DATA = {
         "badge_erp": "✓ ETA • LUCA • DATEV • QUICKBOOKS UYUMLU",
         "badge_audit": "✓ %100 BORÇ/ALACAK DENGE GARANTİSİ",
         "badge_sec": "✓ OTONOM OCR & ÇİFT BAKİYE DENETİMİ",
-        "bot_name": "LedgerBot (Finans Asistanı)",
-        "bot_bubble": "Selam! Ben yapay zeka denetçinim. Belgelerini yükle; 153/770 ayrımını ve Borç/Alacak dengesini senin yerine kurayım! 👾"
+        "bot_title": "👾 LedgerBot Asistan",
+        "bot_welcome": "Merhaba! Ben yapay zeka finans asistanınım. Muhasebe kodları, KDV oranları veya fatura işleme hakkında bana her şeyi sorabilirsin!",
+        "bot_placeholder": "Bir soru yazın (Örn: Laptop aldık hangi koda atayım?)..."
     },
     "🇺🇸 EN": {
         "badge": "INSTITUTIONAL AI FINANCIAL TERMINAL",
@@ -92,8 +97,9 @@ LANG_DATA = {
         "badge_erp": "✓ QUICKBOOKS • XERO • DATEV • SAP READY",
         "badge_audit": "✓ 100% DEBIT/CREDIT BALANCE GUARANTEE",
         "badge_sec": "✓ SOC2 & BANK-GRADE DATA ENCRYPTION",
-        "bot_name": "LedgerBot (Finance AI)",
-        "bot_bubble": "Hi! I am your autonomous AI auditor. Drop your receipts and I will balance debit & credit down to the cent! 👾"
+        "bot_title": "👾 LedgerBot Assistant",
+        "bot_welcome": "Hello! I am your AI financial auditor. Ask me anything regarding account codes, VAT rates or double-entry balancing!",
+        "bot_placeholder": "Ask a question (e.g. How to classify cloud hosting?)..."
     },
     "🇩🇪 DE": {
         "badge": "KI FINANZTERMINAL & BUCHHALTUNG",
@@ -127,8 +133,9 @@ LANG_DATA = {
         "badge_erp": "✓ DATEV SKR03/04 • SAP KOMPATIBEL",
         "badge_audit": "✓ 100% SOLL/HABEN AUSGEGLICHENHEIT",
         "badge_sec": "✓ DSGVO-KONFORME DATENVERARBEITUNG",
-        "bot_name": "LedgerBot (Buchhaltungs-KI)",
-        "bot_bubble": "Hallo! Ich bin dein KI-Buchhalter. Belege hochladen und Datev-Buchungssätze sofort erhalten! 👾"
+        "bot_title": "👾 LedgerBot Assistent",
+        "bot_welcome": "Hallo! Fragen Sie mich alles zu SKR03/04 Buchungssätzen und Vorsteuern.",
+        "bot_placeholder": "Frage eingeben..."
     },
     "🇫🇷 FR": {
         "badge": "TERMINAL FINANCIER AUTONOME IA",
@@ -162,8 +169,9 @@ LANG_DATA = {
         "badge_erp": "✓ CONFORME PCG • SAGE & CEGID READY",
         "badge_audit": "✓ ÉQUILIBRE DÉBIT/CRÉDIT GARANTI",
         "badge_sec": "✓ SÉCURITÉ CONFORME RGPD",
-        "bot_name": "LedgerBot (Assistant IA)",
-        "bot_bubble": "Bonjour! Déposez vos factures pour générer vos écritures comptables conformes au PCG! 👾"
+        "bot_title": "👾 Assistant LedgerBot",
+        "bot_welcome": "Bonjour! Posez-moi vos questions sur le Plan Comptable Général ou vos écritures.",
+        "bot_placeholder": "Poser une question..."
     },
     "🇪🇸 ES": {
         "badge": "TERMINAL FINANCIERO INTELIGENTE",
@@ -197,8 +205,9 @@ LANG_DATA = {
         "badge_erp": "✓ COMPATIBLE A3 • SAGE • SOFTWARE FISCAL",
         "badge_audit": "✓ CUADRE DEBE = HABER GARANTIZADO",
         "badge_sec": "✓ CIFRADO DE DATOS BANCARIO",
-        "bot_name": "LedgerBot (Asistente IA)",
-        "bot_bubble": "¡Hola! Sube tus facturas y cuadraré los asientos contables al céntimo. 👾"
+        "bot_title": "👾 Asistente LedgerBot",
+        "bot_welcome": "¡Hola! Pregúntame sobre el PGC, tipos de IVA o cuadre de asientos.",
+        "bot_placeholder": "Escribe tu duda contable..."
     },
     "🇮🇹 IT": {
         "badge": "TERMINALE FINANZIARIO AUTONOMO",
@@ -232,8 +241,9 @@ LANG_DATA = {
         "badge_erp": "✓ PRONTO PER ZUCCHETTI • TEAMSYSTEM • SAP",
         "badge_audit": "✓ QUADRATURA DARE/AVERE GARANTITA",
         "badge_sec": "✓ PROTEZIONE DATI STANDARD BANCARIO",
-        "bot_name": "LedgerBot (Assistente IA)",
-        "bot_bubble": "Ciao! Carica le fatture e creerò la tua prima nota perfettamente quadrata. 👾"
+        "bot_title": "👾 Assistente LedgerBot",
+        "bot_welcome": "Ciao! Chiedimi qualsiasi cosa sulla prima nota o aliquote IVA.",
+        "bot_placeholder": "Fai una domanda..."
     }
 }
 
@@ -244,12 +254,13 @@ if "theme_idx" not in st.session_state:
     st.session_state["theme_idx"] = 0
 if "industry_idx" not in st.session_state:
     st.session_state["industry_idx"] = 0
+if "chat_messages" not in st.session_state:
+    st.session_state["chat_messages"] = []
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
 # --- GERÇEK VE GÖZ ALICI 3 FARKLI TEMA MOTORU ---
 if st.session_state["theme_idx"] == 1:
-    # 🌌 Cyberpunk Gece (Canlı Neon Fuşya ve Lazer Mavisi Işık Hüzmeleri)
     bg_css = """
         @keyframes cyberpunkPulse {
             0% { background-position: 0% 0%, 100% 100%, 50% 10%; filter: brightness(1) contrast(1.1); }
@@ -267,7 +278,6 @@ if st.session_state["theme_idx"] == 1:
         }
     """
 elif st.session_state["theme_idx"] == 0:
-    # ✨ Ultra Aurora (Zümrüt Yeşili, Safir Mavisi ve Altın Işık Dalgaları)
     bg_css = """
         @keyframes auroraRealFlow {
             0% { background-position: 0% 30%; filter: hue-rotate(0deg); }
@@ -286,7 +296,6 @@ elif st.session_state["theme_idx"] == 0:
         }
     """
 else:
-    # 🌑 Platin Titanyum (Apple Pro Metalik Gümüş & Derin Antrasit)
     bg_css = """
         @keyframes titaniumSheen {
             0% { background-position: 0% 50%; }
@@ -305,7 +314,7 @@ else:
 
 st.markdown(f"""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Press+Start+2P&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     
     html, body, [class*="css"] {{
         font-family: 'Plus Jakarta Sans', sans-serif;
@@ -317,19 +326,19 @@ st.markdown(f"""
     
     .stApp {{
         color: #F8FAFC;
-        padding-bottom: 110px;
+        padding-bottom: 70px;
     }}
 
     /* TEK PARÇA LÜKS CAM KONSOL */
     .master-console {{
-        max-width: 860px;
+        max-width: 880px;
         margin: 15px auto 0 auto;
-        background: rgba(11, 16, 28, 0.75);
+        background: rgba(11, 16, 28, 0.78);
         border: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 28px;
         backdrop-filter: blur(36px);
         -webkit-backdrop-filter: blur(36px);
-        padding: 38px 40px 32px 40px;
+        padding: 38px 40px 28px 40px;
         box-shadow: 0 35px 90px rgba(0, 0, 0, 0.75), 
                     inset 0 1px 0 rgba(255, 255, 255, 0.18);
         text-align: center;
@@ -427,9 +436,6 @@ st.markdown(f"""
         font-weight: 700;
         color: #F1F5F9;
         margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
     }}
     .step-desc {{
         font-size: 0.72rem;
@@ -452,62 +458,21 @@ st.markdown(f"""
         font-weight: 700;
         letter-spacing: 0.8px;
         color: #94A3B8;
-        display: flex;
-        align-items: center;
-        gap: 6px;
     }}
 
     /* KONTROL ÇUBUĞU */
     .control-deck {{
-        max-width: 860px;
+        max-width: 880px;
         margin: 18px auto 0 auto;
-        background: rgba(10, 14, 26, 0.82);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(10, 14, 26, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.14);
         border-radius: 20px;
         backdrop-filter: blur(28px);
         padding: 8px 18px;
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
     }}
-
-    /* PIXEL AI ASİSTAN (SAĞ ALT KÖŞE) */
-    .pixel-bot-wrapper {{
-        position: fixed;
-        bottom: 24px;
-        right: 28px;
-        z-index: 9999999;
-        display: flex;
-        align-items: flex-end;
-        gap: 12px;
-    }}
-    .pixel-bot {{
-        width: 52px;
-        height: 52px;
-        background: linear-gradient(135deg, #6366F1, #06B6D4);
-        border: 2px solid #FFFFFF;
-        border-radius: 14px;
-        box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 26px;
-        cursor: pointer;
-        animation: botFloat 3s ease-in-out infinite;
-        transition: transform 0.2s;
-    }}
-    .pixel-bot:hover {{
-        transform: scale(1.1) rotate(5deg);
-    }}
-    @keyframes botFloat {{
-        0% {{ transform: translateY(0px); }}
-        50% {{ transform: translateY(-8px); }}
-        100% {{ transform: translateY(0px); }}
-    }}
 </style>
 """, unsafe_allow_html=True)
-
-# API İstemcisi
-API_KEY = st.secrets["GEMINI_API_KEY"]
-client = genai.Client(api_key=API_KEY)
 
 # --- EXCEL OLUŞTURUCU FONKSİYON ---
 def excel_olustur(df):
@@ -552,7 +517,6 @@ st.markdown(f"""
     <div class='hero-sub'>{T['subtitle']}</div>
 """, unsafe_allow_html=True)
 
-# Konsolun içerisine doğrudan yerleşen dosya yükleyici
 yuklenen_dosyalar = st.file_uploader(
     T["drop_title"], 
     type=["pdf", "png", "jpg", "jpeg"], 
@@ -798,13 +762,38 @@ if "out_df" in st.session_state:
         use_container_width=True
     )
 
-# --- SAĞ ALT KÖŞEDE KONUŞAN PIXEL AI ASİSTAN ---
-with st.sidebar:
-    pass
+# --- GERÇEK VE CANLI KONUŞAN PIXEL AI ASİSTAN KONSOLU ---
+st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
 
-st.markdown("<div class='pixel-bot-wrapper'>", unsafe_allow_html=True)
-with st.popover("👾", help=T["bot_name"]):
-    st.markdown(f"**🤖 {T['bot_name']}**")
-    st.info(T["bot_bubble"])
-    st.caption("• Canlı Bakiye Denetimi Aktif\n• ETA / Luca / Datev Şablon Motoru Hazır")
-st.markdown("</div>", unsafe_allow_html=True)
+c_l, c_bot, c_r = st.columns([1, 2.5, 1])
+with c_bot:
+    with st.expander(T["bot_title"], expanded=False):
+        st.caption(T["bot_welcome"])
+        
+        # Mesaj Geçmişi
+        for msg in st.session_state["chat_messages"][-4:]:
+            with st.chat_message(msg["role"]):
+                st.write(msg["content"])
+                
+        user_soru = st.chat_input(T["bot_placeholder"])
+        if user_soru:
+            st.session_state["chat_messages"].append({"role": "user", "content": user_soru})
+            with st.chat_message("user"):
+                st.write(user_soru)
+                
+            with st.chat_message("assistant"):
+                bot_prompt = f"""
+                Sen LedgerAI'ın kurumsal finans asistanısın. 
+                Kullanıcı dili: {st.session_state['user_lang']}.
+                Kullanıcı muhasebe veya sistem hakkında soru soruyor: "{user_soru}".
+                Tek Düzen Hesap Planı, US GAAP, Datev veya PCG muhasebe standartlarına göre kısa, net, zeki ve yardımcı bir cevap ver.
+                """
+                try:
+                    bot_cevap = client.models.generate_content(
+                        model="gemini-3.5-flash-lite",
+                        contents=bot_prompt
+                    ).text
+                    st.write(bot_cevap)
+                    st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
+                except Exception as e:
+                    st.error("Asistan şu an yoğun, lütfen tekrar deneyin.")
