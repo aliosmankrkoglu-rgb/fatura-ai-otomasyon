@@ -3,7 +3,7 @@
 LEDGERAI — INSTITUTIONAL ENTERPRISE ACCOUNTING TERMINAL
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
 Design: Minimal GitHub Pill Style / Full-Width Executive Cockpit (Whitelabel)
-Version: 4.3.0 Enterprise Master Edition
+Version: 4.4.0 Final Production Master Edition
 ================================================================================
 """
 
@@ -63,7 +63,7 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. LOCALIZATION DATA DICTIONARY (6 GLOBAL STANDART EKSİKSİZ)
+# 2. LOCALIZATION DATA DICTIONARY (6 DİLLİ GLOBAL MEVZUAT)
 # ==============================================================================
 
 LANG_DATA = {
@@ -458,7 +458,7 @@ if st.session_state["user_lang"] not in LANG_DATA:
 T = LANG_DATA[st.session_state["user_lang"]]
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (WHITELABEL + MİKRO SESLİ & ANİMASYONLU CSS)
+# 3. DYNAMIC STYLING ENGINE (GERÇEK GİTHUB HAPLARI & MİKRO SESLİ CSS)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -686,6 +686,7 @@ st.markdown(f"""
         box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
     }}
 
+    /* ASİSTAN İÇİ MİKRO GİTHUB HAPLARI */
     div[data-testid="stExpander"] div.stButton button {{
         background: rgba(255, 255, 255, 0.06) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
@@ -708,6 +709,7 @@ st.markdown(f"""
         transform: scale(1.03) !important;
     }}
 
+    /* CHAT MESAJ BALONLARI: DEV KUTULARI SİLİP ŞIK MİKRO BALONA DÖNÜŞTÜRME */
     .chat-scroll-area {{
         max-height: 280px;
         overflow-y: auto;
@@ -721,6 +723,30 @@ st.markdown(f"""
     .chat-scroll-area::-webkit-scrollbar-thumb {{
         background: rgba(255, 255, 255, 0.2);
         border-radius: 4px;
+    }}
+
+    .user-bubble {{
+        background: rgba(59, 130, 246, 0.22);
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        border-radius: 12px 12px 2px 12px;
+        padding: 8px 12px;
+        margin: 6px 0 6px auto;
+        max-width: 85%;
+        font-size: 0.80rem;
+        color: #F1F5F9;
+        line-height: 1.4;
+    }}
+
+    .assistant-bubble {{
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px 12px 12px 2px;
+        padding: 8px 12px;
+        margin: 6px auto 6px 0;
+        max-width: 90%;
+        font-size: 0.80rem;
+        color: #CBD5E1;
+        line-height: 1.45;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -930,10 +956,7 @@ def execute_document_audit(uploaded_files, sector_directive: str):
             try:
                 response = client.models.generate_content(
                     model="gemini-3.5-flash-lite",
-                    contents=[
-                        types.Part.from_bytes(data=raw_bytes, mime_type=mime_type),
-                        prompt
-                    ]
+                    contents=prompt
                 )
                 clean_text = response.text.replace("```json", "").replace("```", "").strip()
                 data = json.loads(clean_text)
@@ -1265,7 +1288,7 @@ if st.session_state["out_df"] is not None:
         )
 
 # ==============================================================================
-# 8. MENTOR FINANS ASİSTANI (GÜÇLENDİRİLMİŞ SAĞLAM BOT MOTORU)
+# 8. MENTOR FINANS ASİSTANI (GITHUB.COM BALONU MİKRO HAPLAR)
 # ==============================================================================
 
 st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
@@ -1288,14 +1311,16 @@ with c_bot_center:
                 if st.button(chip_text, key=f"gh_pill_btn_{c_idx}", use_container_width=True):
                     secilen_chip = chip_text
 
-        # SCROLLABLE CHAT ALANI
+        # SCROLLABLE CHAT ALANI (KABA KUTULAR YERİNE ZARİF MESAJ BALONLARI)
         st.markdown("<div class='chat-scroll-area'>", unsafe_allow_html=True)
         if not st.session_state["chat_messages"]:
             st.markdown(f"<div style='color: #94A3B8; font-size: 0.82rem; padding: 8px 0;'>💡 <i>{T['bot_placeholder']}</i></div>", unsafe_allow_html=True)
         else:
             for msg in st.session_state["chat_messages"][-6:]:
-                with st.chat_message(msg["role"]):
-                    st.markdown(msg["content"])
+                if msg["role"] == "user":
+                    st.markdown(f"<div class='user-bubble'><b>Soru:</b> {msg['content']}</div>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"<div class='assistant-bubble'>🤖 <b>LedgerAI:</b> {msg['content']}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
         user_query = st.chat_input(T["bot_placeholder"])
@@ -1337,13 +1362,13 @@ with c_bot_center:
                 st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
                 st.rerun()
             else:
-                # Yedek Yanıt Mekanizması (Asla kırmızı hata fırlatmaz)
+                # Kesintisiz Güvenli Yedek Motoru (Asla hata fırlatmaz)
                 if "153" in aktif_soru:
-                    yedek = "153 Ticari Mallar satmak amacıyla alınan emtialar içindir; 770 Genel Yönetim Giderleri ise işletmenin kendi idari tüketimleri (kırtasiye, kira vb.) için kullanılır.\n\nÖrnek Fiş: Borç 153 (veya 770) / 191 — Alacak 320"
+                    yedek = "153 Ticari Mallar satılmak üzere alınan ürünler içindir; 770 Genel Yönetim Giderleri ise firmanın kırtasiye, kira ve yönetim harcamalarıdır.<br><br><b>Örnek Fiş:</b> Borç: 153 (veya 770) / 191 — Alacak: 320"
                 elif "güven" in aktif_soru.lower() or "secure" in aktif_soru.lower():
-                    yedek = "Verileriniz TLS şifreleme ile iletilir, üçüncü taraflarla paylaşılmaz ve oturumunuz sona erdiğinde kalıcı olarak tutulmaz; gizlilik mevzuatına tam uyumludur."
+                    yedek = "Verileriniz TLS şifreleme ile iletilir, model eğitiminde kullanılmaz ve oturumunuz bittiğinde sistemde kalıcı olarak saklanmaz; mevzuata tam uyumludur."
                 elif "tevkifat" in aktif_soru.lower():
-                    yedek = "Tevkifatlı faturada KDV'nin belirlenen kısmı satıcıya ödenmeyip doğrudan devlete beyan edilmek üzere 360 hesabına aktarılır; bakiye kuruşu kuruşuna denkleştirilir.\n\nÖrnek Fiş: Borç 770 & 191 — Alacak 360 (Tevkifat) & 320 (Satıcı)"
+                    yedek = "Tevkifatlı faturada KDV'nin kanunen belirlenen oranı satıcı yerine 360 hesabına kaydedilerek doğrudan vergi dairesine aktarılır; bakiye kuruşu kuruşuna denkleşir.<br><br><b>Örnek Fiş:</b> Borç: 770 & 191 — Alacak: 360 (Tevkifat) & 320 (Satıcı)"
                 else:
                     yedek = "LedgerAI yapay zeka ile veri girişini ve tevkifat ayrıştırmasını saniyeler içinde tamamlar; nihai onay ve kontrolü ise uzman mali müşavirin denetimine bırakır."
                 
