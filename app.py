@@ -3,7 +3,7 @@
 LEDGERAI — INSTITUTIONAL ENTERPRISE ACCOUNTING TERMINAL
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
 Design: Open Slate / Fluid Responsive Micro-UI / Interactive Pill Controls
-Version: 3.5.0 Enterprise Production Edition
+Version: 3.6.0 Production Master Edition
 ================================================================================
 """
 
@@ -34,7 +34,7 @@ st.set_page_config(
 
 SESSION_DEFAULTS = {
     "user_lang": "🇹🇷 TR",
-    "theme_idx": 0,  # 0: Platin Gri (Varsayılan Açılış)
+    "theme_idx": 0,  # 0: Platin Gri
     "industry_idx": 0,
     "chat_messages": [],
     "out_df": None,
@@ -53,7 +53,7 @@ for key, default_val in SESSION_DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = default_val
 
-# Güvenli API Anahtarı Kontrolü
+# API Anahtarı Doğrulama
 if "GEMINI_API_KEY" in st.secrets:
     API_KEY = st.secrets["GEMINI_API_KEY"]
 else:
@@ -176,7 +176,7 @@ LANG_DATA = {
         "badge_sec": "✓ SOC2 & BANK-GRADE ENCRYPTION",
         "bot_title": "👾 LedgerBot Finance Mentor",
         "bot_welcome": "Hi! I am your AI finance mentor. Tap any quick pill question below or ask me directly:",
-        "bot_placeholder": "Ask a question (e.g. How to book SaaS subscriptions?)...",
+        "bot_placeholder": "Ask a question...",
         "bot_clear": "🧹 Clear",
         "quick_chips": [
             "💡 How does it save time?",
@@ -422,7 +422,7 @@ if st.session_state["user_lang"] not in LANG_DATA:
 T = LANG_DATA[st.session_state["user_lang"]]
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (SEPETE EKLE MODELİ HAP BUTONLAR & AKICI CSS)
+# 3. DYNAMIC STYLING ENGINE (MOBİLDE ASLA KIRILMAYAN YATAY HAPLAR)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -499,7 +499,7 @@ st.markdown(f"""
     
     .stApp {{
         color: #F8FAFC;
-        padding-top: 10px;
+        padding-top: 5px;
         padding-bottom: 70px;
     }}
 
@@ -569,7 +569,7 @@ st.markdown(f"""
         background: rgba(30, 41, 59, 0.8);
     }}
 
-    /* SEPETE EKLE TARZI OVAL PILL İŞLEM BUTONU */
+    /* SEPETE EKLE MODELİ OVAL İŞLEM BUTONU */
     div.stButton > button:first-child {{
         background: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
@@ -590,7 +590,7 @@ st.markdown(f"""
         transform: scale(1.02) !important;
     }}
 
-    /* 3 STEP PROCESS CARDS */
+    /* SÜREÇ KARTLARI */
     .steps-container {{
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -641,60 +641,46 @@ st.markdown(f"""
         color: #CBD5E1;
     }}
 
-    /* CONSOLE CONTROLS */
+    /* KONSOL KONTROLLERİ */
     .console-controls {{
         margin-top: 20px;
         padding-top: 16px;
         border-top: 1px solid rgba(255, 255, 255, 0.10);
     }}
 
-    /* CANLI TEMA ŞERİDİ (TEMA DEĞİŞİMİNİ BELLİ EDEN ÜST BAR) */
-    .theme-switcher-bar {{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        margin: 0 auto 14px auto;
-        padding: 4px 12px;
-        background: rgba(15, 23, 42, 0.75);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 9999px;
-        width: fit-content;
+    /* MOBİLDE ASLA KIRILMAYAN YATAY SCROLL ŞERİTLERİ (NO WRAP PILLS) */
+    .pill-scroll-bar {{
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 10px !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 6px 4px 12px 4px !important;
+        scrollbar-width: none !important;
     }}
-    .theme-switcher-label {{
-        font-size: 0.74rem;
-        font-weight: 700;
-        color: #CBD5E1;
-        letter-spacing: 0.5px;
+    .pill-scroll-bar::-webkit-scrollbar {{
+        display: none !important;
     }}
 
-    /* SEPETE EKLE MODELİ MİKRO BUTONLAR (CHIPS) */
-    div.pill-scroll-row {{
-        display: flex;
-        gap: 8px;
-        overflow-x: auto;
-        padding: 6px 2px 10px 2px;
-        scrollbar-width: none;
-    }}
-    div.pill-scroll-row::-webkit-scrollbar {{ display: none; }}
-
-    div[data-testid="stExpander"] div.stButton button {{
+    /* PILL BUTTON CUSTOM OVERRIDES */
+    div.pill-btn-box div.stButton > button {{
         background: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
         border-radius: 9999px !important;
         font-size: 0.78rem !important;
         font-weight: 600 !important;
         color: #F8FAFC !important;
-        padding: 6px 16px !important;
-        height: auto !important;
+        padding: 6px 18px !important;
         min-height: 32px !important;
+        height: 32px !important;
         box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         white-space: nowrap !important;
-        line-height: 1.2 !important;
+        line-height: 1 !important;
         margin-top: 0px !important;
     }}
-    div[data-testid="stExpander"] div.stButton button:hover {{
+    div.pill-btn-box div.stButton > button:hover {{
         background: #1E293B !important;
         border-color: rgba(255, 255, 255, 0.6) !important;
         transform: scale(1.04) !important;
@@ -702,7 +688,7 @@ st.markdown(f"""
     }}
 
     .chat-scroll-area {{
-        max-height: 320px;
+        max-height: 300px;
         overflow-y: auto;
         padding: 12px 14px;
         background: rgba(15, 23, 42, 0.65);
@@ -906,30 +892,27 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 6. MASTER USER INTERFACE & DYNAMIC THEME SWITCHER
+# 6. MASTER USER INTERFACE & HORIZONTAL COMPACT THEME BAR
 # ==============================================================================
 
-# EN ÜSTTE CANLI TEMA SEÇİCİ ŞERİT (KULLANICININ ANINDA FARK ETMESİ İÇİN)
-st.markdown("<div class='theme-switcher-bar'>", unsafe_allow_html=True)
-st.markdown("<span class='theme-switcher-label'>🎨 Görünüm:</span>", unsafe_allow_html=True)
-theme_cols = st.columns(len(T["themes"]))
-for t_idx, t_name in enumerate(T["themes"]):
-    with theme_cols[t_idx]:
-        is_active = (st.session_state["theme_idx"] == t_idx)
-        btn_label = f"✓ {t_name}" if is_active else t_name
-        if st.button(btn_label, key=f"top_theme_btn_{t_idx}"):
-            if st.session_state["theme_idx"] != t_idx:
-                st.session_state["theme_idx"] = t_idx
-                st.rerun()
-st.markdown("</div>", unsafe_allow_html=True)
-
-# ANA KONSOL KARTI
+# KONSOL KARTI
 st.markdown(f"""
 <div class='master-console'>
     <div class='top-badge'>● {T['badge']}</div>
     <div class='hero-title'>{T['title']}</div>
     <div class='hero-sub'>{T['subtitle']}</div>
 """, unsafe_allow_html=True)
+
+# TEMA DEĞİŞTİRİCİ: MOBİLDE ASLA KIRILMAYAN YATAY SEPETE EKLE MODELİ HAPLAR
+st.markdown("<div class='pill-btn-box'><div class='pill-scroll-bar'>", unsafe_allow_html=True)
+for t_idx, t_name in enumerate(T["themes"]):
+    is_active = (st.session_state["theme_idx"] == t_idx)
+    label = f"✓ {t_name}" if is_active else t_name
+    if st.button(label, key=f"theme_pill_{t_idx}"):
+        if st.session_state["theme_idx"] != t_idx:
+            st.session_state["theme_idx"] = t_idx
+            st.rerun()
+st.markdown("</div></div>", unsafe_allow_html=True)
 
 uploaded_files = st.file_uploader(
     T["drop_title"],
@@ -1086,7 +1069,7 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# KONSOL İÇİ KONTROL ÇUBUĞU (DİL, SEKTÖR VE MİMARİ BİLGİSİ)
+# KONSOL KONTROLLERİ
 st.markdown("<div class='console-controls'>", unsafe_allow_html=True)
 c_ctrl1, c_ctrl2, c_ctrl3 = st.columns([2.5, 4.5, 3.0])
 
@@ -1209,7 +1192,7 @@ if st.session_state["out_df"] is not None:
         )
 
 # ==============================================================================
-# 8. MENTOR FINANS ASİSTANI (SEPETE EKLE DİZAYNI YATAY HAP BUTONLAR)
+# 8. MENTOR FINANS ASİSTANI (MOBİLDE ASLA KIRILMAYAN YATAY HAP BUTONLAR)
 # ==============================================================================
 
 st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
@@ -1224,13 +1207,13 @@ with c_bot_center:
                 st.session_state["chat_messages"] = []
                 st.rerun()
 
-        # SEPETE EKLE DİZAYNI OVAL HAP BUTONLAR (KOLONSUZ, ASLA ALT ALTA YIĞILMAZ)
+        # MOBİLDE ASLA ALT ALTA KIRILMAYAN YATAY SEPETE EKLE HAPLARI
         secilen_chip = None
-        chip_cols = st.columns(len(T["quick_chips"]))
+        st.markdown("<div class='pill-btn-box'><div class='pill-scroll-bar'>", unsafe_allow_html=True)
         for c_idx, chip_text in enumerate(T["quick_chips"]):
-            with chip_cols[c_idx]:
-                if st.button(chip_text, key=f"pill_chip_{c_idx}", use_container_width=True):
-                    secilen_chip = chip_text
+            if st.button(chip_text, key=f"h_pill_chip_{c_idx}"):
+                secilen_chip = chip_text
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
         # SCROLLABLE CHAT ALANI
         st.markdown("<div class='chat-scroll-area'>", unsafe_allow_html=True)
