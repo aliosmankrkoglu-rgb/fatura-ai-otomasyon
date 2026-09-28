@@ -4,7 +4,7 @@ LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY HUB
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL + HTML5 Canvas
 Design: Minimal Circular Glass Nav / 100% Dynamic Multi-Language Localization
 Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, US GAAP
-Version: 10.0.0 True Multi-Language Enterprise Master Edition
+Version: 10.1.0 Bugfix & Smooth Snake Edition
 ================================================================================
 """
 
@@ -73,7 +73,192 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. DYNAMIC GLOBAL LOCALIZATION DATA DICTIONARY (HER ŞEY DİLE BAĞLI)
+# 2. PROSEDÜREL OYUN VE SİMÜLASYON VERİTABANI
+# ==============================================================================
+
+def generate_simple_puzzle(step: int, lang: str):
+    is_tr = "TR" in str(lang)
+    vakalar_tr = [
+        {
+            "vaka": "Şirketiniz satıp kâr elde etmek amacıyla toptancıdan 100 adet spor ayakkabı satın aldı.",
+            "tutar": "80.000 TL + %20 KDV (16.000 TL) = 96.000 TL",
+            "soru": "Satılmak üzere depoya giren bu ticari mallar hangi hesap koduna borç kaydedilir?",
+            "secenekler": ["153 Ticari Mallar", "770 Genel Yönetim Giderleri", "255 Demirbaşlar", "600 Yurtiçi Satışlar"],
+            "dogru": "153 Ticari Mallar",
+            "ipucu": "Satmak amacıyla alınan her türlü emtia ve ürün 153 hesabında izlenir."
+        },
+        {
+            "vaka": "Şirket merkez ofisinde kullanılmak üzere fotokopi kağıtları, toner ve arşiv dosyaları satın alındı.",
+            "tutar": "12.000 TL + %20 KDV (2.400 TL) = 14.400 TL",
+            "soru": "Ofis idari işleyişi için tüketilen bu kırtasiye malzemeleri hangi hesap koduna borç yazılır?",
+            "secenekler": ["770 Genel Yönetim Giderleri", "153 Ticari Mallar", "100 Kasa Hesabı", "320 Satıcılar"],
+            "dogru": "770 Genel Yönetim Giderleri",
+            "ipucu": "Şirketin idari tüketimleri doğrudan 770 Genel Yönetim Giderleri hesabına aktarılır."
+        },
+        {
+            "vaka": "Ofis çalışanlarının kullanması için 5 adet yüksek performanslı dizüstü bilgisayar satın alındı.",
+            "tutar": "150.000 TL + %20 KDV (30.000 TL) = 180.000 TL",
+            "soru": "1 yıldan uzun süre kullanılacak bu ofis bilgisayarları hangi duran varlık hesabına kaydedilir?",
+            "secenekler": ["255 Demirbaşlar", "770 Genel Yönetim Giderleri", "153 Ticari Mallar", "600 Yurtiçi Satışlar"],
+            "dogru": "255 Demirbaşlar",
+            "ipucu": "İşletmede 1 yıldan uzun süre kullanılan bilgisayar, mobilya vb. eşyalar 255 Demirbaşlar hesabında aktifleştirilir."
+        },
+        {
+            "vaka": "Müşterinize toptan ürün satışı yapıldı ve fatura düzenlenip teslim edildi.",
+            "tutar": "200.000 TL + %20 KDV (40.000 TL) = 240.000 TL",
+            "soru": "Gerçekleşen bu ana faaliyet satışı Tek Düzen Hesap Planında hangi gelir hesabına alacak yazılır?",
+            "secenekler": ["600 Yurtiçi Satışlar", "153 Ticari Mallar", "770 Genel Yönetim Giderleri", "102 Bankalar"],
+            "dogru": "600 Yurtiçi Satışlar",
+            "ipucu": "Yurtiçine yapılan ana ticari mal ve hizmet satışları 600 Yurtiçi Satışlar hesabına alacak kaydedilir."
+        }
+    ]
+    vakalar_en = [
+        {
+            "vaka": "Your business purchased 100 units of sneakers from a wholesaler strictly for resale.",
+            "tutar": "$80,000 + Sales Tax = $96,000",
+            "soru": "Which debit account represents commercial goods purchased for resale?",
+            "secenekler": ["1200 Inventory / Merchandise", "6000 Operating Expenses (OpEx)", "1500 Fixed Assets / Equipment", "4000 Sales Revenue"],
+            "dogru": "1200 Inventory / Merchandise",
+            "ipucu": "Goods acquired to be sold to customers are booked into the Inventory asset account."
+        },
+        {
+            "vaka": "Office printer paper, ink cartridges, and folders were acquired for headquarters administration.",
+            "tutar": "$12,000 + Tax = $14,400",
+            "soru": "Which debit account covers administrative office supply consumption?",
+            "secenekler": ["6000 Operating Expenses (OpEx)", "1200 Inventory / Merchandise", "1010 Cash Account", "2000 Accounts Payable"],
+            "dogru": "6000 Operating Expenses (OpEx)",
+            "ipucu": "Consumable office supplies are recorded directly as General & Administrative Operating Expenses."
+        },
+        {
+            "vaka": "Five high-end laptop computers were purchased for staff use across the upcoming 3 years.",
+            "tutar": "$15,000 + Tax = $18,000",
+            "soru": "Which long-term asset account holds company hardware equipment?",
+            "secenekler": ["1500 Fixed Assets / Equipment", "6000 Operating Expenses (OpEx)", "1200 Inventory", "4000 Sales Revenue"],
+            "dogru": "1500 Fixed Assets / Equipment",
+            "ipucu": "Hardware and furniture used over 1 year are capitalized as Fixed Tangible Assets."
+        }
+    ]
+    v_pool = vakalar_tr if is_tr else vakalar_en
+    secilen = random.choice(v_pool)
+    return {
+        "step": int(step),
+        "vaka": str(secilen["vaka"]),
+        "tutar": str(secilen["tutar"]),
+        "soru": str(secilen["soru"]),
+        "secenekler": secilen["secenekler"],
+        "dogru": str(secilen["dogru"]),
+        "ipucu": str(secilen["ipucu"]),
+        "xp": 150
+    }
+
+if not isinstance(st.session_state.get("current_game_vaka"), dict):
+    st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
+
+TRICKY_MATRIX_CARDS = [
+    {
+        "hesap_adi": "BİRİKMİŞ AMORTİSMANLAR (-)",
+        "karakter": "Aktifi Düzenleyici Pasif Karakterli Hesap",
+        "dogru_sinif": 2,
+        "aciklama": "Duran varlıkların aşınma payıdır. 2 ile başlamasına rağmen alacak bakiyesi verir!"
+    },
+    {
+        "hesap_adi": "ALINAN SİPARİŞ AVANSLARI",
+        "karakter": "Kısa Vadeli Borç / Yabancı Kaynak",
+        "dogru_sinif": 3,
+        "aciklama": "Müşteriden mal teslim edilmeden önce alınan paradır, 340 grubunda kısa vadeli borçtur."
+    },
+    {
+        "hesap_adi": "GELECEK AYLARA AİT GİDERLER",
+        "karakter": "Dönen Varlık / Peşin Ödenen Gider",
+        "dogru_sinif": 1,
+        "aciklama": "Gelecek dönem için peşin ödenen kiralardır; 180 grubunda dönen varlık sayılır."
+    },
+    {
+        "hesap_adi": "DÖNEM NET KÂRI",
+        "karakter": "Öz Kaynaklar Unsuru",
+        "dogru_sinif": 5,
+        "aciklama": "İşletme faaliyetleri sonucu kalan net kârdır; 590 grubunda öz kaynaklarda yer alır."
+    },
+    {
+        "hesap_adi": "SATILAN TİCARİ MALLAR MALİYETİ (STMM)",
+        "karakter": "Gelir Tablosu Gider Hesabı",
+        "dogru_sinif": 6,
+        "aciklama": "Satılan malların işletmeye maliyetidir; 621 kodunda gelir tablosunu azaltır."
+    },
+    {
+        "hesap_adi": "BANKA KREDİLERİ (3 YIL VADELİ)",
+        "karakter": "Uzun Vadeli Yabancı Kaynak",
+        "dogru_sinif": 4,
+        "aciklama": "Vadesi 1 yılı aşan borçlanmalar 400 grubunda uzun vadeli yabancı kaynaktır."
+    }
+]
+
+if not isinstance(st.session_state.get("matrix_current_item"), dict):
+    st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
+
+def generate_muhasebe_ogreniyorum_scenario(step: int):
+    senaryolar = [
+        {
+            "fis_no": f"YEV-2026/00{step}",
+            "tarih": datetime.date.today().strftime("%d.%m.%Y"),
+            "baslik": "VADELİ TİCARİ MAL ALIMI & KDV",
+            "aciklama": "Toptancıdan satılmak üzere vadeli ticari mal alışı gerçekleşmiştir.",
+            "detay": "Matrah: 50.000 TL | %20 KDV: 10.000 TL | Toplam Satıcı Borcu: 60.000 TL",
+            "satirlar": [
+                {"kod": "153", "ad": "TİCARİ MALLAR", "borc": 50000.0, "alacak": 0.0},
+                {"kod": "191", "ad": "İNDİRİLECEK KDV", "borc": 10000.0, "alacak": 0.0},
+                {"kod": "320", "ad": "SATICILAR (CARİ HESAP)", "borc": 0.0, "alacak": 60000.0}
+            ],
+            "beklenen_toplam": 60000.0,
+            "ipucu": "Borçlu hesaplar: 153 ve 191 | Alacaklı hesap: 320"
+        },
+        {
+            "fis_no": f"YEV-2026/00{step}",
+            "tarih": datetime.date.today().strftime("%d.%m.%Y"),
+            "baslik": "BANKADAN SATICI BORCU HAVALESİ",
+            "aciklama": "Şirketin banka ticari mevduat hesabından satıcıya borç ödenmiştir.",
+            "detay": "Ödenen Borç Tutarı: 35.000 TL (Dekont No: BNK-8819)",
+            "satirlar": [
+                {"kod": "320", "ad": "SATICILAR", "borc": 35000.0, "alacak": 0.0},
+                {"kod": "102", "ad": "BANKALAR (MEVDUAT)", "borc": 0.0, "alacak": 35000.0}
+            ],
+            "beklenen_toplam": 35000.0,
+            "ipucu": "Borçlu hesap: 320 Satıcılar | Alacaklı hesap: 102 Bankalar"
+        },
+        {
+            "fis_no": f"YEV-2026/00{step}",
+            "tarih": datetime.date.today().strftime("%d.%m.%Y"),
+            "baslik": "NAKİT PEŞİN OFİS GİDERİ",
+            "aciklama": "Şirket merkez ofisi için nakit ödenerek kırtasiye ve sarf malzemesi alınmıştır.",
+            "detay": "Gider Tutarı: 5.000 TL | %20 KDV: 1.000 TL | Kasadan Çıkan Nakit: 6.000 TL",
+            "satirlar": [
+                {"kod": "770", "ad": "GENEL YÖNETİM GİDERLERİ", "borc": 5000.0, "alacak": 0.0},
+                {"kod": "191", "ad": "İNDİRİLECEK KDV", "borc": 1000.0, "alacak": 0.0},
+                {"kod": "100", "ad": "KASA HESABI", "borc": 0.0, "alacak": 6000.0}
+            ],
+            "beklenen_toplam": 6000.0,
+            "ipucu": "Borçlu hesaplar: 770 ve 191 | Alacaklı hesap: 100 Kasa"
+        }
+    ]
+    s = random.choice(senaryolar)
+    return {
+        "step": step,
+        "fis_no": s["fis_no"],
+        "tarih": s["tarih"],
+        "baslik": s["baslik"],
+        "aciklama": s["aciklama"],
+        "detay": s["detay"],
+        "satirlar": s["satirlar"],
+        "beklenen_toplam": s["beklenen_toplam"],
+        "ipucu": s["ipucu"],
+        "xp": 250
+    }
+
+if not isinstance(st.session_state.get("sim_current_vaka"), dict):
+    st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
+
+# ==============================================================================
+# 3. LOCALIZATION DATA DICTIONARY (6 DİLDE TAM VE EKSİKSİZ)
 # ==============================================================================
 
 LANG_DATA = {
@@ -122,7 +307,6 @@ LANG_DATA = {
         "cockpit_card3_title": "🛡️ Çift Taraflı Denetim Kilidi",
         "cockpit_card3_desc": "Toplam Borç = Toplam Alacak eşitliği sağlanmadan yevmiye fişi kapatılmaz; bakiye farkı riski sıfırlanır.",
         "headers": {"vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu", "name": "Hesap Adı", "desc": "Açıklama", "curr": "Para Birimi", "deb": "Borç", "crd": "Alacak"},
-        # AKADEMİ METİNLERİ
         "acad_badge": "SİBER AKADEMİ ARENA",
         "acad_title": "Geleceğin Finans Lideri Yetiştirme Simülasyonu",
         "acad_sub": "Teorik ezber yok! 4 farklı modda interaktif görevleri tamamla, XP topla, rütbe atla.",
@@ -145,7 +329,6 @@ LANG_DATA = {
         "erp_sim_desc": "Bu ticari hareketi çift taraflı kayıt sisteminde hatasız olarak yevmiye fişine bağla!",
         "erp_btn_save": "💾 Fişi Kaydet & Mühürle",
         "erp_btn_next": "➡️ Sonraki Fişe Geç",
-        # HUKUK METİNLERİ
         "leg_title": "⚖️ Kurumsal Güvence, Regülasyon & Sorumluluk Protokolü",
         "leg_sub": "WhatsApp diyaloğu tarzında anlaşılır ve şeffaf hukuki çerçeve.",
         "q1": "💬 Soru 1: LedgerAI muhasebecinin yerine mi geçiyor? Bize yasal ceza gelir mi?",
@@ -202,7 +385,6 @@ LANG_DATA = {
         "cockpit_card3_title": "🛡️ Dual-Audit Integrity Lock",
         "cockpit_card3_desc": "Mathematical assurance guaranteeing that Total Debit strictly equals Total Credit before release.",
         "headers": {"vouch": "Voucher #", "date": "Date", "code": "Account Code", "name": "Account Name", "desc": "Memo", "curr": "Currency", "deb": "Debit", "crd": "Credit"},
-        # ACADEMY TEXTS
         "acad_badge": "CYBER ACADEMY ARENA",
         "acad_title": "Next-Gen Financial Leader Training Simulation",
         "acad_sub": "No dry memorization! Master real accounting through 4 interactive game modes, collect XP, and level up.",
@@ -225,7 +407,6 @@ LANG_DATA = {
         "erp_sim_desc": "Balance this commercial event into dual-entry debit and credit lines without penny discrepancies!",
         "erp_btn_save": "💾 Post & Seal Voucher",
         "erp_btn_next": "➡️ Next Journal Entry",
-        # LEGAL TEXTS
         "leg_title": "⚖️ Corporate Assurance, Regulation & SLA Protocol",
         "leg_sub": "Transparent, human-readable legal compliance in a dialogue format.",
         "q1": "💬 Question 1: Does LedgerAI replace certified accountants?",
@@ -546,7 +727,7 @@ INSTANT_FAQ_CACHE = {
 }
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (IPHONE CIRCLE GLASS BUTTONS & NEON HUD)
+# 4. DYNAMIC STYLING ENGINE (IPHONE CIRCLE GLASS BUTTONS & NEON HUD)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -810,7 +991,6 @@ st.markdown(f"""
         line-height: 1.4;
     }}
 
-    /* ASİSTAN İÇİ MİKRO HAPLAR */
     div[data-testid="stExpander"] div.stButton button {{
         background: rgba(255, 255, 255, 0.06) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
@@ -872,7 +1052,6 @@ st.markdown(f"""
         line-height: 1.45;
     }}
 
-    /* WHATSAPP BALONLARI */
     .wa-bubble-left {{
         background: rgba(30, 41, 59, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.12);
@@ -904,7 +1083,6 @@ st.markdown(f"""
         line-height: 1.55;
     }}
 
-    /* OTONOM YEVMİYE FİŞİ EĞİTİM MODÜLÜ */
     .erp-window {{
         background: #C0C0C0;
         border: 2px solid #FFFFFF;
@@ -1020,7 +1198,7 @@ def sesli_bildirim_cal(tur="success"):
     st.markdown(ses_js, unsafe_allow_html=True)
 
 # ==============================================================================
-# 4. INSTITUTIONAL MULTI-TAB EXCEL ENGINE
+# 5. INSTITUTIONAL MULTI-TAB EXCEL ENGINE
 # ==============================================================================
 
 def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
@@ -1118,7 +1296,7 @@ def export_eta_csv(df: pd.DataFrame) -> bytes:
     return eta_df.to_csv(sep=";", index=False, encoding="utf-8-sig").encode("utf-8-sig")
 
 # ==============================================================================
-# 5. CORE AI RECOGNITION ENGINE (TEVKİFAT, MULTI-TAX & DUAL AUDIT)
+# 6. CORE AI RECOGNITION ENGINE (TEVKİFAT, MULTI-TAX & DUAL AUDIT)
 # ==============================================================================
 
 def execute_document_audit(uploaded_files, sector_directive: str):
@@ -1201,7 +1379,7 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 6. MULTI-DECK COCKPIT (IPHONE CIRCLE GLASS BUTTONS)
+# 7. MULTI-DECK COCKPIT (IPHONE CIRCLE GLASS BUTTONS)
 # ==============================================================================
 
 st.markdown("<div class='cockpit-container'>", unsafe_allow_html=True)
@@ -1219,6 +1397,7 @@ with nav_right:
             for l_key in list(LANG_DATA.keys()):
                 if st.button(l_key, key=f"btn_lang_pop_{l_key}", use_container_width=True):
                     st.session_state["user_lang"] = l_key
+                    st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], l_key)
                     st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -1668,25 +1847,40 @@ with sekme_akademi:
             T["g_tab4"]
         ])
 
-        # OYUN 1: HESAP KODU AVCISI
+        # OYUN 1: HESAP KODU AVCISI (TYPEERROR DÜZELTİLDİ)
         with oyun_sekme1:
-            vaka = st.session_state["current_game_vaka"]
+            raw_vaka = st.session_state.get("current_game_vaka")
+            if not isinstance(raw_vaka, dict) or "secenekler" not in raw_vaka:
+                st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
+                vaka = st.session_state["current_game_vaka"]
+            else:
+                vaka = raw_vaka
+
+            v_step = vaka.get("step", st.session_state["game_step"])
+            v_xp = vaka.get("xp", 150)
+            v_vaka = vaka.get("vaka", "")
+            v_tutar = vaka.get("tutar", "")
+            v_soru = vaka.get("soru", "")
+            v_secenekler = vaka.get("secenekler", [])
+            v_dogru = vaka.get("dogru", "")
+            v_ipucu = vaka.get("ipucu", "")
+
             c_game1, c_game2 = st.columns([1.2, 1.0], gap="large")
             with c_game1:
                 st.markdown(f"""
                 <div style='background:rgba(15,23,42,0.75); border:1px dashed rgba(255,255,255,0.22); border-radius:20px; padding:22px;'>
                     <div style='display:flex; justify-content:space-between; align-items:center;'>
-                        <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1px;'>{T['mission']} #{vaka['step']}</span>
-                        <span style='font-size:0.75rem; color:#F0ABFC; font-weight:700;'>+{vaka['xp']} XP</span>
+                        <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1px;'>{T['mission']} #{v_step}</span>
+                        <span style='font-size:0.75rem; color:#F0ABFC; font-weight:700;'>+{v_xp} XP</span>
                     </div>
                     <div style='font-size:0.88rem; color:#CBD5E1; margin:12px 0; line-height:1.5;'>
-                        <b>{vaka['vaka']}</b>
+                        <b>{v_vaka}</b>
                     </div>
                     <div style='background:rgba(0,0,0,0.35); border-radius:12px; padding:12px; font-family:"Consolas", monospace; font-size:0.82rem; color:#E2E8F0; line-height:1.5;'>
-                        📄 <b>{T['inv_total']}:</b> {vaka['tutar']}
+                        📄 <b>{T['inv_total']}:</b> {v_tutar}
                     </div>
                     <div style='margin-top:14px; font-size:0.85rem; color:#F8FAFC; font-weight:600;'>
-                        ❓ {vaka['soru']}
+                        ❓ {v_soru}
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -1695,14 +1889,14 @@ with sekme_akademi:
                 st.markdown("<div style='background:rgba(30,41,59,0.72); border:1px solid rgba(255,255,255,0.14); border-radius:20px; padding:22px;'>", unsafe_allow_html=True)
                 st.markdown(f"<div style='font-size:0.82rem; font-weight:700; color:#F1F5F9; margin-bottom:12px;'>{T['click_card']}</div>", unsafe_allow_html=True)
 
-                for opt in vaka["secenekler"]:
-                    if st.button(f"👉 {opt}", key=f"btn_opt_{opt}_{vaka['step']}", use_container_width=True):
-                        if opt == vaka["dogru"]:
-                            st.session_state["academy_xp"] += vaka["xp"]
+                for opt in v_secenekler:
+                    if st.button(f"👉 {opt}", key=f"btn_opt_{opt}_{v_step}", use_container_width=True):
+                        if opt == v_dogru:
+                            st.session_state["academy_xp"] += v_xp
                             st.session_state["academy_streak"] += 1
                             sesli_bildirim_cal("success")
                             st.balloons()
-                            st.success(f"🎉 SUCCESS! {vaka['ipucu']} (+{vaka['xp']} XP)")
+                            st.success(f"🎉 SUCCESS! {v_ipucu} (+{v_xp} XP)")
                             time.sleep(1.2)
                             st.session_state["game_step"] += 1
                             st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
@@ -1711,7 +1905,7 @@ with sekme_akademi:
                             st.session_state["academy_lives"] -= 1
                             st.session_state["academy_streak"] = 0
                             sesli_bildirim_cal("error")
-                            st.error(f"💥 MISMATCH! (-1 Life) Correct: {vaka['dogru']}. {vaka['ipucu']}")
+                            st.error(f"💥 MISMATCH! (-1 Life) Correct: {v_dogru}. {v_ipucu}")
                             time.sleep(1.4)
                             st.session_state["game_step"] += 1
                             st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
@@ -1721,7 +1915,13 @@ with sekme_akademi:
 
         # OYUN 2: BİLANÇO KARAKTER MATRİSİ
         with oyun_sekme2:
-            m_item = st.session_state["matrix_current_item"]
+            raw_matrix = st.session_state.get("matrix_current_item")
+            if not isinstance(raw_matrix, dict) or "hesap_adi" not in raw_matrix:
+                st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
+                m_item = st.session_state["matrix_current_item"]
+            else:
+                m_item = raw_matrix
+
             st.markdown(f"""
             <div style='background:rgba(15,23,42,0.75); border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:22px; text-align:center; margin-bottom:16px;'>
                 <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1.2px;'>{T['tricky_title']}</span>
@@ -1765,7 +1965,7 @@ with sekme_akademi:
                             st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
                             st.rerun()
 
-        # OYUN 3: HEDEFLİ BİLANÇO SNAKE
+        # OYUN 3: HEDEFLİ BİLANÇO SNAKE (YENİLENMİŞ VE HATASIZ KOD)
         with oyun_sekme3:
             st.markdown(f"""
             <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:16px 20px; margin-bottom:12px;'>
@@ -1778,14 +1978,16 @@ with sekme_akademi:
             <!DOCTYPE html>
             <html>
             <head>
+                <meta charset="utf-8">
                 <style>
-                    body { margin: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; color: #FFF; user-select: none; }
-                    #gameCanvas { background: #060913; border: 2px solid #38BDF8; border-radius: 14px; box-shadow: 0 0 25px rgba(56,189,248,0.25); }
+                    body { margin: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; color: #FFF; user-select: none; }
+                    #canvasContainer { position: relative; width: 440px; height: 300px; }
+                    #gameCanvas { background: #060913; border: 2px solid #38BDF8; border-radius: 14px; box-shadow: 0 0 25px rgba(56,189,248,0.25); display: block; }
                     .hud { display: flex; justify-content: space-between; width: 440px; margin-bottom: 8px; font-size: 14px; font-weight: bold; color: #38BDF8; }
                     .touch-grid { display: grid; grid-template-columns: repeat(3, 55px); gap: 6px; margin-top: 10px; }
                     .t-btn { width: 55px; height: 42px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
                     .t-btn:active { background: #38BDF8; color: #000; }
-                    #menuOverlay { position: absolute; width: 440px; height: 300px; background: rgba(6, 9, 19, 0.90); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+                    #menuOverlay { position: absolute; top: 0; left: 0; width: 440px; height: 300px; background: rgba(6, 9, 19, 0.92); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
                     .menu-title { font-size: 20px; font-weight: 800; color: #38BDF8; margin-bottom: 6px; }
                     .menu-sub { font-size: 11px; color: #CBD5E1; max-width: 320px; margin-bottom: 16px; line-height: 1.4; }
                     .menu-btn { background: #38BDF8; color: #000; border: none; padding: 10px 28px; border-radius: 99px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 0 15px rgba(56,189,248,0.4); }
@@ -1796,7 +1998,7 @@ with sekme_akademi:
                     <span>SCORE: <span id="score">0</span> XP</span>
                     <span>TARGET: <span id="targetCode" style="color:#FACC15;">153 INVENTORY</span></span>
                 </div>
-                <div style="position:relative; display:flex; align-items:center; justify-content:center;">
+                <div id="canvasContainer">
                     <canvas id="gameCanvas" width="440" height="300"></canvas>
                     <div id="menuOverlay">
                         <div class="menu-title" id="overlayTitle">🎮 BALANCE SNAKE ARENA</div>
@@ -1946,7 +2148,12 @@ with sekme_akademi:
 
         # OYUN 4: MUHASEBE ÖĞRENİYORUM
         with oyun_sekme4:
-            sim_sc = st.session_state["sim_current_vaka"]
+            raw_sim = st.session_state.get("sim_current_vaka")
+            if not isinstance(raw_sim, dict) or "satirlar" not in raw_sim:
+                st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
+                sim_sc = st.session_state["sim_current_vaka"]
+            else:
+                sim_sc = raw_sim
 
             st.markdown(f"""
             <div style='background:rgba(15,23,42,0.85); border:1px solid #38BDF8; border-radius:14px; padding:14px 18px; margin-bottom:12px;'>
