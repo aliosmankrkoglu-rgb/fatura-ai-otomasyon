@@ -2,8 +2,8 @@
 ================================================================================
 LEDGERAI — INSTITUTIONAL ENTERPRISE ACCOUNTING TERMINAL
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: Open Slate / Fluid Responsive Micro-UI / Interactive Pill Controls
-Version: 3.6.0 Production Master Edition
+Design: Minimal GitHub Pill Style / Open Slate Executive Dashboard (Whitelabel)
+Version: 3.7.0 Ultimate Production Master Edition
 ================================================================================
 """
 
@@ -422,7 +422,7 @@ if st.session_state["user_lang"] not in LANG_DATA:
 T = LANG_DATA[st.session_state["user_lang"]]
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (MOBİLDE ASLA KIRILMAYAN YATAY HAPLAR)
+# 3. DYNAMIC STYLING ENGINE (GERÇEK GITHUB HAPI MİKRO BUTONLARI & WHİTELABEL)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -499,7 +499,7 @@ st.markdown(f"""
     
     .stApp {{
         color: #F8FAFC;
-        padding-top: 5px;
+        padding-top: 15px;
         padding-bottom: 70px;
     }}
 
@@ -569,14 +569,14 @@ st.markdown(f"""
         background: rgba(30, 41, 59, 0.8);
     }}
 
-    /* SEPETE EKLE MODELİ OVAL İŞLEM BUTONU */
+    /* İŞLEM BUTONU: KURUMSAL GİTHUB HAPI */
     div.stButton > button:first-child {{
         background: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
         border-radius: 9999px !important;
         font-weight: 700 !important;
         font-size: clamp(0.92rem, 1.3vw, 1.02rem) !important;
-        padding: 13px 34px !important;
+        padding: 12px 34px !important;
         color: #FFFFFF !important;
         box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6) !important;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -641,50 +641,59 @@ st.markdown(f"""
         color: #CBD5E1;
     }}
 
-    /* KONSOL KONTROLLERİ */
+    /* KONSOL İÇİ KONTROL ÇUBUĞU */
     .console-controls {{
         margin-top: 20px;
         padding-top: 16px;
         border-top: 1px solid rgba(255, 255, 255, 0.10);
     }}
 
-    /* MOBİLDE ASLA KIRILMAYAN YATAY SCROLL ŞERİTLERİ (NO WRAP PILLS) */
-    .pill-scroll-bar {{
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        gap: 10px !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        padding: 6px 4px 12px 4px !important;
-        scrollbar-width: none !important;
+    /* GITHUB BALONU MİKRO HAP BUTONLARI (PILL BUTTONS) */
+    .github-pill {{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 9999px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: #F8FAFC;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        white-space: nowrap;
     }}
-    .pill-scroll-bar::-webkit-scrollbar {{
-        display: none !important;
+    .github-pill:hover {{
+        background: rgba(255, 255, 255, 0.16);
+        border-color: rgba(255, 255, 255, 0.45);
+        transform: scale(1.04);
+        color: #FFFFFF;
     }}
 
-    /* PILL BUTTON CUSTOM OVERRIDES */
-    div.pill-btn-box div.stButton > button {{
-        background: #000000 !important;
-        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    /* EXPANDER VE CHAT BUTONLARINI GİTHUB HAPINA ÇEVİRME */
+    div[data-testid="stExpander"] div.stButton button {{
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.20) !important;
         border-radius: 9999px !important;
-        font-size: 0.78rem !important;
+        font-size: 0.75rem !important;
         font-weight: 600 !important;
         color: #F8FAFC !important;
-        padding: 6px 18px !important;
-        min-height: 32px !important;
-        height: 32px !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        padding: 4px 14px !important;
+        min-height: 28px !important;
+        height: 28px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+        transition: all 0.2s ease !important;
         white-space: nowrap !important;
-        line-height: 1 !important;
         margin-top: 0px !important;
+        line-height: 1 !important;
     }}
-    div.pill-btn-box div.stButton > button:hover {{
-        background: #1E293B !important;
-        border-color: rgba(255, 255, 255, 0.6) !important;
-        transform: scale(1.04) !important;
-        box-shadow: 0 4px 15px rgba(255,255,255,0.2) !important;
+    div[data-testid="stExpander"] div.stButton button:hover {{
+        background: rgba(255, 255, 255, 0.16) !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        transform: scale(1.03) !important;
     }}
 
     .chat-scroll-area {{
@@ -781,7 +790,7 @@ def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
                 c.fill = h_fill3
                 c.font = h_font1
                 c.alignment = Alignment(horizontal="center", vertical="center")
-            for col in ws3.columns:
+            for col in ws2.columns:
                 m_len = max(len(str(cell.value or '')) for cell in col)
                 c_letter = get_column_letter(col[0].column)
                 for cell in col:
@@ -892,27 +901,16 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 6. MASTER USER INTERFACE & HORIZONTAL COMPACT THEME BAR
+# 6. MASTER USER INTERFACE & MINIMAL TERMINAL
 # ==============================================================================
 
-# KONSOL KARTI
+# ANA KONSOL KARTI (GEREKSİZ DİKEY BUTONLAR TAMAMEN KALDIRILDI)
 st.markdown(f"""
 <div class='master-console'>
     <div class='top-badge'>● {T['badge']}</div>
     <div class='hero-title'>{T['title']}</div>
     <div class='hero-sub'>{T['subtitle']}</div>
 """, unsafe_allow_html=True)
-
-# TEMA DEĞİŞTİRİCİ: MOBİLDE ASLA KIRILMAYAN YATAY SEPETE EKLE MODELİ HAPLAR
-st.markdown("<div class='pill-btn-box'><div class='pill-scroll-bar'>", unsafe_allow_html=True)
-for t_idx, t_name in enumerate(T["themes"]):
-    is_active = (st.session_state["theme_idx"] == t_idx)
-    label = f"✓ {t_name}" if is_active else t_name
-    if st.button(label, key=f"theme_pill_{t_idx}"):
-        if st.session_state["theme_idx"] != t_idx:
-            st.session_state["theme_idx"] = t_idx
-            st.rerun()
-st.markdown("</div></div>", unsafe_allow_html=True)
 
 uploaded_files = st.file_uploader(
     T["drop_title"],
@@ -1069,9 +1067,9 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# KONSOL KONTROLLERİ
+# KONSOL İÇİ KONTROL ÇUBUĞU (TEMA, DİL VE SEKTÖR TEK SIRADA DÜZENLİ)
 st.markdown("<div class='console-controls'>", unsafe_allow_html=True)
-c_ctrl1, c_ctrl2, c_ctrl3 = st.columns([2.5, 4.5, 3.0])
+c_ctrl1, c_ctrl2, c_ctrl3, c_ctrl4 = st.columns([1.8, 3.2, 3.2, 1.8])
 
 with c_ctrl1:
     lang_keys = list(LANG_DATA.keys())
@@ -1082,13 +1080,20 @@ with c_ctrl1:
         st.rerun()
 
 with c_ctrl2:
+    new_theme_str = st.selectbox("Theme / Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
+    new_t_idx = T["themes"].index(new_theme_str)
+    if new_t_idx != st.session_state["theme_idx"]:
+        st.session_state["theme_idx"] = new_t_idx
+        st.rerun()
+
+with c_ctrl3:
     new_industry_str = st.selectbox("Industry / Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
     new_i_idx = T["industries"].index(new_industry_str)
     if new_i_idx != st.session_state["industry_idx"]:
         st.session_state["industry_idx"] = new_i_idx
         st.rerun()
 
-with c_ctrl3:
+with c_ctrl4:
     with st.popover(T["about_btn"]):
         st.markdown(f"#### {T['about_title']}")
         st.markdown(T["about_content"])
@@ -1105,7 +1110,7 @@ if st.session_state["out_df"] is not None:
     st.caption(T["preview_tip"])
 
     headers = T["headers"]
-    st.markdown("<div class='filter-card'>", unsafe_allow_html=True)
+    st.markdown("<div style='background:rgba(30,41,59,0.55); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:10px 16px; margin-bottom:14px;'>", unsafe_allow_html=True)
     f_col1, f_col2, f_col3 = st.columns([2.5, 3.5, 2])
     
     with f_col1:
@@ -1192,7 +1197,7 @@ if st.session_state["out_df"] is not None:
         )
 
 # ==============================================================================
-# 8. MENTOR FINANS ASİSTANI (MOBİLDE ASLA KIRILMAYAN YATAY HAP BUTONLAR)
+# 8. MENTOR FINANS ASİSTANI (GITHUB.COM BALONU MİKRO BUTONLARI)
 # ==============================================================================
 
 st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
@@ -1207,13 +1212,15 @@ with c_bot_center:
                 st.session_state["chat_messages"] = []
                 st.rerun()
 
-        # MOBİLDE ASLA ALT ALTA KIRILMAYAN YATAY SEPETE EKLE HAPLARI
+        # GITHUB.COM STİLİ MİKRO BALON BUTONLARI (KOLONSUZ, DEVLEŞMEYEN MİKRO HAPLAR)
         secilen_chip = None
-        st.markdown("<div class='pill-btn-box'><div class='pill-scroll-bar'>", unsafe_allow_html=True)
+        st.markdown("<div style='display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;'>", unsafe_allow_html=True)
+        btn_cols = st.columns(len(T["quick_chips"]))
         for c_idx, chip_text in enumerate(T["quick_chips"]):
-            if st.button(chip_text, key=f"h_pill_chip_{c_idx}"):
-                secilen_chip = chip_text
-        st.markdown("</div></div>", unsafe_allow_html=True)
+            with btn_cols[c_idx]:
+                if st.button(chip_text, key=f"gh_pill_btn_{c_idx}", use_container_width=True):
+                    secilen_chip = chip_text
+        st.markdown("</div>", unsafe_allow_html=True)
 
         # SCROLLABLE CHAT ALANI
         st.markdown("<div class='chat-scroll-area'>", unsafe_allow_html=True)
