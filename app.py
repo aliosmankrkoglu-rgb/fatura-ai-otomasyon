@@ -2,7 +2,7 @@
 ================================================================================
 LEDGERAI — INSTITUTIONAL ENTERPRISE ACCOUNTING TERMINAL
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: Open Slate / Platinum Titanium Executive Dashboard (Whitelabel)
+Design: Open Slate / Fluid Responsive Micro-UI / Interactive Assistant Chips
 ================================================================================
 """
 
@@ -30,7 +30,7 @@ st.set_page_config(
 
 SESSION_DEFAULTS = {
     "user_lang": "🇹🇷 TR",
-    "theme_idx": 0,  # 0: Kurumsal Açık Platin
+    "theme_idx": 0,  # 0: Platin Gri (Varsayılan Açılış)
     "industry_idx": 0,
     "chat_messages": [],
     "out_df": None,
@@ -59,7 +59,7 @@ client = genai.Client(api_key=API_KEY)
 
 LANG_DATA = {
     "🇹🇷 TR": {
-        "badge": "KURUMSAL OTONOM FİNANS TERMİNALİ",
+        "badge": "OTONOM FİNANS TERMİNALİ",
         "title": "LedgerAI",
         "subtitle": "Faturaları saniyeler içinde sektörel hesap kodlarına ve kuruşu kuruşuna dengeli ERP fişine dönüştürün.",
         "drop_title": "Belgeleri Buraya Bırakın veya Seçin",
@@ -70,7 +70,7 @@ LANG_DATA = {
         "success": "✓ Fişler başarıyla oluşturuldu ve Borç/Alacak kuruşu kuruşuna dengelendi.",
         "failed": "❌ Belgeler işlenemedi. Lütfen görsel netliğini kontrol edin.",
         "preview_title": "📊 Muhasebe Yevmiye Fişi & Denetim Masası",
-        "preview_tip": "💡 Hücrelere çift tıklayarak kod veya açıklamaları değiştirebilirsiniz. Çok sayfalı Excel'e anında yansır.",
+        "preview_tip": "💡 Hücrelere çift tıklayarak kod veya tutarları değiştirebilirsiniz. Çok sayfalı Excel'e anında yansır.",
         "tot_deb": "Toplam Borç",
         "tot_crd": "Toplam Alacak",
         "balanced": "✅ Fiş Dengeli (Borç = Alacak)",
@@ -84,7 +84,7 @@ LANG_DATA = {
             "🏭 Üretim & Fabrika (150/730)"
         ],
         "themes": [
-            "🌑 Platin Gri (Kurumsal)",
+            "🌑 Platin Gri",
             "✨ Ultra Canlı Aurora",
             "🌌 Cyberpunk Gece"
         ],
@@ -108,36 +108,22 @@ LANG_DATA = {
         "badge_audit": "✓ %100 BORÇ/ALACAK DENGE GARANTİSİ",
         "badge_sec": "✓ ÇOK SAYFALI ÖZEL EXCEL RAPORU",
         "bot_title": "👾 LedgerBot Finans Mentorü",
-        "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya pratik hesap kodlarını sormak için bana yazabilirsin. Kısa, net ve örnekle anlatırım!",
-        "bot_placeholder": "Sorunuzu yazın (Örn: Tevkifatlı fatura nasıl işlenir? Borç/Alacak mantığı nedir?)...",
+        "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya pratik hesap kodlarını sormak için aşağıdaki hızlı sorulara tıklayabilir ya da bana yazabilirsin!",
+        "bot_placeholder": "Sorunuzu yazın (Örn: Tevkifatlı fatura nasıl işlenir?)...",
         "bot_clear": "🧹 Temizle",
+        "quick_chips": [
+            "💡 Muhasebeciye ne kazandırır?",
+            "🔒 Verilerim güvende mi?",
+            "⚖️ Tevkifat & Stopaj mantığı nedir?"
+        ],
         "headers": {
             "vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu",
             "name": "Hesap Adı", "desc": "Açıklama", "curr": "Para Birimi",
             "deb": "Borç", "crd": "Alacak"
-        },
-        "faq_title": "💬 Sıkça Sorulan Sorular & Güvenlik",
-        "faqs": [
-            {
-                "q": "Bir muhasebeciye ne gibi kolaylıklar sağlayabilir?",
-                "a": "LedgerAI, manuel veri girişini ve fiş eşleştirmesini otomatikleştirerek muhasebecilerin rutin iş yükünü %80 oranında azaltır. Faturaları yapay zeka ile doğrudan doğru hesaplara işler, tevkifat ve KDV ayrımını yaparak insan hatasını sıfırlar.\n\nÖrneğin; ofis kırtasiye faturası doğrudan 770 Genel Yönetim Giderleri hesabına aktarılırken ticari ürünler 153 hesabına aktarılır.\nBorç: 770 / 191 — Alacak: 320"
-            },
-            {
-                "q": "Ne kadar güvenilir bir işlem bu? Verilerim güvende mi?",
-                "a": "LedgerAI, verilerinizi uçtan uca TLS şifreleme ile iletir. Sistem belgelerinizi kalıcı olarak üçüncü taraflarla paylaşmaz veya model eğitiminde kullanmaz. İşlem bittiğinde fişler sadece sizin oturumunuzda tutulur ve KVKK/finansal gizlilik prensiplerine tam uyum sağlar."
-            },
-            {
-                "q": "Tevkifatlı veya birden fazla KDV oranlı faturaları nasıl işler?",
-                "a": "Faturada örneğin hem %10 hem %20 KDV varsa, sistem her ikisini ayrı ayrı hesaplayarak ayrı satırlar açar. KDV tevkifatı veya SMMM stopajı tespit edilirse, satıcıya ödenecek net tutar 320 hesabına, kesilen vergi ise 360 Ödenecek Vergi hesabına otomatik yazılır ve bakiye her zaman eşitlenir."
-            },
-            {
-                "q": "Excel çıktısında veriler nasıl gruplanır?",
-                "a": "İndirilen Excel dosyasında tüm yevmiye fişleri genel sayfada yer alırken; 153 Ticari Mallar ve 770 Genel Masraflar bağımsız renkli sekmelerde listelenir. Böylece departman bazlı kontrol saniyeler içinde yapılır."
-            }
-        ]
+        }
     },
     "🇺🇸 EN": {
-        "badge": "INSTITUTIONAL AI FINANCIAL TERMINAL",
+        "badge": "AUTONOMOUS FINANCIAL TERMINAL",
         "title": "LedgerAI",
         "subtitle": "Convert raw invoices into balanced, multi-GAAP ERP journal vouchers autonomously.",
         "drop_title": "Drop Financial Documents Here or Browse",
@@ -160,7 +146,7 @@ LANG_DATA = {
             "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"
         ],
         "themes": [
-            "🌑 Platinum Slate (Executive)",
+            "🌑 Platinum Slate",
             "✨ Ultra Vivid Aurora",
             "🌌 Cyberpunk Night"
         ],
@@ -177,25 +163,19 @@ LANG_DATA = {
         "badge_audit": "✓ 100% DEBIT/CREDIT BALANCE GUARANTEE",
         "badge_sec": "✓ MULTI-TAB WORKBOOK EXPORT",
         "bot_title": "👾 LedgerBot Finance Mentor",
-        "bot_welcome": "Hi! I am your AI finance mentor. Ask me any accounting concepts or codes. I reply concisely with direct practical examples!",
-        "bot_placeholder": "Ask a question (e.g. How to book SaaS subscriptions? Debit vs Credit?)...",
+        "bot_welcome": "Hi! I am your AI finance mentor. Tap any quick question below or ask me anything directly!",
+        "bot_placeholder": "Ask a question (e.g. How to book SaaS subscriptions?)...",
         "bot_clear": "🧹 Clear",
+        "quick_chips": [
+            "💡 How does it save time?",
+            "🔒 Is our data secure?",
+            "⚖️ Explain Debit vs Credit"
+        ],
         "headers": {
             "vouch": "Voucher #", "date": "Date", "code": "Account Code",
             "name": "Account Name", "desc": "Memo", "curr": "Currency",
             "deb": "Debit", "crd": "Credit"
-        },
-        "faq_title": "💬 Frequently Asked Questions & Security",
-        "faqs": [
-            {
-                "q": "How does LedgerAI streamline enterprise accounting?",
-                "a": "It automates invoice parsing and chart-of-accounts mapping, reducing manual entry by 80%. It eliminates human errors by validating Debit = Credit parity before generating journal vouchers."
-            },
-            {
-                "q": "Is our financial data safe?",
-                "a": "Yes. Data is processed over secure TLS connections with bank-grade encryption. Documents are parsed strictly within your active session and never stored permanently."
-            }
-        ]
+        }
     }
 }
 
@@ -205,11 +185,11 @@ if st.session_state["user_lang"] not in LANG_DATA:
 T = LANG_DATA[st.session_state["user_lang"]]
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (KURUMSAL AÇIK PLATİN / ARDUVAZ VE WHITELABEL CSS)
+# 3. DYNAMIC STYLING ENGINE (FLUID TYPOGRAPHY & EXECUTIVE SLATE CSS)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
-    # 🌑 Platin Gri (Açık Arduvaz / Metalik Şirket Havası)
+    # 🌑 Platin Gri
     bg_style = """
         @keyframes slateShimmer {
             0% { background-position: 0% 50%; }
@@ -217,8 +197,8 @@ if st.session_state["theme_idx"] == 0:
             100% { background-position: 0% 50%; }
         }
         .stApp {
-            background: radial-gradient(circle at 50% 0%, rgba(203, 213, 225, 0.15) 0%, transparent 65%),
-                        radial-gradient(circle at 85% 90%, rgba(148, 163, 184, 0.10) 0%, transparent 50%),
+            background: radial-gradient(circle at 50% 0%, rgba(203, 213, 225, 0.16) 0%, transparent 65%),
+                        radial-gradient(circle at 85% 90%, rgba(148, 163, 184, 0.12) 0%, transparent 50%),
                         linear-gradient(145deg, #111827 0%, #1E293B 50%, #0F172A 100%);
             background-size: 200% 200%;
             animation: slateShimmer 24s ease infinite;
@@ -308,7 +288,7 @@ st.markdown(f"""
         border-radius: 24px;
         backdrop-filter: blur(28px);
         -webkit-backdrop-filter: blur(28px);
-        padding: 36px 44px 28px 44px;
+        padding: clamp(24px, 4vw, 40px) clamp(20px, 4vw, 44px);
         box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 
                     inset 0 1px 0 rgba(255, 255, 255, 0.22);
         text-align: center;
@@ -322,7 +302,7 @@ st.markdown(f"""
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.20);
         border-radius: 99px;
-        font-size: 0.7rem;
+        font-size: clamp(0.65rem, 1vw, 0.72rem);
         font-weight: 700;
         letter-spacing: 1.4px;
         color: #E2E8F0;
@@ -331,7 +311,7 @@ st.markdown(f"""
     }}
 
     .hero-title {{
-        font-size: 3.1rem;
+        font-size: clamp(2.1rem, 4vw, 3.1rem);
         font-weight: 800;
         letter-spacing: -1px;
         background: linear-gradient(135deg, #FFFFFF 40%, #CBD5E1 100%);
@@ -342,7 +322,7 @@ st.markdown(f"""
     }}
     
     .hero-sub {{
-        font-size: 0.98rem;
+        font-size: clamp(0.88rem, 1.5vw, 0.98rem);
         color: #CBD5E1;
         font-weight: 400;
         line-height: 1.5;
@@ -371,7 +351,7 @@ st.markdown(f"""
         border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 12px;
         font-weight: 700;
-        font-size: 0.95rem;
+        font-size: clamp(0.88rem, 1.2vw, 0.95rem);
         padding: 12px 28px;
         color: #FFFFFF;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -388,7 +368,7 @@ st.markdown(f"""
     /* 3 STEP PROCESS CARDS */
     .steps-container {{
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 16px;
         margin: 24px auto 0 auto;
         text-align: left;
@@ -454,13 +434,13 @@ st.markdown(f"""
 
     /* SCROLLABLE CHAT CONTAINER */
     .chat-scroll-area {{
-        max-height: 360px;
+        max-height: 340px;
         overflow-y: auto;
         padding: 12px 14px;
         background: rgba(15, 23, 42, 0.65);
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 14px;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }}
     .chat-scroll-area::-webkit-scrollbar {{
         width: 6px;
@@ -470,15 +450,31 @@ st.markdown(f"""
         border-radius: 4px;
     }}
 
-    /* FAQ CONTAINER */
-    .faq-container {{
-        max-width: 980px;
-        margin: 35px auto 0 auto;
-        background: rgba(30, 41, 59, 0.65);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 20px;
-        backdrop-filter: blur(24px);
-        padding: 24px 30px;
+    /* INSTAGRAM/CHATGPT STYLE QUICK CHIP BUTTONS */
+    .quick-chip-container {{
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 4px 2px 10px 2px;
+        margin-bottom: 8px;
+    }}
+    div[data-testid="stExpander"] div.stButton button.chip-btn {{
+        height: 28px !important;
+        min-height: 28px !important;
+        font-size: 0.74rem !important;
+        padding: 2px 12px !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 16px !important;
+        color: #E2E8F0 !important;
+        white-space: nowrap !important;
+        box-shadow: none !important;
+        margin-top: 0 !important;
+    }}
+    div[data-testid="stExpander"] div.stButton button.chip-btn:hover {{
+        background: rgba(255, 255, 255, 0.16) !important;
+        border-color: rgba(255, 255, 255, 0.35) !important;
+        color: #FFFFFF !important;
     }}
 
     /* AUDIT FILTER BOX */
@@ -497,13 +493,6 @@ st.markdown(f"""
 # ==============================================================================
 
 def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
-    """
-    Generates an auditor-grade, multi-tab Excel workbook:
-    - Tab 1: Konsolide Yevmiye Fişi (Genel Fişler)
-    - Tab 2: 153 Ticari Mallar (Stok/Emtia Alımları - Yeşil Tema)
-    - Tab 3: 770 Genel Masraflar (İşletme Giderleri - Mavi Tema)
-    - Tab 4: Denetim & Bakiye Özeti
-    """
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         headers = T["headers"]
@@ -897,7 +886,7 @@ if st.session_state["out_df"] is not None:
     # AKILLI FİLTRELEME & DENETİM KONTROLÜ
     headers = T["headers"]
     st.markdown("<div class='filter-card'>", unsafe_allow_html=True)
-    f_col1, f_col2, f_col3 = st.columns([2, 3, 2])
+    f_col1, f_col2, f_col3 = st.columns([2.5, 3.5, 2])
     
     with f_col1:
         filtre_turu = st.selectbox(
@@ -910,13 +899,12 @@ if st.session_state["out_df"] is not None:
         if st.session_state.get("raw_audit_results"):
             doc_cnt = len(st.session_state["raw_audit_results"])
             avg_conf = sum(d.get("confidence", 95) for d in st.session_state["raw_audit_results"]) / max(doc_cnt, 1)
-            st.markdown(f"<div style='font-size:0.85rem; padding-top:6px; color:#A7F3D0;'>🛡️ <b>Denetim Güvencesi:</b> {doc_cnt} Belge %{avg_conf:.1f} OCR & Matematik Doğruluğu ile Mühürlendi.</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='font-size:0.85rem; padding-top:6px; color:#A7F3D0;'>🛡️ <b>Denetim Güvencesi:</b> {doc_cnt} Belge %{avg_conf:.1f} Doğruluk ile Mühürlendi.</div>", unsafe_allow_html=True)
 
     with f_col3:
-        st.markdown("<div style='text-align:right; font-size:0.82rem; padding-top:6px; color:#CBD5E1;'>💡 Hücreye çift tıklayıp düzenleyin</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:right; font-size:0.82rem; padding-top:6px; color:#CBD5E1;'>💡 Çift tıklayıp düzenleyin</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Filtreleme Mantığı
     df_goruntule = st.session_state["out_df"].copy()
     if filtre_turu == "Sadece 153 (Ticari Mallar)":
         df_goruntule = df_goruntule[df_goruntule[headers["code"]].astype(str).str.startswith("153")]
@@ -984,7 +972,7 @@ if st.session_state["out_df"] is not None:
         )
 
 # ==============================================================================
-# 8. MENTOR FINANS ASİSTANI (SCROLLABLE & CLEAN)
+# 8. MENTOR FINANS ASİSTANI (INSTAGRAM/GPT STYLE QUICK CHIPS)
 # ==============================================================================
 
 st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
@@ -1012,23 +1000,38 @@ with c_bot_center:
                 st.session_state["chat_messages"] = []
                 st.rerun()
 
+        # INSTAGRAM / CHATGPT TARZI MİNİMAL HIZLI SORU BUTONLARI (QUICK CHIPS)
+        st.markdown("<div class='quick-chip-container'>", unsafe_allow_html=True)
+        chip_cols = st.columns(len(T["quick_chips"]))
+        secilen_chip = None
+        for c_idx, chip_text in enumerate(T["quick_chips"]):
+            with chip_cols[c_idx]:
+                if st.button(chip_text, key=f"chip_{c_idx}", use_container_width=True):
+                    secilen_chip = chip_text
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # SCROLLABLE CHAT ALANI
         st.markdown("<div class='chat-scroll-area'>", unsafe_allow_html=True)
         if not st.session_state["chat_messages"]:
             st.markdown(f"<div style='color: #94A3B8; font-size: 0.85rem; padding: 10px 0;'>💡 <i>{T['bot_placeholder']}</i></div>", unsafe_allow_html=True)
         else:
-            for msg in st.session_state["chat_messages"][-4:]:
+            for msg in st.session_state["chat_messages"][-6:]:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
         st.markdown("</div>", unsafe_allow_html=True)
 
         user_query = st.chat_input(T["bot_placeholder"])
-        if user_query:
-            st.session_state["chat_messages"].append({"role": "user", "content": user_query})
+        
+        # Kullanıcı elle yazdıysa veya hızlı chip butonuna bastıysa tetikle
+        aktif_soru = user_query or secilen_chip
+        
+        if aktif_soru:
+            st.session_state["chat_messages"].append({"role": "user", "content": aktif_soru})
             
             prompt_bot = f"""
             Sen LedgerAI'ın kurumsal finans mentorü ve pratik muhasebe uzmanısın.
             Kullanıcı Dili: {st.session_state['user_lang']}
-            Kullanıcı Sorusu: "{user_query}"
+            Kullanıcı Sorusu: "{aktif_soru}"
 
             TALİMATLAR:
             1. Asla lafı uzatma, genel tanımlar yazma.
@@ -1049,20 +1052,3 @@ with c_bot_center:
                 st.rerun()
             except Exception:
                 st.error("Asistan yanıt veremedi, lütfen tekrar deneyiniz.")
-
-# ==============================================================================
-# 9. SIKÇA SORULAN SORULAR & KURUMSAL GÜVENLİK (FAQ)
-# ==============================================================================
-
-st.markdown(f"""
-<div class='faq-container'>
-    <div style='font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; color: #F1F5F9;'>
-        {T['faq_title']}
-    </div>
-""", unsafe_allow_html=True)
-
-for faq in T.get("faqs", []):
-    with st.expander(f"📌 {faq['q']}", expanded=False):
-        st.markdown(f"<div style='font-size: 0.88rem; color: #CBD5E1; line-height: 1.6;'>{faq['a']}</div>", unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
