@@ -351,7 +351,7 @@ LANG_DATA = {
         "erp_btn_save": "💾 Fişi Kaydet & Mühürle",
         "erp_btn_next": "➡️ Sonraki Fişe Geç",
         "leg_title": "⚖️ Kurumsal Güvence, Regülasyon & Sorumluluk Protokolü",
-        "leg_sub": "WhatsApp diyaloğu tarzında anlaşılır ve şeffaf hukuki çerçeve.",
+        "leg_sub": "Anlaşılır ve şeffaf hukuki çerçeve.",
         "q1": "💬 Soru 1: LedgerAI muhasebecinin yerine mi geçiyor? Bize yasal ceza gelir mi?",
         "a1": "<b>Cevap:</b> Kesinlikle hayır! LedgerAI bir <b>Dual-Control (İki Göz)</b> asistanıdır. Fişleri sadece ön hazırlık olarak taslak çıkarır. 3568 Sayılı Kanun gereği tüm yasal defter ve beyanname onay yetkisi yetkili meslek mensuplarına aittir.",
         "q2": "🔒 Soru 2: Faturalarımız, müşteri isimlerimiz veya şirket sırlarımız kaydediliyor mu?",
