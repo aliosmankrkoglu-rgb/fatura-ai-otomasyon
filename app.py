@@ -4,7 +4,7 @@ LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY HUB
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL + HTML5 Canvas
 Design: Minimal Circular Glass Nav / 100% Dynamic Multi-Language Localization
 Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, US GAAP
-Version: 11.0.0 Legal Safeguard & Enhanced Audio-Visual Edition
+Version: 11.1.0 Multi-Language Scenario Bugfix Edition
 ================================================================================
 """
 
@@ -73,7 +73,7 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. PROSEDÜREL OYUN VE SİMÜLASYON VERİTABANI
+# 2. PROSEDÜREL OYUN VE DİL DUYARLI SİMÜLASYON VERİTABANI
 # ==============================================================================
 
 def generate_simple_puzzle(step: int, lang: str):
@@ -196,8 +196,9 @@ TRICKY_MATRIX_CARDS = [
 if not isinstance(st.session_state.get("matrix_current_item"), dict):
     st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
 
-def generate_muhasebe_ogreniyorum_scenario(step: int):
-    senaryolar = [
+def generate_muhasebe_ogreniyorum_scenario(step: int, lang: str):
+    is_tr = "TR" in str(lang)
+    senaryolar_tr = [
         {
             "fis_no": f"YEV-2026/00{step}",
             "tarih": datetime.date.today().strftime("%d.%m.%Y"),
@@ -240,22 +241,39 @@ def generate_muhasebe_ogreniyorum_scenario(step: int):
             "ipucu": "Borçlu hesaplar: 770 ve 191 | Alacaklı hesap: 100 Kasa"
         }
     ]
-    s = random.choice(senaryolar)
+    senaryolar_en = [
+        {
+            "fis_no": f"VOU-2026/00{step}",
+            "tarih": datetime.date.today().strftime("%d.%m.%Y"),
+            "baslik": "COMMERCIAL INVENTORY PURCHASE",
+            "aciklama": "Merchandise inventory was purchased on account from a vendor.",
+            "detay": "Net: $50,000 | Tax: $10,000 | Total Payable: $60,000",
+            "satirlar": [
+                {"kod": "1200", "ad": "INVENTORY", "borc": 50000.0, "alacak": 0.0},
+                {"kod": "2200", "ad": "SALES TAX RECEIVABLE", "borc": 10000.0, "alacak": 0.0},
+                {"kod": "2000", "ad": "ACCOUNTS PAYABLE", "borc": 0.0, "alacak": 60000.0}
+            ],
+            "beklenen_toplam": 60000.0,
+            "ipucu": "Debit accounts: 1200 & 2200 | Credit account: 2000"
+        }
+    ]
+    s_pool = senaryolar_tr if is_tr else senaryolar_en
+    s = random.choice(s_pool)
     return {
-        "step": step,
-        "fis_no": s["fis_no"],
-        "tarih": s["tarih"],
-        "baslik": s["baslik"],
-        "aciklama": s["aciklama"],
-        "detay": s["detay"],
+        "step": int(step),
+        "fis_no": str(s["fis_no"]),
+        "tarih": str(s["tarih"]),
+        "baslik": str(s["baslik"]),
+        "aciklama": str(s["aciklama"]),
+        "detay": str(s["detay"]),
         "satirlar": s["satirlar"],
-        "beklenen_toplam": s["beklenen_toplam"],
-        "ipucu": s["ipucu"],
+        "beklenen_toplam": float(s["beklenen_toplam"]),
+        "ipucu": str(s["ipucu"]),
         "xp": 250
     }
 
 if not isinstance(st.session_state.get("sim_current_vaka"), dict):
-    st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
+    st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"], st.session_state["user_lang"])
 
 # ==============================================================================
 # 3. GLOBAL LOCALIZATION DATA DICTIONARY (6 DİLDE TAM & HUKUKEN ZIRHLI)
@@ -669,7 +687,7 @@ LANG_DATA = {
         "preview_title": "📊 Prima Nota & Centro di Controllo",
         "preview_tip": "💡 Fai doppio clic per modificare.",
         "tot_deb": "Totale Dare",
-        "tot_crd": "Totale Avere",
+        "tot_crd": "Total Avere",
         "balanced": "✅ Quadratura Perfetta",
         "unbalanced": "⚠️ Sbilancio!",
         "download_btn": "📥 Scarica Excel (.xlsx)",
@@ -734,6 +752,15 @@ if st.session_state["user_lang"] not in LANG_DATA:
     st.session_state["user_lang"] = "🇹🇷 TR"
 
 T = LANG_DATA[st.session_state["user_lang"]]
+
+INSTANT_FAQ_CACHE = {
+    "💡 Muhasebeciye ne kazandırır?": "LedgerAI, manuel veri girişini %80 azaltarak mali müşavirlerin rutin fiş işleme yükünü ortadan kaldırır. Yapay zeka fiş taslağını oluşturur, uzman insan sadece onaylar ve denetler.",
+    "🔒 Verilerim güvende mi?": "Evet. Tüm finansal verileriniz TLS 256-bit uçtan uca şifreleme ile işlenir. Belgeleriniz kalıcı sunucularda saklanmaz ve model eğitiminde (training) kullanılmaz.",
+    "⚖️ Tevkifat & Stopaj mantığı nedir?": "Tevkifat ve stopaj, faturadaki verginin bir kısmının alıcı tarafından kesilerek doğrudan vergi dairesine (360 hesabına) ödenmesidir. Böylece satıcı cari hesabı net tutara oturur ve yevmiye fişi kuruş farkı olmadan dengelenir.",
+    "🎯 153 ile 770 arasındaki fark nedir?": "153 Ticari Mallar satılmak amacıyla alınan ticari ürünlerin stok hesabıdır. 770 Genel Yönetim Giderleri ise işletmenin kendi idari faaliyetlerinde tükettiği (ofis kırtasiyesi, kira, danışmanlık vb.) giderlerin kaydedildiği hesaptır.",
+    "💡 How does it save time?": "LedgerAI automates repetitive invoice typing and multi-tier tax splitting by 80%, leaving the final executive approval to the CPA.",
+    "🔒 Is our data secure?": "Yes. Encrypted via TLS 256-bit bank-grade protocols. Your financial files are processed strictly within the active session and never stored permanently."
+}
 
 # ==============================================================================
 # 4. DYNAMIC STYLING ENGINE (IPHONE CIRCLE GLASS BUTTONS & NEON HUD)
@@ -1165,7 +1192,6 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# GELİŞMİŞ SYNTHESIZER SES MOTORU (WEB AUDIO API)
 def sesli_bildirim_cal(tur="success"):
     if tur == "success":
         ses_js = """
@@ -1173,13 +1199,12 @@ def sesli_bildirim_cal(tur="success"):
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const now = ctx.currentTime;
-                // Çift Katmanlı Kristal Çan Efekti (C6 & G6 Chord)
                 [1046.50, 1567.98].forEach((freq, idx) => {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(freq, now + (idx * 0.05));
-                    gain.gain.setValueAtTime(0.06, now + (idx * 0.05));
+                    gain.gain.setValueAtTime(0.08, now + (idx * 0.05));
                     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
@@ -1195,7 +1220,6 @@ def sesli_bildirim_cal(tur="success"):
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const now = ctx.currentTime;
-                // Akustik Düşük Frekanslı İkaz Akoru
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'sawtooth';
@@ -2165,7 +2189,7 @@ with sekme_akademi:
         with oyun_sekme4:
             raw_sim = st.session_state.get("sim_current_vaka")
             if not isinstance(raw_sim, dict) or "satirlar" not in raw_sim:
-                st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
+                st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"], st.session_state["user_lang"])
                 sim_sc = st.session_state["sim_current_vaka"]
             else:
                 sim_sc = raw_sim
