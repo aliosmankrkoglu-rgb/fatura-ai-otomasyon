@@ -1,10 +1,10 @@
 """
 ================================================================================
-LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & CYBER ACADEMY
+LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY HUB
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL + HTML5 Canvas
-Design: Minimal Circular Glass Nav / Authentic ETA:SQL Journal Entry Simulator
+Design: Minimal Circular Glass Nav / Authentic Accounting Learning ERP Engine
 Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, US GAAP
-Version: 9.0.0 Authentic ETA ERP Engine Edition
+Version: 9.5.0 Universal Multi-Language Production Edition
 ================================================================================
 """
 
@@ -55,8 +55,8 @@ SESSION_DEFAULTS = {
     "current_game_vaka": None,
     "matrix_step": 1,
     "matrix_current_item": None,
-    "eta_step": 1,
-    "eta_current_scenario": None
+    "sim_step": 1,
+    "sim_current_vaka": None
 }
 
 for key, default_val in SESSION_DEFAULTS.items():
@@ -73,11 +73,12 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. PROSEDÜREL OYUN VE OTANTİK ETA SENARYO MOTORU
+# 2. PROSEDÜREL OYUN VE SİMÜLASYON VERİTABANI
 # ==============================================================================
 
-def generate_simple_puzzle(step: int):
-    vakalar = [
+def generate_simple_puzzle(step: int, lang: str):
+    is_tr = "TR" in lang
+    vakalar_tr = [
         {
             "vaka": "Şirketiniz satıp kâr elde etmek amacıyla toptancıdan 100 adet spor ayakkabı satın aldı.",
             "tutar": "80.000 TL + %20 KDV (16.000 TL) = 96.000 TL",
@@ -111,7 +112,34 @@ def generate_simple_puzzle(step: int):
             "ipucu": "Yurtiçine yapılan ana ticari mal ve hizmet satışları 600 Yurtiçi Satışlar hesabına alacak kaydedilir."
         }
     ]
-    secilen = random.choice(vakalar)
+    vakalar_en = [
+        {
+            "vaka": "Your business purchased 100 units of sneakers from a wholesaler strictly for resale.",
+            "tutar": "$80,000 + Sales Tax = $96,000",
+            "soru": "Which debit account represents commercial goods purchased for resale?",
+            "secenekler": ["1200 Inventory / Merchandise", "6000 Operating Expenses (OpEx)", "1500 Fixed Assets / Equipment", "4000 Sales Revenue"],
+            "dogru": "1200 Inventory / Merchandise",
+            "ipucu": "Goods acquired to be sold to customers are booked into the Inventory asset account."
+        },
+        {
+            "vaka": "Office printer paper, ink cartridges, and folders were acquired for headquarters administration.",
+            "tutar": "$12,000 + Tax = $14,400",
+            "soru": "Which debit account covers administrative office supply consumption?",
+            "secenekler": ["6000 Operating Expenses (OpEx)", "1200 Inventory / Merchandise", "1010 Cash Account", "2000 Accounts Payable"],
+            "dogru": "6000 Operating Expenses (OpEx)",
+            "ipucu": "Consumable office supplies are recorded directly as General & Administrative Operating Expenses."
+        },
+        {
+            "vaka": "Five high-end laptop computers were purchased for staff use across the upcoming 3 years.",
+            "tutar": "$15,000 + Tax = $18,000",
+            "soru": "Which long-term asset account holds company hardware equipment?",
+            "secenekler": ["1500 Fixed Assets / Equipment", "6000 Operating Expenses (OpEx)", "1200 Inventory", "4000 Sales Revenue"],
+            "dogru": "1500 Fixed Assets / Equipment",
+            "ipucu": "Hardware and furniture used over 1 year are capitalized as Fixed Tangible Assets."
+        }
+    ]
+    v_pool = vakalar_tr if is_tr else vakalar_en
+    secilen = random.choice(v_pool)
     return {
         "step": step,
         "vaka": secilen["vaka"],
@@ -124,7 +152,7 @@ def generate_simple_puzzle(step: int):
     }
 
 if st.session_state["current_game_vaka"] is None:
-    st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"])
+    st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
 
 TRICKY_MATRIX_CARDS = [
     {
@@ -168,9 +196,9 @@ TRICKY_MATRIX_CARDS = [
 if st.session_state["matrix_current_item"] is None:
     st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
 
-# ETA PROVA MOTORU (GERÇEKÇİ FATURA SENARYOLARI)
-def generate_eta_scenario(step: int):
-    senaryo_listesi = [
+# 4. MODÜL: MUHASEBE ÖĞRENİYORUM (YEVMİYE FİŞİ PROVA MOTORU)
+def generate_muhasebe_ogreniyorum_scenario(step: int):
+    senaryolar = [
         {
             "fis_no": f"YEV-2026/00{step}",
             "tarih": datetime.date.today().strftime("%d.%m.%Y"),
@@ -189,7 +217,7 @@ def generate_eta_scenario(step: int):
             "fis_no": f"YEV-2026/00{step}",
             "tarih": datetime.date.today().strftime("%d.%m.%Y"),
             "baslik": "BANKADAN SATICI BORCU HAVALESİ",
-            "aciklama": "Şirketin Garanti Bankası ticari mevduat hesabından satıcıya borç ödenmiştir.",
+            "aciklama": "Şirketin banka ticari mevduat hesabından satıcıya borç ödenmiştir.",
             "detay": "Ödenen Borç Tutarı: 35.000 TL (Dekont No: BNK-8819)",
             "satirlar": [
                 {"kod": "320", "ad": "SATICILAR", "borc": 35000.0, "alacak": 0.0},
@@ -213,7 +241,7 @@ def generate_eta_scenario(step: int):
             "ipucu": "Borçlu hesaplar: 770 ve 191 | Alacaklı hesap: 100 Kasa"
         }
     ]
-    s = random.choice(senaryo_listesi)
+    s = random.choice(senaryolar)
     return {
         "step": step,
         "fis_no": s["fis_no"],
@@ -227,11 +255,11 @@ def generate_eta_scenario(step: int):
         "xp": 250
     }
 
-if st.session_state["eta_current_scenario"] is None:
-    st.session_state["eta_current_scenario"] = generate_eta_scenario(st.session_state["eta_step"])
+if st.session_state["sim_current_vaka"] is None:
+    st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
 
 # ==============================================================================
-# 3. LOCALIZATION DATA DICTIONARY (6 GLOBAL DİL)
+# 3. LOCALIZATION DATA DICTIONARY (6 DİLDE TAM EŞİTLENMİŞ LÜKS METİNLER)
 # ==============================================================================
 
 LANG_DATA = {
@@ -259,7 +287,14 @@ LANG_DATA = {
         "themes": ["Kurumsal", "Modern", "Akademi"],
         "about_btn": "Hakkında",
         "about_title": "LedgerAI Kurumsal Mimari & Regülasyon",
-        "about_content": "LedgerAI, Türkiye Tek Düzen Hesap Planı, VUK ve uluslararası standartlara tam uyumlu otonom ön muhasebe terminalidir.",
+        "about_content": """
+        ### 🛡️ Kurumsal Finans & Güvenlik Mimarisi
+        LedgerAI, Türkiye Tek Düzen Hesap Planı, VUK ve uluslararası standartlara tam uyumlu bir otonom ön muhasebe altyapısıdır:
+        * **1. Çift Göz Prensibi (Dual Control):** Yapay zeka veri ayıklayıcı ve tasnif edici olarak çalışır; yasal defter kaydı yetkili SMMM/YMM onayına bağlıdır.
+        * **2. Tevkifat & Stopaj Ayrıştırma:** 5/10, 7/10, 9/10 KDV tevkifatlarını ve serbest meslek stopajlarını ayrı hesap kodlarına (360) dengeli olarak dağıtır.
+        * **3. Çift Bakiye Doğrulama:** Borç ve Alacak tutarları kuruşu kuruşuna eşitlenmeden sistem dışa aktarıma izin vermez.
+        * **4. ERP Entegrasyon Standartları:** ETA V.11, Luca, Logo, Zirve, Datev ve QuickBooks uyumlu veri çıktıları sağlar.
+        """,
         "bot_title": "👾 LedgerBot Finans Mentorü",
         "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya fatura mantığını sormak için aşağıdaki sorulara tıklayabilirsin:",
         "bot_placeholder": "Muhasebe sorunuzu yazın...",
@@ -302,7 +337,14 @@ LANG_DATA = {
         "themes": ["Kurumsal", "Modern", "Akademi"],
         "about_btn": "About",
         "about_title": "LedgerAI Architecture & Regulation",
-        "about_content": "Autonomous double-entry journal voucher generator compliant with US GAAP, IFRS and SOC2.",
+        "about_content": """
+        ### 🛡️ Enterprise Financial & Security Architecture
+        Autonomous multi-GAAP accounting terminal compliant with US GAAP, IFRS, and SOC2:
+        * **1. Human-in-the-Loop Audit:** AI structures journal entries; certified financial controllers provide final clearance.
+        * **2. Mathematical Parity Lock:** Absolute verification guaranteeing Debit strictly equals Credit.
+        * **3. Withholding Reconciliation:** Automatic allocation of multi-rate sales taxes and tax withholdings.
+        * **4. ERP Interoperability:** Certified CSV/Excel templates for QuickBooks, SAP, Datev, and Xero.
+        """,
         "bot_title": "👾 LedgerBot Finance Mentor",
         "bot_welcome": "Hi! I am your AI finance mentor. Tap any quick question below or ask me directly:",
         "bot_placeholder": "Ask a financial question...",
@@ -490,7 +532,7 @@ INSTANT_FAQ_CACHE = {
 }
 
 # ==============================================================================
-# 4. DYNAMIC STYLING ENGINE (AUTHENTIC ETA WINDOW & IPHONE BUTTONS)
+# 4. DYNAMIC STYLING ENGINE (IPHONE CIRCLE GLASS BUTTONS & NEON HUD)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -853,8 +895,8 @@ st.markdown(f"""
         line-height: 1.55;
     }}
 
-    /* OTANTİK ETA:SQL PENCERE MİMARİSİ */
-    .eta-window {{
+    /* OTONOM YEVMİYE FİŞİ EĞİTİM MODÜLÜ (RETRO PENCERE) */
+    .erp-window {{
         background: #C0C0C0;
         border: 2px solid #FFFFFF;
         border-right-color: #808080;
@@ -866,7 +908,7 @@ st.markdown(f"""
         border-radius: 4px;
         margin-bottom: 20px;
     }}
-    .eta-titlebar {{
+    .erp-titlebar {{
         background: linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%);
         color: #FFFFFF;
         font-weight: bold;
@@ -877,7 +919,7 @@ st.markdown(f"""
         align-items: center;
         letter-spacing: 0.5px;
     }}
-    .eta-toolbar {{
+    .erp-toolbar {{
         background: #E0E0E0;
         border: 1px solid #808080;
         padding: 3px 6px;
@@ -887,8 +929,8 @@ st.markdown(f"""
         font-size: 11px;
         font-weight: 600;
     }}
-    .eta-header-card {{
-        background: #FFFFE1; /* ETA Kalsik Açık Sarı Fiş Başlığı */
+    .erp-header-card {{
+        background: #FFFFE1;
         border: 1px solid #999999;
         padding: 6px 10px;
         margin-bottom: 4px;
@@ -899,26 +941,7 @@ st.markdown(f"""
         color: #000080;
         font-weight: bold;
     }}
-    .eta-grid-table {{
-        width: 100%;
-        border-collapse: collapse;
-        background: #FFFFFF;
-        font-size: 11px;
-    }}
-    .eta-grid-table th {{
-        background: #D4D0C8;
-        border: 1px solid #808080;
-        padding: 4px 6px;
-        font-weight: bold;
-        color: #000000;
-        text-align: center;
-    }}
-    .eta-grid-table td {{
-        border: 1px solid #D0D0D0;
-        padding: 4px 6px;
-        color: #000000;
-    }}
-    .eta-footer-bar {{
+    .erp-footer-bar {{
         background: #EBE9ED;
         border: 1px solid #808080;
         padding: 6px 10px;
@@ -1181,12 +1204,13 @@ with nav_right:
     
     with btn_dock1:
         st.markdown("<div class='circle-glass-btn'>", unsafe_allow_html=True)
-        with st.popover("🌐", help="Dil Seçimi"):
+        with st.popover("🌐", help="Dil / Language"):
             st.markdown("<div style='font-size:0.85rem; font-weight:700; margin-bottom:8px;'>🌐 Dil / Language</div>", unsafe_allow_html=True)
             st.markdown("<div class='pop-pill-grid'>", unsafe_allow_html=True)
             for l_key in list(LANG_DATA.keys()):
                 if st.button(l_key, key=f"btn_lang_pop_{l_key}", use_container_width=True):
                     st.session_state["user_lang"] = l_key
+                    st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], l_key)
                     st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -1369,7 +1393,7 @@ with sekme_terminal:
 
         # MİKRO CAM KAPSÜL FAALİYET SEKTÖRÜ
         st.markdown("<div style='margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
-        st.markdown("<div style='font-size:0.72rem; color:#94A3B8; font-weight:700; letter-spacing:0.5px; margin-bottom:6px;'>FAALİYET SEKTÖRÜ (TIKLAYARAK SEÇİN):</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:0.72rem; color:#94A3B8; font-weight:700; letter-spacing:0.5px; margin-bottom:6px;'>FAALİYET SEKTÖRÜ:</div>", unsafe_allow_html=True)
         
         st.markdown("<div class='sector-pills'>", unsafe_allow_html=True)
         s_cols = st.columns(4)
@@ -1587,7 +1611,7 @@ with sekme_terminal:
                         st.rerun()
 
 # ------------------------------------------------------------------------------
-# SEKME 2: 🎓 SİBER AKADEMİ (4'LÜ EĞLENCELİ OYUN MERKEZİ & ETA SİMÜLATÖRÜ)
+# SEKME 2: 🎓 SİBER AKADEMİ (4'LÜ EĞLENCELİ OYUN MERKEZİ & RETRO ERP)
 # ------------------------------------------------------------------------------
 with sekme_akademi:
     xp = st.session_state["academy_xp"]
@@ -1633,7 +1657,7 @@ with sekme_akademi:
             "🎮 1. Hesap Kodu Avcısı", 
             "🧩 2. Bilanço Karakter Matrisi (Zor)",
             "🐍 3. Hedefli Bilanço Snake",
-            "📑 4. ETA:SQL Yevmiye Fişi Modülü"
+            "📑 4. Muhasebe Öğreniyorum (Yevmiye Provası)"
         ])
 
         # OYUN 1: HESAP KODU AVCISI (NEON KART BUTONLAR)
@@ -1673,7 +1697,7 @@ with sekme_akademi:
                             st.success(f"🎉 DOĞRU CEVAP! {vaka['ipucu']} (+{vaka['xp']} XP)")
                             time.sleep(1.2)
                             st.session_state["game_step"] += 1
-                            st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"])
+                            st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
                             st.rerun()
                         else:
                             st.session_state["academy_lives"] -= 1
@@ -1682,7 +1706,7 @@ with sekme_akademi:
                             st.error(f"💥 YANDIN! (-1 Can) Doğru hesap: {vaka['dogru']} olmalıydı. {vaka['ipucu']}")
                             time.sleep(1.4)
                             st.session_state["game_step"] += 1
-                            st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"])
+                            st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
                             st.rerun()
 
                 st.markdown("</div>", unsafe_allow_html=True)
@@ -1733,11 +1757,11 @@ with sekme_akademi:
                             st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
                             st.rerun()
 
-        # OYUN 3: HEDEFLİ BİLANÇO SNAKE
+        # OYUN 3: HEDEFLİ BİLANÇO SNAKE (ÖZEL BAŞLANGIÇ EKRANLI)
         with oyun_sekme3:
             st.markdown("""
             <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:16px 20px; margin-bottom:12px;'>
-                <h4 style='color:#FFFFFF; margin:0 0 4px 0;'>🐍 Görevli Bilanço Snake (Hesap Avı)</h4>
+                <h4 style='color:#FFFFFF; margin:0 0 4px 0;'>🐍 Retro Bilanço Snake (Hesap Avcısı)</h4>
                 <p style='font-size:0.80rem; color:#CBD5E1; margin:0;'>
                 <b>Oyunun Amacı:</b> Ekranda beliren <b>GÖREV HESAP KODUNU</b> ye! Doğru kodu yersen +100 XP kazanırsın. Yanlış kodu yersen veya duvara/kuyruğuna çarparsan oyun durur! 
                 (Durdurmak için <b>[BOŞLUK / SPACE]</b> tuşuna bas).
@@ -1756,9 +1780,10 @@ with sekme_akademi:
                     .touch-grid { display: grid; grid-template-columns: repeat(3, 55px); gap: 6px; margin-top: 10px; }
                     .t-btn { width: 55px; height: 42px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
                     .t-btn:active { background: #38BDF8; color: #000; }
-                    #menuOverlay { position: absolute; width: 440px; height: 300px; background: rgba(6, 9, 19, 0.85); border-radius: 14px; display: none; flex-direction: column; align-items: center; justify-content: center; }
-                    .menu-title { font-size: 20px; font-weight: 800; color: #F43F5E; margin-bottom: 12px; }
-                    .menu-btn { background: #38BDF8; color: #000; border: none; padding: 10px 24px; border-radius: 99px; font-weight: bold; cursor: pointer; }
+                    #menuOverlay { position: absolute; width: 440px; height: 300px; background: rgba(6, 9, 19, 0.90); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+                    .menu-title { font-size: 20px; font-weight: 800; color: #38BDF8; margin-bottom: 6px; }
+                    .menu-sub { font-size: 11px; color: #CBD5E1; max-width: 320px; margin-bottom: 16px; line-height: 1.4; }
+                    .menu-btn { background: #38BDF8; color: #000; border: none; padding: 10px 28px; border-radius: 99px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 0 15px rgba(56,189,248,0.4); }
                 </style>
             </head>
             <body>
@@ -1769,8 +1794,9 @@ with sekme_akademi:
                 <div style="position:relative; display:flex; align-items:center; justify-content:center;">
                     <canvas id="gameCanvas" width="440" height="300"></canvas>
                     <div id="menuOverlay">
-                        <div class="menu-title" id="overlayTitle">💀 FATURA İPTAL OLDU!</div>
-                        <button class="menu-btn" onclick="restartGame()">YENİDEN BAŞLA</button>
+                        <div class="menu-title" id="overlayTitle">🎮 BİLANÇO SNAKE ARENA</div>
+                        <div class="menu-sub" id="overlaySub">Hedef hesap kodunu topla, bilançoyu büyüt! Yanlış hesabı yersen veya duvara çarparsan oyun biter.</div>
+                        <button class="menu-btn" onclick="startGame()">OYUNU BAŞLAT</button>
                     </div>
                 </div>
                 <div class="touch-grid">
@@ -1782,10 +1808,11 @@ with sekme_akademi:
                     const ctx = canvas.getContext("2d");
                     const overlay = document.getElementById("menuOverlay");
                     const overlayTitle = document.getElementById("overlayTitle");
+                    const overlaySub = document.getElementById("overlaySub");
                     const grid = 20;
                     let count = 0;
                     let score = 0;
-                    let isPaused = false;
+                    let isPaused = true;
                     let isGameOver = false;
 
                     let snake = { x: 160, y: 160, dx: grid, dy: 0, cells: [], maxCells: 4 };
@@ -1819,11 +1846,13 @@ with sekme_akademi:
 
                     function triggerGameOver(msg) {
                         isGameOver = true;
-                        overlayTitle.innerText = msg;
+                        overlayTitle.innerText = "💀 OYUN BİTTİ!";
+                        overlayTitle.style.color = "#F43F5E";
+                        overlaySub.innerText = msg;
                         overlay.style.display = "flex";
                     }
 
-                    function restartGame() {
+                    function startGame() {
                         snake.x = 160; snake.y = 160;
                         snake.cells = []; snake.maxCells = 4;
                         snake.dx = grid; snake.dy = 0;
@@ -1831,6 +1860,7 @@ with sekme_akademi:
                         document.getElementById("score").innerText = score;
                         overlay.style.display = "none";
                         isGameOver = false;
+                        isPaused = false;
                         spawnFoods();
                     }
 
@@ -1843,14 +1873,16 @@ with sekme_akademi:
                         snake.x += snake.dx;
                         snake.y += snake.dy;
 
+                        // DUVARA ÇARPINCA YANMA
                         if (snake.x < 0 || snake.x >= canvas.width || snake.y < 0 || snake.y >= canvas.height) {
-                            triggerGameOver("💀 DUVARA ÇARPTIN! (BİLANÇO TAŞTI)");
+                            triggerGameOver("Duvara çarptın! (Bilanço dışına taştı)");
                             return;
                         }
 
                         snake.cells.unshift({x: snake.x, y: snake.y});
                         if (snake.cells.length > snake.maxCells) snake.cells.pop();
 
+                        // YEMLERİ ÇİZ
                         foods.forEach(f => {
                             ctx.fillStyle = f.isTarget ? "#FACC15" : "#EF4444";
                             ctx.fillRect(f.x, f.y, grid-1, grid-1);
@@ -1859,12 +1891,14 @@ with sekme_akademi:
                             ctx.fillText(f.code, f.x + 2, f.y + 13);
                         });
 
+                        // YILAN ÇİZ & ÇARPIŞMALAR
                         ctx.fillStyle = "#10B981";
                         snake.cells.forEach(function(cell, index) {
                             if (index === 0) ctx.fillStyle = "#38BDF8";
                             else ctx.fillStyle = "#10B981";
                             ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
 
+                            // YEM YEME
                             foods.forEach(f => {
                                 if (cell.x === f.x && cell.y === f.y) {
                                     if (f.isTarget) {
@@ -1873,14 +1907,15 @@ with sekme_akademi:
                                         document.getElementById("score").innerText = score;
                                         spawnFoods();
                                     } else {
-                                        triggerGameOver("❌ YANLIŞ HESABI YEDİN! (VERGİ CEZASI)");
+                                        triggerGameOver("Yanlış hesabı yedin! (Vergi cezası)");
                                     }
                                 }
                             });
 
+                            // KUYRUĞA ÇARPMA
                             for (let i = index + 1; i < snake.cells.length; i++) {
                                 if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-                                    triggerGameOver("💀 KUYRUĞUNA ÇARPTIN!");
+                                    triggerGameOver("Kendi kuyruğuna çarptın!");
                                     return;
                                 }
                             }
@@ -1889,9 +1924,9 @@ with sekme_akademi:
 
                     function changeDir(dir) {
                         if (dir === 'LEFT' && snake.dx === 0) { snake.dx = -grid; snake.dy = 0; }
-                        else if (dir === 'UP' && snake.dy === 0) { snake.dy = -grid; snake.dx = 0; }
+                        else if (dir === 'UP' && snake.dy === 0) { snake.dy = -grid; snake.dy = 0; }
                         else if (dir === 'RIGHT' && snake.dx === 0) { snake.dx = grid; snake.dy = 0; }
-                        else if (dir === 'DOWN' && snake.dy === 0) { snake.dy = grid; snake.dx = 0; }
+                        else if (dir === 'DOWN' && snake.dy === 0) { snake.dy = grid; snake.dy = 0; }
                     }
 
                     document.addEventListener('keydown', function(e) {
@@ -1902,7 +1937,6 @@ with sekme_akademi:
                         else if (e.which === 40 && snake.dy === 0) changeDir('DOWN');
                     });
 
-                    spawnFoods();
                     requestAnimationFrame(gameLoop);
                 </script>
             </body>
@@ -1910,44 +1944,42 @@ with sekme_akademi:
             """
             components.html(snake_html, height=430)
 
-        # OYUN 4: OTANTİK ETA:SQL PENCERE MODÜLÜ
+        # OYUN 4: MUHASEBE ÖĞRENİYORUM (YEVMİYE FİŞİ PROVA MOTORU)
         with oyun_sekme4:
-            eta_sc = st.session_state["eta_current_scenario"]
+            sim_sc = st.session_state["sim_current_vaka"]
 
             st.markdown(f"""
             <div style='background:rgba(15,23,42,0.85); border:1px solid #38BDF8; border-radius:14px; padding:14px 18px; margin-bottom:12px;'>
                 <div style='display:flex; justify-content:space-between; align-items:center;'>
-                    <span style='font-size:0.78rem; font-weight:800; color:#38BDF8;'>📌 ETA:SQL MUHASEBE GÖREVİ #{eta_sc['step']}</span>
-                    <span style='font-size:0.75rem; color:#F0ABFC; font-weight:700;'>Ödül: +{eta_sc['xp']} XP</span>
+                    <span style='font-size:0.78rem; font-weight:800; color:#38BDF8;'>📌 MUHASEBE ÖĞRENİYORUM: YEVMİYE FİŞİ VAKASI #{sim_sc['step']}</span>
+                    <span style='font-size:0.75rem; color:#F0ABFC; font-weight:700;'>Ödül: +{sim_sc['xp']} XP</span>
                 </div>
-                <div style='font-size:0.86rem; color:#FFFFFF; font-weight:600; margin:4px 0;'>{eta_sc['baslik']}</div>
-                <div style='font-size:0.80rem; color:#CBD5E1;'><b>Olay:</b> {eta_sc['aciklama']} | <b>Detay:</b> {eta_sc['detay']}</div>
+                <div style='font-size:0.86rem; color:#FFFFFF; font-weight:600; margin:4px 0;'>{sim_sc['baslik']}</div>
+                <div style='font-size:0.80rem; color:#CBD5E1;'><b>Olay:</b> {sim_sc['aciklama']} | <b>Detay:</b> {sim_sc['detay']}</div>
             </div>
             """, unsafe_allow_html=True)
 
-            # OTANTİK ETA:SQL PENCERESİ
             st.markdown(f"""
-            <div class='eta-window'>
-                <div class='eta-titlebar'>
-                    <span>🗂️ ETA:SQL - [Yevmiye Fişi Girişi - {eta_sc['fis_no']}]</span>
+            <div class='erp-window'>
+                <div class='erp-titlebar'>
+                    <span>🗂️ Muhasebe Öğreniyorum - [Otonom Yevmiye Fişi Girişi - {sim_sc['fis_no']}]</span>
                     <span>_ □ ✕</span>
                 </div>
-                <div class='eta-toolbar'>
+                <div class='erp-toolbar'>
                     <span>[F2] Kayıt</span> | <span>[F3] Sil</span> | <span>[F5] İptal</span> | <span>[F6] Kart Arama</span> | <span>[F7] Fiş Listesi</span> | <span>[F8] Yazıcı</span>
                 </div>
-                <div class='eta-header-card'>
-                    <div>FİŞ NO: <b>{eta_sc['fis_no']}</b></div>
-                    <div>TARİH: <b>{eta_sc['tarih']}</b></div>
+                <div class='erp-header-card'>
+                    <div>FİŞ NO: <b>{sim_sc['fis_no']}</b></div>
+                    <div>TARİH: <b>{sim_sc['tarih']}</b></div>
                     <div>FİŞ TİPİ: <b>02 - MAHSUP</b></div>
                     <div>DURUM: <span style='color:#008000;'>AÇIK / DÜZENLEME</span></div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
 
-            st.markdown("<div style='font-size:0.78rem; font-weight:700; color:#CBD5E1; margin:6px 0 4px 0;'>ETA FİŞ SATIRLARI (HESAP KODU VE TUTARLARI DOLDURUNUZ):</div>", unsafe_allow_html=True)
+            st.markdown("<div style='font-size:0.78rem; font-weight:700; color:#CBD5E1; margin:6px 0 4px 0;'>FİŞ SATIRLARI (HESAP KODU VE TUTARLARI GİRİNİZ):</div>", unsafe_allow_html=True)
             
-            # Dinamik ETA Satır Formu
-            satir_sayisi = len(eta_sc["satirlar"])
+            satir_sayisi = len(sim_sc["satirlar"])
             girilen_satirlar = []
 
             col_w = [2.2, 3.5, 2.0, 2.0]
@@ -1963,13 +1995,13 @@ with sekme_akademi:
             for i in range(satir_sayisi):
                 s_c1, s_c2, s_c3, s_c4 = st.columns(col_w)
                 with s_c1:
-                    kod = st.text_input(f"Kod {i+1}", key=f"eta_k_{eta_sc['step']}_{i}", label_visibility="collapsed", placeholder="Örn: 153, 320")
+                    kod = st.text_input(f"Kod {i+1}", key=f"sim_k_{sim_sc['step']}_{i}", label_visibility="collapsed", placeholder="Örn: 153, 320")
                 with s_c2:
-                    aciklama = st.text_input(f"Açıklama {i+1}", key=f"eta_a_{eta_sc['step']}_{i}", label_visibility="collapsed", value=eta_sc["satirlar"][i]["ad"])
+                    aciklama = st.text_input(f"Açıklama {i+1}", key=f"sim_a_{sim_sc['step']}_{i}", label_visibility="collapsed", value=sim_sc["satirlar"][i]["ad"])
                 with s_c3:
-                    borc = st.number_input(f"Borç {i+1}", min_value=0.0, value=0.0, step=100.0, key=f"eta_b_{eta_sc['step']}_{i}", label_visibility="collapsed")
+                    borc = st.number_input(f"Borç {i+1}", min_value=0.0, value=0.0, step=100.0, key=f"sim_b_{sim_sc['step']}_{i}", label_visibility="collapsed")
                 with s_c4:
-                    alacak = st.number_input(f"Alacak {i+1}", min_value=0.0, value=0.0, step=100.0, key=f"eta_c_{eta_sc['step']}_{i}", label_visibility="collapsed")
+                    alacak = st.number_input(f"Alacak {i+1}", min_value=0.0, value=0.0, step=100.0, key=f"sim_c_{sim_sc['step']}_{i}", label_visibility="collapsed")
 
                 toplam_girilen_borc += borc
                 toplam_girilen_alacak += alacak
@@ -1977,52 +2009,50 @@ with sekme_akademi:
 
             fark = abs(toplam_girilen_borc - toplam_girilen_alacak)
 
-            # ETA PENCERE ALTI TOPLAM ÇUBUĞU
             fark_renk = "#008000" if (fark < 0.05 and toplam_girilen_borc > 0) else "#CC0000"
             st.markdown(f"""
-            <div class='eta-footer-bar'>
+            <div class='erp-footer-bar'>
                 <span>TOPLAM BORÇ: <b style='color:#000080;'>{toplam_girilen_borc:,.2f} TL</b></span>
                 <span>TOPLAM ALACAK: <b style='color:#000080;'>{toplam_girilen_alacak:,.2f} TL</b></span>
                 <span>BAKİYE FARKI: <b style='color:{fark_renk};'>{fark:,.2f} TL</b></span>
             </div>
             """, unsafe_allow_html=True)
 
-            b_eta1, b_eta2 = st.columns([1.5, 1.0])
-            with b_eta1:
-                if st.button("💾 [F2] Fişi ETA'ya Kaydet & Mühürle", use_container_width=True):
-                    # Fiş Doğruluk Kontrolü
+            b_sim1, b_sim2 = st.columns([1.5, 1.0])
+            with b_sim1:
+                if st.button("💾 [F2] Fişi Kaydet & Mühürle", use_container_width=True):
                     hepsi_dogru = True
                     for i in range(satir_sayisi):
-                        hedef = eta_sc["satirlar"][i]
+                        hedef = sim_sc["satirlar"][i]
                         girilen = girilen_satirlar[i]
                         if not (hedef["kod"] in girilen["kod"] and abs(hedef["borc"] - girilen["borc"]) < 0.05 and abs(hedef["alacak"] - girilen["alacak"]) < 0.05):
                             hepsi_dogru = False
                             break
 
                     if hepsi_dogru and fark < 0.05 and toplam_girilen_borc > 0:
-                        st.session_state["academy_xp"] += eta_sc["xp"]
+                        st.session_state["academy_xp"] += sim_sc["xp"]
                         st.session_state["academy_streak"] += 1
                         sesli_bildirim_cal("success")
                         st.balloons()
-                        st.success(f"🎉 MÜKEMMEL KAYIT! Fiş {eta_sc['fis_no']} ETA:SQL veritabanına mühürlendi. (+{eta_sc['xp']} XP)")
+                        st.success(f"🎉 MÜKEMMEL KAYIT! Fiş {sim_sc['fis_no']} başarıyla mühürlendi. (+{sim_sc['xp']} XP)")
                         time.sleep(1.5)
-                        st.session_state["eta_step"] += 1
-                        st.session_state["eta_current_scenario"] = generate_eta_scenario(st.session_state["eta_step"])
+                        st.session_state["sim_step"] += 1
+                        st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
                         st.rerun()
                     else:
                         st.session_state["academy_lives"] -= 1
                         st.session_state["academy_streak"] = 0
                         sesli_bildirim_cal("error")
-                        st.error(f"💥 ETA KAYIT HATASI! (-1 Can) Fiş dengesiz veya hesap kodları yanlış. {eta_sc['ipucu']}")
+                        st.error(f"💥 YEVMİYE KAYIT HATASI! (-1 Can) Fiş dengesiz veya hesap kodları yanlış. {sim_sc['ipucu']}")
                         time.sleep(1.5)
-                        st.session_state["eta_step"] += 1
-                        st.session_state["eta_current_scenario"] = generate_eta_scenario(st.session_state["eta_step"])
+                        st.session_state["sim_step"] += 1
+                        st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
                         st.rerun()
 
-            with b_eta2:
-                if st.button("➡️ Sonraki ETA Fişine Geç", use_container_width=True):
-                    st.session_state["eta_step"] += 1
-                    st.session_state["eta_current_scenario"] = generate_eta_scenario(st.session_state["eta_step"])
+            with b_sim2:
+                if st.button("➡️ Sonraki Fişe Geç", use_container_width=True):
+                    st.session_state["sim_step"] += 1
+                    st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
                     st.rerun()
 
 # ------------------------------------------------------------------------------
