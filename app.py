@@ -2,8 +2,8 @@
 ================================================================================
 LEDGERAI — INSTITUTIONAL ENTERPRISE ACCOUNTING TERMINAL
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: Dual-Wing Executive Cockpit / GitHub Pill Micro-UI (Whitelabel)
-Version: 4.0.0 Cockpit Master Edition
+Design: Minimal Corporate Terminal / Audio Feedback Engine (Whitelabel)
+Version: 4.2.0 Master Edition
 ================================================================================
 """
 
@@ -34,7 +34,7 @@ st.set_page_config(
 
 SESSION_DEFAULTS = {
     "user_lang": "🇹🇷 TR",
-    "theme_idx": 0,  # 0: Platin Gri (Varsayılan Açılış)
+    "theme_idx": 0,  # 0: Platin Gri
     "industry_idx": 0,
     "chat_messages": [],
     "out_df": None,
@@ -53,7 +53,7 @@ for key, default_val in SESSION_DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = default_val
 
-# API Anahtarı Doğrulama
+# API Doğrulaması
 if "GEMINI_API_KEY" in st.secrets:
     API_KEY = st.secrets["GEMINI_API_KEY"]
 else:
@@ -63,7 +63,7 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. LOCALIZATION DATA DICTIONARY (6 DİLLİ GLOBAL MEVZUAT)
+# 2. LOCALIZATION DATA DICTIONARY (6 GLOBAL STANDART EKSİKSİZ)
 # ==============================================================================
 
 LANG_DATA = {
@@ -166,7 +166,7 @@ LANG_DATA = {
         "themes": [
             "🌑 Platinum Slate",
             "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Gece"
+            "🌌 Cyberpunk Night"
         ],
         "about_btn": "ℹ️ How it Works & Philosophy",
         "about_title": "LedgerAI Architecture & Human-AI Collaboration",
@@ -201,6 +201,254 @@ LANG_DATA = {
             "name": "Account Name", "desc": "Memo", "curr": "Currency",
             "deb": "Debit", "crd": "Credit"
         }
+    },
+    "🇩🇪 DE": {
+        "badge": "MENSCH + KI FINANZTERMINAL",
+        "title": "LedgerAI",
+        "subtitle": "KI bereitet Buchungen und Steuern vor; Finanzexperten prüfen und geben frei.",
+        "drop_title": "Belege hier ablegen oder durchsuchen",
+        "drop_sub": "PDF, PNG, JPG • Rechnungen & Quittungen",
+        "process_btn": "⚡ Buchungssätze Erstellen",
+        "limit_err": "🛑 Maximal 5 Dokumente im Demo-Modus.",
+        "ready_count": "Bereit: **{count}**",
+        "success": "✓ Buchungen erfolgreich erstellt und ausgeglichen.",
+        "failed": "❌ Belege konnten nicht gelesen werden.",
+        "preview_title": "📊 Buchungszeilen & Kontrollzentrum",
+        "preview_tip": "💡 Doppelklick zum Ändern von Konten oder Beträgen.",
+        "tot_deb": "Soll Gesamt",
+        "tot_crd": "Haben Gesamt",
+        "balanced": "✅ Ausgeglichen (Soll = Haben)",
+        "unbalanced": "⚠️ Differenz festgestellt!",
+        "download_btn": "📥 Excel Herunterladen (.xlsx)",
+        "download_eta": "💾 Datev Format (CSV)",
+        "download_luca": "💾 SAP Kompatibel",
+        "industries": [
+            "⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf",
+            "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"
+        ],
+        "themes": [
+            "🌑 Platin Titan",
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night"
+        ],
+        "about_btn": "ℹ️ Funktionsweise & Philosophie",
+        "about_title": "LedgerAI Architektur & Mensch-KI Standard",
+        "about_content": "LedgerAI entlastet Buchhalter durch intelligente Vorkontierung unter ständiger Expertenkontrolle.",
+        "step1_title": "1. Belegprüfung",
+        "step1_desc": "Präzise Vorsteueraufteilung und USt-IdNr Validierung in Sekunden.",
+        "step2_title": "2. SKR03/04 Zuordnung",
+        "step2_desc": "Automatische Kontierung nach Wareneinkauf, Kosten oder Anlagevermögen.",
+        "step3_title": "3. Soll/Haben-Check",
+        "step3_desc": "Revisionssichere Prüfung auf mathematische Ausgeglichenheit.",
+        "badge_erp": "✓ DATEV SKR03/04 • SAP KOMPATIBEL",
+        "badge_audit": "✓ 100% SOLL/HABEN AUSGEGLICHENHEIT",
+        "badge_sec": "✓ DSGVO-KONFORME DATENVERARBEITUNG",
+        "bot_title": "👾 LedgerBot Finanzmentor",
+        "bot_welcome": "Hallo! Tippen Sie auf eine Frage oder fragen Sie mich direkt nach Buchungssätzen:",
+        "bot_placeholder": "Frage eingeben...",
+        "bot_clear": "🧹 Leeren",
+        "quick_chips": [
+            "💡 Wie spart es Arbeitszeit?",
+            "🔒 Datenschutz & Sicherheit",
+            "⚖️ Soll an Haben Prinzip"
+        ],
+        "cockpit_card1_title": "🏛️ Vorsteuer- & Steuerlogik",
+        "cockpit_card1_desc": "Automatische Zuordnung von SKR03/04 Vorsteuern und USt-IdNr Validierung.",
+        "cockpit_card2_title": "⚡ Datev Export",
+        "cockpit_card2_desc": "Direkter Datev-konformer CSV-Export für das Steuerbüro.",
+        "cockpit_card3_title": "🛡️ Soll/Haben Garantie",
+        "cockpit_card3_desc": "Mathematische Prüfung auf absolute Ausgeglichenheit der Buchungssätze.",
+        "headers": {
+            "vouch": "Beleg", "date": "Datum", "code": "Konto",
+            "name": "Bezeichnung", "desc": "Text", "curr": "Währung",
+            "deb": "Soll", "crd": "Haben"
+        }
+    },
+    "🇫🇷 FR": {
+        "badge": "TERMINAL COLLABORATIF IA + HUMAIN",
+        "title": "LedgerAI",
+        "subtitle": "L'IA prépare les imputations comptables; l'expert-comptable valide et approuve.",
+        "drop_title": "Déposer les pièces comptables ici",
+        "drop_sub": "Factures et reçus (PDF, PNG, JPG)",
+        "process_btn": "⚡ Générer les Écritures",
+        "limit_err": "🛑 Limite: 5 documents par lot.",
+        "ready_count": "Prêts: **{count}**",
+        "success": "✓ Écritures générées avec succès et équilibrées.",
+        "failed": "❌ Échec de lecture.",
+        "preview_title": "📊 Journal Comptable & Audit Expert",
+        "preview_tip": "💡 Double-cliquez sur une cellule pour modifier.",
+        "tot_deb": "Total Débit",
+        "tot_crd": "Total Crédit",
+        "balanced": "✅ Équilibré (Débit = Crédit)",
+        "unbalanced": "⚠️ Déséquilibre Détecté!",
+        "download_btn": "📥 Télécharger Excel (.xlsx)",
+        "download_eta": "💾 Format Standard PCG",
+        "download_luca": "💾 Sage / Cegid Ready",
+        "industries": [
+            "⚡ Auto (IA)", "🛒 Négoce / Stock",
+            "🏢 Services / Conseil", "🏭 Production / Industrie"
+        ],
+        "themes": [
+            "🌑 Platine Titane",
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night"
+        ],
+        "about_btn": "ℹ️ Fonctionnement & Philosophie",
+        "about_title": "Architecture LedgerAI & Co-Pilotage",
+        "about_content": "L'alliance de l'intelligence artificielle et du discernement de l'expert-comptable.",
+        "step1_title": "1. Lecture OCR",
+        "step1_desc": "Extraction des montants HT, TVA et identification du fournisseur.",
+        "step2_title": "2. Ventilation PCG",
+        "step2_desc": "Affectation automatique aux comptes de classe 6 selon l'activité.",
+        "step3_title": "3. Contrôle Débit/Crédit",
+        "step3_desc": "Vérification stricte de l'équilibre de chaque écriture de journal.",
+        "badge_erp": "✓ CONFORME PCG • SAGE & CEGID READY",
+        "badge_audit": "✓ ÉQUILIBRE DÉBIT/CRÉDIT GARANTI",
+        "badge_sec": "✓ SÉCURITÉ CONFORME RGPD",
+        "bot_title": "👾 LedgerBot Mentor",
+        "bot_welcome": "Bonjour! Choisissez une question rapide ou posez votre question comptable:",
+        "bot_placeholder": "Poser une question...",
+        "bot_clear": "🧹 Effacer",
+        "quick_chips": [
+            "💡 Gain de temps en cabinet",
+            "🔒 Sécurité des données",
+            "⚖️ Principe Débit / Crédit"
+        ],
+        "cockpit_card1_title": "🏛️ Ventilation PCG",
+        "cockpit_card1_desc": "Affectation automatique aux comptes de charges et TVA déductible.",
+        "cockpit_card2_title": "⚡ Formats Export",
+        "cockpit_card2_desc": "Compatible avec les logiciels Sage, Cegid et tableur multi-feuilles.",
+        "cockpit_card3_title": "🛡️ Équilibre Débit/Crédit",
+        "cockpit_card3_desc": "Vérification stricte de la balance avant validation finale.",
+        "headers": {
+            "vouch": "Pièce", "date": "Date", "code": "Compte",
+            "name": "Libellé", "desc": "Détail", "curr": "Devise",
+            "deb": "Débit", "crd": "Crédit"
+        }
+    },
+    "🇪🇸 ES": {
+        "badge": "TERMINAL COLABORATIVO IA + HUMANO",
+        "title": "LedgerAI",
+        "subtitle": "La IA estructura los asientos contables; el asesor profesional revisa y valida.",
+        "drop_title": "Arrastra los documentos aquí o examina",
+        "drop_sub": "PDF, PNG, JPG • Facturas y recibos",
+        "process_btn": "⚡ Generar Asientos",
+        "limit_err": "🛑 Máximo 5 documentos por lote.",
+        "ready_count": "Listos: **{count}**",
+        "success": "✓ Asientos generados y equilibrados.",
+        "failed": "❌ Error al procesar.",
+        "preview_title": "📊 Libro Diario & Mesa de Control",
+        "preview_tip": "💡 Haz doble clic para modificar cuentas.",
+        "tot_deb": "Total Debe",
+        "tot_crd": "Total Haber",
+        "balanced": "✅ Cuadrado (Debe = Haber)",
+        "unbalanced": "⚠️ Descuadre Detectado!",
+        "download_btn": "📥 Descargar Excel (.xlsx)",
+        "download_eta": "💾 Formato Contasol",
+        "download_luca": "💾 A3 / Sage Ready",
+        "industries": [
+            "⚡ Automático (IA)", "🛒 Comercio / Inventario",
+            "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"
+        ],
+        "themes": [
+            "🌑 Platino Titanio",
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night"
+        ],
+        "about_btn": "ℹ️ Filosofía y Seguridad",
+        "about_title": "Arquitectura y Simbiosis Humano-IA",
+        "about_content": "Potenciando al contador mediante automatización sin sustituir su criterio profesional.",
+        "step1_title": "1. Análisis de Factura",
+        "step1_desc": "Lectura OCR avanzada de bases imponibles y tipos impositivos.",
+        "step2_title": "2. Asignación PGC",
+        "step2_desc": "Distribución en cuentas de gastos o existencias según la empresa.",
+        "step3_title": "3. Cuadre de Asiento",
+        "step3_desc": "Garantía matemática de que el Debe coincide con el Haber.",
+        "badge_erp": "✓ COMPATIBLE A3 • SAGE • SOFTWARE FISCAL",
+        "badge_audit": "✓ CUADRE DEBE = HABER GARANTIZADO",
+        "badge_sec": "✓ CIFRADO DE DATOS BANCARIO",
+        "bot_title": "👾 LedgerBot Mentor",
+        "bot_welcome": "¡Hola! Pulsa una pregunta rápida o escribe tu consulta contable:",
+        "bot_placeholder": "Escribe tu duda...",
+        "bot_clear": "🧹 Limpiar",
+        "quick_chips": [
+            "💡 Ventajas para la asesoría",
+            "🔒 Seguridad y confidencialidad",
+            "⚖️ Cuadre de Debe y Haber"
+        ],
+        "cockpit_card1_title": "🏛️ Cuadre Fiscal",
+        "cockpit_card1_desc": "Gestión automática de retenciones e IVA soportado.",
+        "cockpit_card2_title": "⚡ Compatibilidad ERP",
+        "cockpit_card2_desc": "Exportación directa para Contasol, A3 y software contable estándar.",
+        "cockpit_card3_title": "🛡️ Control de Asiento",
+        "cockpit_card3_desc": "Validación matemática estricta de paridad Debe = Haber.",
+        "headers": {
+            "vouch": "Asiento", "date": "Fecha", "code": "Cuenta",
+            "name": "Nombre Cuenta", "desc": "Concepto", "curr": "Moneda",
+            "deb": "Debe", "crd": "Haber"
+        }
+    },
+    "🇮🇹 IT": {
+        "badge": "TERMINALE COLLABORATIVO IA + UOMO",
+        "title": "LedgerAI",
+        "subtitle": "L'IA prepara le scritture contabili; il commercialista esperto valida e autorizza.",
+        "drop_title": "Trascina qui le fatture o cerca file",
+        "drop_sub": "PDF, PNG, JPG • Ricevute e fatture",
+        "process_btn": "⚡ Genera Scritture",
+        "limit_err": "🛑 Massimo 5 documenti.",
+        "ready_count": "Pronti: **{count}**",
+        "success": "✓ Scritture generate e bilanciate.",
+        "failed": "❌ Impossibile elaborare.",
+        "preview_title": "📊 Prima Nota & Centro di Controllo",
+        "preview_tip": "💡 Fai doppio clic per modificare.",
+        "tot_deb": "Totale Dare",
+        "tot_crd": "Totale Avere",
+        "balanced": "✅ Quadratura Perfetta",
+        "unbalanced": "⚠️ Sbilancio!",
+        "download_btn": "📥 Scarica Excel (.xlsx)",
+        "download_eta": "💾 Formato Zucchetti",
+        "download_luca": "💾 Teamsystem Ready",
+        "industries": [
+            "⚡ Automatico (IA)", "🛒 Commercio / Magazzino",
+            "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"
+        ],
+        "themes": [
+            "🌑 Platino Titanio",
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night"
+        ],
+        "about_btn": "ℹ️ Filosofia e Sicurezza",
+        "about_title": "Architettura di Collaborazione Uomo-IA",
+        "about_content": "Automazione contabile trasparente che esalta il valore del consulente aziendale.",
+        "step1_title": "1. Acquisizione Dati",
+        "step1_desc": "Scansione OCR di aliquote IVA, imponibili e fornitore.",
+        "step2_title": "2. Piano dei Conti",
+        "step2_desc": "Classificazione tra costi di gestione, merci o cespiti ammortizzabili.",
+        "step3_title": "3. Quadratura Dare/Avere",
+        "step3_desc": "Verifica della perfetta parità contabile della scrittura.",
+        "badge_erp": "✓ PRONTO PER ZUCCHETTI • TEAMSYSTEM • SAP",
+        "badge_audit": "✓ QUADRATURA DARE/AVERE GARANTITA",
+        "badge_sec": "✓ PROTEZIONE DATI STANDARD BANCARIO",
+        "bot_title": "👾 LedgerBot Mentor",
+        "bot_welcome": "Ciao! Seleziona una domanda pillola o scrivimi direttamente:",
+        "bot_placeholder": "Fai una domanda contabile...",
+        "bot_clear": "🧹 Cancella",
+        "quick_chips": [
+            "💡 Vantaggi per lo studio",
+            "🔒 Sicurezza dei dati fiscali",
+            "⚖️ Pareggio Dare / Avere"
+        ],
+        "cockpit_card1_title": "🏛️ Scritture Bilanciate",
+        "cockpit_card1_desc": "Gestione automatica ritenute d'acconto ed IVA a credito.",
+        "cockpit_card2_title": "⚡ Compatibilità Gestionale",
+        "cockpit_card2_desc": "File pronti per Zucchetti, Teamsystem e formati Excel avanzati.",
+        "cockpit_card3_title": "🛡️ Quadratura Certificata",
+        "cockpit_card3_desc": "Garanzia matematica di parità tra totale Dare e Avere.",
+        "headers": {
+            "vouch": "Partita", "date": "Data", "code": "Conto",
+            "name": "Descrizione", "desc": "Causale", "curr": "Valuta",
+            "deb": "Dare", "crd": "Avere"
+        }
     }
 }
 
@@ -210,7 +458,7 @@ if st.session_state["user_lang"] not in LANG_DATA:
 T = LANG_DATA[st.session_state["user_lang"]]
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (KOKPİT DÜZENİ & GITHUB.COM MİKRO HAPLARI)
+# 3. DYNAMIC STYLING ENGINE (WHITELABEL + MİKRO SESLİ & ANİMASYONLU CSS)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -274,34 +522,45 @@ st.markdown(f"""
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }}
     
-    /* WHITELABEL GİZLEME */
+    /* WHITELABEL: GITHUB, STREAMLIT FOOTER, POPUP PROFİL VE ROZETLERİ KÖKÜNDEN SİL */
     header[data-testid="stHeader"] {{ display: none !important; }}
     #MainMenu {{ visibility: hidden !important; }}
     footer {{ visibility: hidden !important; }}
     div[data-testid="stToolbar"] {{ display: none !important; }}
     div[data-testid="stDecoration"] {{ display: none !important; }}
     .viewerBadge_container__1QSob {{ display: none !important; }}
+    div[class*="viewerBadge"] {{ display: none !important; }}
+    div[class*="profile-badge"] {{ display: none !important; }}
+    iframe[title*="github"] {{ display: none !important; }}
     [data-testid="stSidebar"] {{ display: none !important; }}
     
     {bg_style}
     
     .stApp {{
         color: #F8FAFC;
-        padding-top: 10px;
+        padding-top: 15px;
         padding-bottom: 60px;
     }}
 
-    /* DUAL WING COCKPIT CONSOLE (MASAÜSTÜNDE BOŞLUĞU BİTİREN KART) */
+    .cockpit-container {{
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 10px;
+    }}
+
     .cockpit-card {{
         background: rgba(30, 41, 59, 0.72);
         border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 24px;
         backdrop-filter: blur(28px);
         -webkit-backdrop-filter: blur(28px);
-        padding: clamp(20px, 3vw, 32px);
+        padding: clamp(22px, 3vw, 34px);
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 
                     inset 0 1px 0 rgba(255, 255, 255, 0.20);
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }}
 
     .top-badge {{
@@ -316,8 +575,9 @@ st.markdown(f"""
         font-weight: 700;
         letter-spacing: 1.2px;
         color: #E2E8F0;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         text-transform: uppercase;
+        width: fit-content;
     }}
 
     .hero-title {{
@@ -339,14 +599,13 @@ st.markdown(f"""
         margin-bottom: 18px;
     }}
 
-    /* FILE UPLOADER */
     div[data-testid="stFileUploader"] {{
         background: rgba(15, 23, 42, 0.65);
         border: 1px dashed rgba(255, 255, 255, 0.22);
         border-radius: 18px;
         padding: 18px 14px;
         transition: all 0.25s ease;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }}
     div[data-testid="stFileUploader"]:hover {{
         border-color: rgba(203, 213, 225, 0.9);
@@ -354,7 +613,7 @@ st.markdown(f"""
         background: rgba(30, 41, 59, 0.8);
     }}
 
-    /* GITHUB.COM BALONU ŞEKLİNDE SİYAH OVAL İŞLEM BUTONU */
+    /* SEPETE EKLE TARZI OVAL BUTON */
     div.stButton > button:first-child {{
         background: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
@@ -366,6 +625,7 @@ st.markdown(f"""
         box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6) !important;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         letter-spacing: 0.2px !important;
+        margin-top: 4px !important;
     }}
     div.stButton > button:first-child:hover {{
         background: #111827 !important;
@@ -374,7 +634,6 @@ st.markdown(f"""
         transform: scale(1.02) !important;
     }}
 
-    /* SAĞ KANAT KARTLARI */
     .cockpit-info-box {{
         background: rgba(255, 255, 255, 0.035);
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -400,18 +659,32 @@ st.markdown(f"""
         line-height: 1.4;
     }}
 
-    /* MİKRO KONTROL ŞERİDİ (GITHUB.COM HAPLARI) */
-    .micro-dock {{
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 14px;
-        padding-top: 12px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    /* GERÇEK GİTHUB.COM MİKRO HAPI (SELECTBOX VE BUTONLAR) */
+    .github-pill-select div[data-baseweb="select"] > div {{
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        border-radius: 9999px !important;
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 0 10px !important;
+        font-size: 0.75rem !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+        color: #F8FAFC !important;
+    }}
+    
+    div[data-testid="stPopover"] > button {{
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        border-radius: 9999px !important;
+        min-height: 28px !important;
+        height: 28px !important;
+        padding: 0 14px !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        color: #F8FAFC !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
     }}
 
-    /* ASİSTAN İÇİ MİKRO GITHUB HAPLARI */
     div[data-testid="stExpander"] div.stButton button {{
         background: rgba(255, 255, 255, 0.06) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
@@ -450,6 +723,47 @@ st.markdown(f"""
     }}
 </style>
 """, unsafe_allow_html=True)
+
+# SESLİ BİLDİRİM MOTORU (WEB AUDIO API)
+def sesli_bildirim_cal(tur="success"):
+    if tur == "success":
+        ses_js = """
+        <script>
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+                osc.frequency.exponentialRampToValueAtTime(880.00, ctx.currentTime + 0.15); // A5
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.35);
+            } catch(e) {}
+        </script>
+        """
+    else:
+        ses_js = """
+        <script>
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, ctx.currentTime);
+                gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.25);
+            } catch(e) {}
+        </script>
+        """
+    st.markdown(ses_js, unsafe_allow_html=True)
 
 # ==============================================================================
 # 4. INSTITUTIONAL MULTI-TAB EXCEL ENGINE
@@ -639,17 +953,19 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 6. DUAL WING EXECUTIVE COCKPIT (MASAÜSTÜNDE BOŞLUĞU BİTİREN KOKPİT)
+# 6. DUAL-WING EXECUTIVE COCKPIT (MASAÜSTÜNDE DENGELİ KONSOL)
 # ==============================================================================
 
+st.markdown("<div class='cockpit-container'>", unsafe_allow_html=True)
 col_left, col_right = st.columns([1.35, 1.0], gap="large")
 
 with col_left:
     st.markdown(f"""
     <div class='cockpit-card'>
-        <div class='top-badge'>● {T['badge']}</div>
-        <div class='hero-title'>{T['title']}</div>
-        <div class='hero-sub'>{T['subtitle']}</div>
+        <div>
+            <div class='top-badge'>● {T['badge']}</div>
+            <div class='hero-title'>{T['title']}</div>
+            <div class='hero-sub'>{T['subtitle']}</div>
     """, unsafe_allow_html=True)
 
     uploaded_files = st.file_uploader(
@@ -664,7 +980,7 @@ with col_left:
         if len(uploaded_files) > 5:
             st.error(T["limit_err"])
         else:
-            st.markdown(f"<div style='font-size:0.85rem; margin:6px 0 10px 0; color:#A7F3D0;'>{T['ready_count'].format(count=len(uploaded_files))}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='font-size:0.85rem; margin:4px 0 8px 0; color:#A7F3D0;'>{T['ready_count'].format(count=len(uploaded_files))}</div>", unsafe_allow_html=True)
 
             if st.button(T["process_btn"], use_container_width=True):
                 start_time = time.time()
@@ -782,30 +1098,39 @@ with col_left:
                     st.session_state["h_crd"] = headers["crd"]
                     st.session_state["last_processing_time"] = round(time.time() - start_time, 2)
                     st.session_state["processed_docs_count"] = len(parsed_data)
+                    sesli_bildirim_cal("success")
                     st.success(f"{T['success']} ({st.session_state['last_processing_time']} sn)")
 
-    # KONSOL İÇİ MİKRO KONTROL ŞERİDİ (GITHUB.COM HAPLARI ŞEKLİNDE HİZALANDI)
-    st.markdown("<div class='micro-dock'>", unsafe_allow_html=True)
-    c_m1, c_m2, c_m3, c_m4 = st.columns([1.8, 3.2, 3.2, 1.8])
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # KONSOL İÇİ MİKRO GİTHUB HAPLARI
+    st.markdown("<div style='margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
+    c_m1, c_m2, c_m3, c_m4 = st.columns([1.6, 3.2, 3.2, 1.8])
     with c_m1:
+        st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
         lang_keys = list(LANG_DATA.keys())
         curr_lang_idx = lang_keys.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in lang_keys else 0
         new_lang = st.selectbox("Dil", lang_keys, index=curr_lang_idx, label_visibility="collapsed")
         if new_lang != st.session_state["user_lang"]:
             st.session_state["user_lang"] = new_lang
             st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
     with c_m2:
+        st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
         new_theme_str = st.selectbox("Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
         new_t_idx = T["themes"].index(new_theme_str)
         if new_t_idx != st.session_state["theme_idx"]:
             st.session_state["theme_idx"] = new_t_idx
             st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
     with c_m3:
+        st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
         new_industry_str = st.selectbox("Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
         new_i_idx = T["industries"].index(new_industry_str)
         if new_i_idx != st.session_state["industry_idx"]:
             st.session_state["industry_idx"] = new_i_idx
             st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
     with c_m4:
         with st.popover(T["about_btn"]):
             st.markdown(f"#### {T['about_title']}")
@@ -813,23 +1138,24 @@ with col_left:
     st.markdown("</div></div>", unsafe_allow_html=True)
 
 with col_right:
-    # SAĞ KANAT: KURUMSAL GÜVEN, DENETİM VE CANLI OPERASYON KARTI
     st.markdown(f"""
     <div class='cockpit-card'>
-        <div style='font-size:0.75rem; font-weight:800; letter-spacing:1px; color:#94A3B8; text-transform:uppercase; margin-bottom:12px;'>
-            🛡️ Kurumsal Finans & Güvence Masası
-        </div>
-        <div class='cockpit-info-box'>
-            <div class='cockpit-info-title'>{T['cockpit_card1_title']}</div>
-            <div class='cockpit-info-desc'>{T['cockpit_card1_desc']}</div>
-        </div>
-        <div class='cockpit-info-box'>
-            <div class='cockpit-info-title'>{T['cockpit_card2_title']}</div>
-            <div class='cockpit-info-desc'>{T['cockpit_card2_desc']}</div>
-        </div>
-        <div class='cockpit-info-box'>
-            <div class='cockpit-info-title'>{T['cockpit_card3_title']}</div>
-            <div class='cockpit-info-desc'>{T['cockpit_card3_desc']}</div>
+        <div>
+            <div style='font-size:0.75rem; font-weight:800; letter-spacing:1px; color:#94A3B8; text-transform:uppercase; margin-bottom:12px;'>
+                🛡️ Kurumsal Finans & Güvence Masası
+            </div>
+            <div class='cockpit-info-box'>
+                <div class='cockpit-info-title'>{T['cockpit_card1_title']}</div>
+                <div class='cockpit-info-desc'>{T['cockpit_card1_desc']}</div>
+            </div>
+            <div class='cockpit-info-box'>
+                <div class='cockpit-info-title'>{T['cockpit_card2_title']}</div>
+                <div class='cockpit-info-desc'>{T['cockpit_card2_desc']}</div>
+            </div>
+            <div class='cockpit-info-box'>
+                <div class='cockpit-info-title'>{T['cockpit_card3_title']}</div>
+                <div class='cockpit-info-desc'>{T['cockpit_card3_desc']}</div>
+            </div>
         </div>
         <div style='display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:10px 14px; background:rgba(0,0,0,0.25); border-radius:12px;'>
             <span style='font-size:0.75rem; color:#A7F3D0;'>✓ %100 Bakiye Garantisi</span>
@@ -837,6 +1163,8 @@ with col_right:
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 # ==============================================================================
 # 7. INTERACTIVE JOURNAL VOUCHER GRID, FILTERS & AUDIT CENTER
@@ -899,6 +1227,7 @@ if st.session_state["out_df"] is not None:
         m3.success(T["balanced"])
     else:
         m3.error(f"{T['unbalanced']} (Δ {diff:,.2f})")
+        sesli_bildirim_cal("error")
         
     m4.metric("İşlem Süresi", f"{st.session_state['last_processing_time']} sn")
 
@@ -950,7 +1279,7 @@ with c_bot_center:
                 st.session_state["chat_messages"] = []
                 st.rerun()
 
-        # GITHUB.COM STİLİ ASLA YIĞILMAYAN MİKRO HAP BUTONLAR
+        # GITHUB.COM STİLİ MİKRO HAP BUTONLAR
         secilen_chip = None
         btn_cols = st.columns(len(T["quick_chips"]))
         for c_idx, chip_text in enumerate(T["quick_chips"]):
