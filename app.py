@@ -338,7 +338,7 @@ LANG_DATA = {
         "g_tab1": "🎮 1. Hesap Kodu Avcısı",
         "g_tab2": "🧩 2. Bilanço Karakter Matrisi (Zor)",
         "g_tab3": "🐍 3. Hedefli Bilanço Snake",
-        "g_tab4": "📑 4. Muhasebe Öğreniyorum (Yevmiye Provası)",
+        "g_tab4": "📑 4. Muhasebe Öğreniyorum",
         "mission": "GÖREV",
         "inv_total": "Fatura Tutarı",
         "click_card": "🎯 Doğru Hesap Kartına Tıklayın:",
