@@ -1,9 +1,8 @@
 """
 ================================================================================
-LEDGERAI — INSTITUTIONAL ENTERPRISE ACCOUNTING TERMINAL
+LEDGERAI — 3-TIER ADAPTIVE AUDIT TERMINAL & CO-PILOT
+Themes: Corporate Platinum (CFO) | Aurora Modern (Startup) | Cyberpunk (Academy)
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: Minimal GitHub Pill Style / Full-Width Executive Cockpit (Whitelabel)
-Version: 4.4.0 Final Production Master Edition
 ================================================================================
 """
 
@@ -34,7 +33,7 @@ st.set_page_config(
 
 SESSION_DEFAULTS = {
     "user_lang": "🇹🇷 TR",
-    "theme_idx": 0,  # 0: Platin Gri
+    "theme_idx": 0,  # 0: Platin Gri (Kurumsal CFO), 1: Aurora, 2: Cyberpunk
     "industry_idx": 0,
     "chat_messages": [],
     "out_df": None,
@@ -94,9 +93,9 @@ LANG_DATA = {
             "🏭 Üretim & Fabrika (150/730)"
         ],
         "themes": [
-            "🌑 Platin Gri",
-            "✨ Ultra Canlı Aurora",
-            "🌌 Cyberpunk Gece"
+            "🌑 Platin Gri (CFO Kurumsal)",
+            "✨ Aurora (Yeni Nesil Girişim)",
+            "🌌 Cyberpunk (Eğitici Akademi)"
         ],
         "about_btn": "ℹ️ İşleyiş & Felsefe",
         "about_title": "LedgerAI Mimarisi & İnsan-AI Ortaklığı",
@@ -164,9 +163,9 @@ LANG_DATA = {
             "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"
         ],
         "themes": [
-            "🌑 Platinum Slate",
-            "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
+            "🌑 Platinum Slate (CFO)",
+            "✨ Aurora (Modern Startup)",
+            "🌌 Cyberpunk (Student Academy)"
         ],
         "about_btn": "ℹ️ How it Works & Philosophy",
         "about_title": "LedgerAI Architecture & Human-AI Collaboration",
@@ -227,9 +226,9 @@ LANG_DATA = {
             "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"
         ],
         "themes": [
-            "🌑 Platin Titan",
-            "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
+            "🌑 Platin Titan (CFO)",
+            "✨ Aurora (Startup)",
+            "🌌 Cyberpunk (Akademie)"
         ],
         "about_btn": "ℹ️ Funktionsweise & Philosophie",
         "about_title": "LedgerAI Architektur & Mensch-KI Standard",
@@ -289,9 +288,9 @@ LANG_DATA = {
             "🏢 Services / Conseil", "🏭 Production / Industrie"
         ],
         "themes": [
-            "🌑 Platine Titane",
-            "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
+            "🌑 Platine Titane (CFO)",
+            "✨ Aurora (Moderne)",
+            "🌌 Cyberpunk (Académie)"
         ],
         "about_btn": "ℹ️ Fonctionnement & Philosophie",
         "about_title": "Architecture LedgerAI & Co-Pilotage",
@@ -351,9 +350,9 @@ LANG_DATA = {
             "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"
         ],
         "themes": [
-            "🌑 Platino Titanio",
-            "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
+            "🌑 Platino Titanio (CFO)",
+            "✨ Aurora (Moderno)",
+            "🌌 Cyberpunk (Academia)"
         ],
         "about_btn": "ℹ️ Filosofía y Seguridad",
         "about_title": "Arquitectura y Simbiosis Humano-IA",
@@ -413,9 +412,9 @@ LANG_DATA = {
             "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"
         ],
         "themes": [
-            "🌑 Platino Titanio",
-            "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
+            "🌑 Platino Titanio (CFO)",
+            "✨ Aurora (Moderno)",
+            "🌌 Cyberpunk (Accademia)"
         ],
         "about_btn": "ℹ️ Filosofia e Sicurezza",
         "about_title": "Architettura di Collaborazione Uomo-IA",
@@ -457,12 +456,24 @@ if st.session_state["user_lang"] not in LANG_DATA:
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
+# HIZLI VE KESİNTİSİZ CEVAP ÖNBELLEĞİ (ŞİMŞEK GİBİ 0.01 SN DÖNÜŞ İÇİN)
+INSTANT_FAQ_CACHE = {
+    "💡 Muhasebeciye ne kazandırır?": "LedgerAI manuel fatura girişini ve tevkifat hesaplamalarını %80 hızlandırır. Yapay zeka fişi hazırlar, son kontrolü mali müşavir yapar; hata payını sıfıra indirir.\n\nPratik Fiş Kaydı: Borç: 770 Genel Yönetim Giderleri / 191 İndirilecek KDV — Alacak: 320 Satıcılar",
+    "🔒 Verilerim güvende mi?": "Verileriniz TLS 256-bit bankacılık standardında şifrelenir; belgeleriniz model eğitiminde kullanılmaz ve oturumunuz kapandığında sistemde kalıcı olarak saklanmaz.",
+    "⚖️ Tevkifat & Stopaj mantığı nedir?": "Tevkifatlı faturada KDV'nin belirlenen oranı (örn. 5/10, 9/10) satıcı yerine devlete beyan edilmek üzere '360 Ödenecek Vergi' hesabına aktarılır. Böylece bakiye kuruşu kuruşuna denkleşir.\n\nPratik Kayıt Örneği: Borç: 770 & 191 — Alacak: 360 (Tevkifat) & 320 (Satıcıya Ödenecek Net)",
+    "🎯 153 ile 770 arasındaki fark nedir?": "153 Ticari Mallar hesabı şirketin satmak amacıyla aldığı ürünler içindir. 770 Genel Yönetim Giderleri ise işletmenin kendi idari tüketimleri (ofis kırtasiyesi, kira, danışmanlık vb.) için kullanılır.\n\nPratik Kayıt Örneği: Borç: 153 (veya 770) / 191 — Alacak: 320 Satıcılar",
+    "💡 How does it save time?": "LedgerAI automates repetitive invoice typing and multi-tier tax splitting by 80%, leaving the final executive approval to the CPA.\n\nPractical Entry: Debit: 6000 OpEx / 2200 Tax — Credit: 2000 AP",
+    "🔒 Is our data secure?": "Yes. Encrypted via TLS 256-bit bank-grade protocols. Your financial files are processed strictly within the active session and never stored permanently.",
+    "⚖️ Explain Debit vs Credit": "Every transaction impacts two sides equally. What enters the company or creates an expense is Debited; how it was financed or owed is Credited.",
+    "🎯 Inventory vs OpEx accounts": "Inventory (1200) holds merchandise meant for resale. Operating Expenses (6000) are consumables and services used to operate the business."
+}
+
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (GERÇEK GİTHUB HAPLARI & MİKRO SESLİ CSS)
+# 3. 3 FARKLI KİTLE İÇİN DİNAMİK TEMATİK STİL MOTORU
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
-    # 🌑 Platin Gri
+    # 🌑 Platin Gri (Kurumsal CFO Modu - Ağırbaşlı & Keskin)
     bg_style = """
         @keyframes slateShimmer {
             0% { background-position: 0% 50%; }
@@ -479,7 +490,7 @@ if st.session_state["theme_idx"] == 0:
         }
     """
 elif st.session_state["theme_idx"] == 1:
-    # ✨ Ultra Canlı Aurora
+    # ✨ Ultra Canlı Aurora (Yeni Nesil & Genç Girişimciler - Canlı SaaS)
     bg_style = """
         @keyframes auroraRealFlow {
             0% { background-position: 0% 30%; filter: hue-rotate(0deg); }
@@ -497,7 +508,7 @@ elif st.session_state["theme_idx"] == 1:
         }
     """
 else:
-    # 🌌 Cyberpunk Gece
+    # 🌌 Cyberpunk Gece (Gençler & Öğrenciler - Eğitici Akademi & Canlı Neon)
     bg_style = """
         @keyframes cyberpunkPulse {
             0% { background-position: 0% 0%, 100% 100%; filter: brightness(1); }
@@ -522,7 +533,7 @@ st.markdown(f"""
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }}
     
-    /* WHITELABEL: GITHUB, STREAMLIT FOOTER, POPUP ROZETLERİNİ TAMAMEN SİL */
+    /* WHITELABEL GİZLEME */
     header[data-testid="stHeader"] {{ display: none !important; }}
     #MainMenu {{ visibility: hidden !important; }}
     footer {{ visibility: hidden !important; }}
@@ -614,7 +625,7 @@ st.markdown(f"""
         background: rgba(30, 41, 59, 0.8);
     }}
 
-    /* SEPETE EKLE MODELİ OVAL İŞLEM BUTONU */
+    /* SEPETE EKLE MODELİ OVAL BUTON */
     div.stButton > button:first-child {{
         background: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
@@ -686,7 +697,6 @@ st.markdown(f"""
         box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
     }}
 
-    /* ASİSTAN İÇİ MİKRO GİTHUB HAPLARI */
     div[data-testid="stExpander"] div.stButton button {{
         background: rgba(255, 255, 255, 0.06) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
@@ -709,7 +719,6 @@ st.markdown(f"""
         transform: scale(1.03) !important;
     }}
 
-    /* CHAT MESAJ BALONLARI: DEV KUTULARI SİLİP ŞIK MİKRO BALONA DÖNÜŞTÜRME */
     .chat-scroll-area {{
         max-height: 280px;
         overflow-y: auto;
@@ -977,7 +986,7 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 6. DUAL-WING EXECUTIVE COCKPIT (MASAÜSTÜNDE DENGELİ KONSOL)
+# 6. DUAL-WING EXECUTIVE COCKPIT (TAM EKRAN LÜKS KOKPİT)
 # ==============================================================================
 
 st.markdown("<div class='cockpit-container'>", unsafe_allow_html=True)
@@ -1127,9 +1136,9 @@ with col_left:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # KONSOL İÇİ MİKRO GİTHUB HAPLARI
+    # TAM HİZALI KURUMSAL MİKRO DOCK (GÖRSEL 31'DEKİ DAĞINIKLIĞI SIFIRLAR)
     st.markdown("<div style='margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
-    c_m1, c_m2, c_m3, c_m4 = st.columns([1.6, 3.2, 3.2, 1.8])
+    c_m1, c_m2, c_m3, c_m4 = st.columns([1.6, 3.4, 3.4, 1.6])
     with c_m1:
         st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
         lang_keys = list(LANG_DATA.keys())
@@ -1162,23 +1171,43 @@ with col_left:
     st.markdown("</div></div>", unsafe_allow_html=True)
 
 with col_right:
+    # SAĞ KANAT KARTLARI (TEMAYA GÖRE AKILLI İÇERİK DEĞİŞİMİ)
+    if st.session_state["theme_idx"] == 2:
+        # CYBERPUNK AKADEMİ (ÖĞRENCİLER & EĞİTİM MODU)
+        k_baslik = "🎮 Finans & Muhasebe Akademisi"
+        k1_t, k1_d = "🏆 Görev 1: Tevkifatı Çöz", "KDV'nin bir kısmını devlete emanet bırakma sanatını öğren! Borç/Alacak eşitle, seviye atla."
+        k2_t, k2_d = "⚡ Görev 2: ERP Sentezi", "ETA ve Luca için tek tuşla profesyonel CSV ve çok sekmeli Excel veri madenciliği."
+        k3_t, k3_d = "🛡️ Görev 3: Bakiye Kilidi", "Maliye denetçisi gibi düşün: Borç ve Alacak eşit değilse fiş geçersiz sayılır!"
+    elif st.session_state["theme_idx"] == 1:
+        # AURORA (YENİ NESİL MODERN SAAS)
+        k_baslik = "✨ Yeni Nesil Girişim Finansı"
+        k1_t, k1_d = "📈 Dinamik Vergi Eşleme", "Faturayı taratır taratmaz KDV matrahlarını ve gider dağılımını canlı olarak yakalar."
+        k2_t, k2_d = "🚀 Modern Export Hub", "QuickBooks, Xero ve çok sekmeli kurumsal Excel'e saniyeler içinde senkronize ol."
+        k3_t, k3_d = "💎 %100 Otonom Doğruluk", "Matematiksel çift kontrol ile manuel hesap hatalarını tarihe göm."
+    else:
+        # PLATİN GRİ (KURUMSAL CFO MODU)
+        k_baslik = "🛡️ Kurumsal Finans & Güvence Masası"
+        k1_t, k1_d = T['cockpit_card1_title'], T['cockpit_card1_desc']
+        k2_t, k2_d = T['cockpit_card2_title'], T['cockpit_card2_desc']
+        k3_t, k3_d = T['cockpit_card3_title'], T['cockpit_card3_desc']
+
     st.markdown(f"""
     <div class='cockpit-card'>
         <div>
             <div style='font-size:0.75rem; font-weight:800; letter-spacing:1px; color:#94A3B8; text-transform:uppercase; margin-bottom:12px;'>
-                🛡️ Kurumsal Finans & Güvence Masası
+                {k_baslik}
             </div>
             <div class='cockpit-info-box'>
-                <div class='cockpit-info-title'>{T['cockpit_card1_title']}</div>
-                <div class='cockpit-info-desc'>{T['cockpit_card1_desc']}</div>
+                <div class='cockpit-info-title'>{k1_t}</div>
+                <div class='cockpit-info-desc'>{k1_d}</div>
             </div>
             <div class='cockpit-info-box'>
-                <div class='cockpit-info-title'>{T['cockpit_card2_title']}</div>
-                <div class='cockpit-info-desc'>{T['cockpit_card2_desc']}</div>
+                <div class='cockpit-info-title'>{k2_t}</div>
+                <div class='cockpit-info-desc'>{k2_d}</div>
             </div>
             <div class='cockpit-info-box'>
-                <div class='cockpit-info-title'>{T['cockpit_card3_title']}</div>
-                <div class='cockpit-info-desc'>{T['cockpit_card3_desc']}</div>
+                <div class='cockpit-info-title'>{k3_t}</div>
+                <div class='cockpit-info-desc'>{k3_d}</div>
             </div>
         </div>
         <div style='display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:10px 14px; background:rgba(0,0,0,0.25); border-radius:12px;'>
@@ -1288,7 +1317,7 @@ if st.session_state["out_df"] is not None:
         )
 
 # ==============================================================================
-# 8. MENTOR FINANS ASİSTANI (GITHUB.COM BALONU MİKRO HAPLAR)
+# 8. MENTOR FINANS ASİSTANI (HIZLI CACHE + KESİNTİSİZ CEVAP)
 # ==============================================================================
 
 st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
@@ -1311,7 +1340,7 @@ with c_bot_center:
                 if st.button(chip_text, key=f"gh_pill_btn_{c_idx}", use_container_width=True):
                     secilen_chip = chip_text
 
-        # SCROLLABLE CHAT ALANI (KABA KUTULAR YERİNE ZARİF MESAJ BALONLARI)
+        # SCROLLABLE CHAT ALANI
         st.markdown("<div class='chat-scroll-area'>", unsafe_allow_html=True)
         if not st.session_state["chat_messages"]:
             st.markdown(f"<div style='color: #94A3B8; font-size: 0.82rem; padding: 8px 0;'>💡 <i>{T['bot_placeholder']}</i></div>", unsafe_allow_html=True)
@@ -1329,48 +1358,53 @@ with c_bot_center:
         if aktif_soru:
             st.session_state["chat_messages"].append({"role": "user", "content": aktif_soru})
             
-            prompt_bot = f"""
-            Sen LedgerAI'ın kurumsal finans mentorü ve pratik muhasebe uzmanısın.
-            Felsefe: İnsan gücünü kovmak değil, insan ile yapay zekayı birleştirip muhasebeciye süper güç kazandırmak.
-            Kullanıcı Dili: {st.session_state['user_lang']}
-            Kullanıcı Sorusu: "{aktif_soru}"
-
-            TALİMATLAR:
-            1. Asla lafı uzatma, genel tanımlar yazma.
-            2. MAKSİMUM 2-3 CÜMLEDE doğrudan ve net cevabı ver.
-            3. "İnsan + AI ortaklığı" felsefesini koru: Yapay zeka hazırlar, uzman insan onaylar.
-            4. Her cevabın sonuna tek satırlık somut fiş kaydı veya pratik örnek ekle:
-               - Borç: 153 Ticari Mallar / 191 KDV
-               - Alacak: 320 Satıcılar
-            5. Türkiye için Tek Düzen kodlarını (153, 770, 740, 255 vb.), global için GAAP/Datev kodlarını kullan.
-            """
-            
-            bot_cevap = None
-            for deneme in range(3):
-                try:
-                    yanit = client.models.generate_content(
-                        model="gemini-3.5-flash-lite",
-                        contents=prompt_bot
-                    )
-                    if yanit and yanit.text:
-                        bot_cevap = yanit.text.strip()
-                        break
-                except Exception:
-                    time.sleep(1.5)
-            
-            if bot_cevap:
-                st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
+            # 1. ADIM: HIZLI CEVAP ÖNBELLEĞİ KONTROLÜ (0.01 SN ANINDA CEVAP!)
+            if aktif_soru in INSTANT_FAQ_CACHE:
+                anlik_cevap = INSTANT_FAQ_CACHE[aktif_soru]
+                st.session_state["chat_messages"].append({"role": "assistant", "content": anlik_cevap})
                 st.rerun()
             else:
-                # Kesintisiz Güvenli Yedek Motoru (Asla hata fırlatmaz)
-                if "153" in aktif_soru:
-                    yedek = "153 Ticari Mallar satılmak üzere alınan ürünler içindir; 770 Genel Yönetim Giderleri ise firmanın kırtasiye, kira ve yönetim harcamalarıdır.<br><br><b>Örnek Fiş:</b> Borç: 153 (veya 770) / 191 — Alacak: 320"
-                elif "güven" in aktif_soru.lower() or "secure" in aktif_soru.lower():
-                    yedek = "Verileriniz TLS şifreleme ile iletilir, model eğitiminde kullanılmaz ve oturumunuz bittiğinde sistemde kalıcı olarak saklanmaz; mevzuata tam uyumludur."
-                elif "tevkifat" in aktif_soru.lower():
-                    yedek = "Tevkifatlı faturada KDV'nin kanunen belirlenen oranı satıcı yerine 360 hesabına kaydedilerek doğrudan vergi dairesine aktarılır; bakiye kuruşu kuruşuna denkleşir.<br><br><b>Örnek Fiş:</b> Borç: 770 & 191 — Alacak: 360 (Tevkifat) & 320 (Satıcı)"
+                # 2. ADIM: ÖZEL SORULAR İÇİN GEMINI MOTORU (3 FARKLI TEMAYA GÖRE KİŞİLİK)
+                if st.session_state["theme_idx"] == 2:
+                    persona_direktifi = "Sen Cyberpunk Akademi finans rehberisin. Öğrencilere ve gençlere muhasebeyi oyunlaştırarak, seviye atlar gibi öğretici anlat."
+                elif st.session_state["theme_idx"] == 1:
+                    persona_direktifi = "Sen yeni nesil dinamik girişim CFO'susun. Modern SaaS ve şirket terminolojisiyle pratik ve hızlı tavsiye ver."
                 else:
-                    yedek = "LedgerAI yapay zeka ile veri girişini ve tevkifat ayrıştırmasını saniyeler içinde tamamlar; nihai onay ve kontrolü ise uzman mali müşavirin denetimine bırakır."
+                    persona_direktifi = "Sen kıdemli bir kurumsal vergi denetçisi ve mali müşavirsin. Resmi, net ve Tek Düzen kodlarına tam hakim cevap ver."
+
+                prompt_bot = f"""
+                {persona_direktifi}
+                Kullanıcı Dili: {st.session_state['user_lang']}
+                Kullanıcı Sorusu: "{aktif_soru}"
+
+                TALİMATLAR:
+                1. Asla lafı uzatma, genel tanımlar yazma.
+                2. MAKSİMUM 2-3 CÜMLEDE doğrudan ve net cevabı ver.
+                3. "İnsan + AI ortaklığı" felsefesini koru: Yapay zeka hazırlar, uzman insan onaylar.
+                4. Her cevabın sonuna tek satırlık somut fiş kaydı veya pratik örnek ekle:
+                   - Borç: 153 Ticari Mallar / 191 KDV
+                   - Alacak: 320 Satıcılar
+                5. Türkiye için Tek Düzen kodlarını (153, 770, 740, 255 vb.), global için GAAP/Datev kodlarını kullan.
+                """
                 
-                st.session_state["chat_messages"].append({"role": "assistant", "content": yedek})
-                st.rerun()
+                bot_cevap = None
+                for deneme in range(3):
+                    try:
+                        yanit = client.models.generate_content(
+                            model="gemini-3.5-flash-lite",
+                            contents=prompt_bot
+                        )
+                        if yanit and yanit.text:
+                            bot_cevap = yanit.text.strip()
+                            break
+                    except Exception:
+                        time.sleep(1.0)
+                
+                if bot_cevap:
+                    st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
+                    st.rerun()
+                else:
+                    # YEDEK GÜVENLİ CEVAP
+                    yedek = "Tevkifat ve gider tasnifi mevzuata göre otomatik yapılmıştır. Uzman onayından sonra fiş ERP sistemine aktarılabilir.\n\nÖrnek Fiş: Borç: 770 & 191 — Alacak: 320"
+                    st.session_state["chat_messages"].append({"role": "assistant", "content": yedek})
+                    st.rerun()
