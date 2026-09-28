@@ -1,10 +1,10 @@
 """
 ================================================================================
-LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY COCKPIT
+LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY SIMULATION
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: Minimal GitHub Pill Style / Multi-Deck Enterprise Architecture
-Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, GAAP
-Version: 5.0.0 Production Flagship Edition
+Design: Minimal GitHub Capsule Pill Architecture / Dual-Wing Executive Cockpit
+Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, US GAAP
+Version: 5.2.0 Flagship Production Edition
 ================================================================================
 """
 
@@ -27,7 +27,7 @@ from openpyxl.utils import get_column_letter
 # ==============================================================================
 
 st.set_page_config(
-    page_title="LedgerAI — Autonomous Financial Terminal & Academy",
+    page_title="LedgerAI — Enterprise Financial Terminal & Academy",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -35,7 +35,7 @@ st.set_page_config(
 
 SESSION_DEFAULTS = {
     "user_lang": "🇹🇷 TR",
-    "theme_idx": 0,  # 0: Platin Gri, 1: Aurora, 2: Cyberpunk
+    "theme_idx": 0,  # 0: Platin Titanyum, 1: Nebula Aurora, 2: Siber Matris
     "industry_idx": 0,
     "chat_messages": [],
     "out_df": None,
@@ -47,16 +47,17 @@ SESSION_DEFAULTS = {
     "total_batch_debit": 0.0,
     "total_batch_credit": 0.0,
     "total_withholding_amount": 0.0,
-    "academy_xp": 150,
-    "academy_level": "Kıdemli Stajyer",
-    "active_puzzle_idx": 0
+    "academy_xp": 100,
+    "academy_level": "Mali Stajyer",
+    "puzzle_step": 0,
+    "puzzle_solved": False
 }
 
 for key, default_val in SESSION_DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = default_val
 
-# API Doğrulaması
+# API Anahtarı Doğrulama
 if "GEMINI_API_KEY" in st.secrets:
     API_KEY = st.secrets["GEMINI_API_KEY"]
 else:
@@ -66,7 +67,77 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. LOCALIZATION DATA DICTIONARY (6 DİLLİ GLOBAL MEVZUAT)
+# 2. SİBER AKADEMİ OYUN VERİTABANI (KADEMELİ PUZZLE DÖNGÜSÜ)
+# ==============================================================================
+
+ACADEMY_PUZZLES = [
+    {
+        "id": 1,
+        "title": "GÖREV 1: TİCARİ MAL & MASRAF AYRIMI (KOLAY)",
+        "scenario": "Şirketiniz (Teknoloji Mağazası) satmak amacıyla toptancıdan 50 adet kablosuz kulaklık satın aldı.",
+        "invoice_data": "Tutar: 60.000 TL + %20 KDV (12.000 TL) = 72.000 TL | Fatura No: GIB2026000001",
+        "question": "Satılmak üzere depoya giren bu ticari mallar ve KDV hangi borç hesaplarına kaydedilmelidir?",
+        "options_code": [
+            "153.01 Ticari Mallar / 191.20 İndirilecek KDV",
+            "770.01 Genel Yönetim Giderleri / 191.20 İndirilecek KDV",
+            "600.01 Yurtiçi Satışlar / 391.20 Hesaplanan KDV",
+            "255.01 Demirbaşlar / 191.20 İndirilecek KDV"
+        ],
+        "options_tax": ["Tevkifatsız Normal Alım (%20 Tam KDV)", "5/10 KDV Tevkifatı", "9/10 KDV Tevkifatı"],
+        "correct_code": "153.01 Ticari Mallar / 191.20 İndirilecek KDV",
+        "correct_tax": "Tevkifatsız Normal Alım (%20 Tam KDV)",
+        "reward_xp": 150,
+        "success_msg": "Harika! Satılmak üzere alınan mallar daima 153 Ticari Mallar hesabında izlenir.",
+        "error_msg": "Hata! Satış amacıyla depoya giren ürünler masraf (770) değil, stok (153) olmalıdır."
+    },
+    {
+        "id": 2,
+        "title": "GÖREV 2: 5/10 KDV TEVKİFATI KİLİDİ (ORTA)",
+        "scenario": "Şirketiniz bir temizlik firmasından ofis temizlik hizmet faturası aldı. Mevzuat gereği temizlik hizmetlerinde 5/10 KDV Tevkifatı zorunludur.",
+        "invoice_data": "Matrah: 20.000 TL | %20 KDV: 4.000 TL | Tevkifat (5/10): 2.000 TL | Ödenecek: 22.000 TL",
+        "question": "Bu işlemde kesilen 2.000 TL tevkifat hangi alacak hesabına kaydedilerek bakiye eşitlenir?",
+        "options_code": [
+            "770.01 Genel Yönetim Gideri (Borç) / 191.20 KDV (Borç)",
+            "153.01 Ticari Mallar (Borç) / 191.20 KDV (Borç)",
+            "740.01 Hizmet Üretim Maliyeti (Borç)"
+        ],
+        "options_tax": [
+            "360.01 Ödenecek KDV Tevkifatı (2.000 TL Alacak)",
+            "320.01 Satıcıya Tam Ödeme (Tevkifatsız)",
+            "391.20 Hesaplanan KDV (Alacak)"
+        ],
+        "correct_code": "770.01 Genel Yönetim Gideri (Borç) / 191.20 KDV (Borç)",
+        "correct_tax": "360.01 Ödenecek KDV Tevkifatı (2.000 TL Alacak)",
+        "reward_xp": 250,
+        "success_msg": "Tebrikler! Tevkif edilen 2.000 TL KDV devlete ödenmek üzere 360 hesabına aktarılır.",
+        "error_msg": "Dikkat! Tevkifat kesintisi satıcıya ödenmez; 360 Ödenecek Tevkifat hesabına alacak yazılır."
+    },
+    {
+        "id": 3,
+        "title": "GÖREV 3: SMMM SERBEST MESLEK MAKBUZU & STOPAJ (İLERİ)",
+        "scenario": "Şirketinizin Mali Müşaviri aylık muhasebe danışmanlık makbuzu kesti. Makbuzda %20 Gelir Vergisi Stopajı ve %20 KDV bulunmaktadır.",
+        "invoice_data": "Brüt Ücret: 10.000 TL | Stopaj (%20): 2.000 TL | KDV (%20): 2.000 TL | Net Ödenen: 10.000 TL",
+        "question": "Müşavire net 10.000 TL ödenirken kesilen 2.000 TL stopaj hangi hesaba bağlanmalıdır?",
+        "options_code": [
+            "770.02 Müşavirlik Gideri (Borç 10.000) & 191.20 KDV (Borç 2.000)",
+            "153.01 Ticari Mal Alışı (Borç 10.000)",
+            "659.01 Diğer Olağan Giderler (Borç 10.000)"
+        ],
+        "options_tax": [
+            "360.02 Ödenecek Stopaj (Alacak 2.000) & 320/102 Net Ödeme (10.000)",
+            "320 Satıcılar Tam Ödeme (Alacak 12.000)",
+            "391 Hesaplanan KDV (Alacak 2.000)"
+        ],
+        "correct_code": "770.02 Müşavirlik Gideri (Borç 10.000) & 191.20 KDV (Borç 2.000)",
+        "correct_tax": "360.02 Ödenecek Stopaj (Alacak 2.000) & 320/102 Net Ödeme (10.000)",
+        "reward_xp": 400,
+        "success_msg": "Mükemmel Başarı! Brüt gider 770'e, KDV 191'e, stopaj 360'a ve net para çıkışı 102/320'ye işlendi.",
+        "error_msg": "Stopaj mantığı hatalı! Kesilen gelir vergisi 360 Ödenecek Stopaj hesabına kaydedilmelidir."
+    }
+]
+
+# ==============================================================================
+# 3. LOCALIZATION DATA DICTIONARY (6 DİLDE TAM VE DETAYLI AÇIKLAMALAR)
 # ==============================================================================
 
 LANG_DATA = {
@@ -97,39 +168,20 @@ LANG_DATA = {
             "🏭 Üretim & Fabrika (150/730)"
         ],
         "themes": [
-            "🌑 Platin Gri",
-            "✨ Aurora",
-            "🌌 Cyberpunk"
+            "🌑 Platin Titanyum (Kurumsal)",
+            "✨ Nebula Aurora (Modern)",
+            "⚡ Siber Matris (Akademi)"
         ],
-        "about_btn": "ℹ️ İşleyiş & Felsefe",
-        "about_title": "LedgerAI Mimarisi & İnsan-AI Ortaklığı",
+        "about_btn": "ℹ️ Mimarî & Standartlar",
+        "about_title": "LedgerAI Sistem Mimarisi & Regülasyon Standartları",
         "about_content": """
-        ### 🛡️ İnsan Gücü ve Yapay Zekanın Güvenli Birleşimi
-        **LedgerAI**, çalışanların veya mali müşavirlerin yerini almak için değil; onların üzerindeki mekanik veri giriş yükünü kaldırıp stratejik denetim gücü kazandırmak için tasarlandı.
-        * **1. Çift Göz Prensibi:** Yapay zeka faturadaki KDV tevkifatını ve matrahı ayrıştırıp yevmiye fişini hazırlar; insan uzman son kontrolü yapıp onaylar.
-        * **2. Sıfır Hata Garantisi:** Matematiksel olarak Borç = Alacak denkliği kuruşu kuruşuna doğrulanmadan sistem fiş üretmez.
-        * **3. İstihdamı Destekleyen Teknoloji:** Muhasebe personeli saatlerce fatura girmek yerine finansal analiz ve danışmanlığa odaklanır.
-        * **4. ERP Uyumluluğu:** ETA V.11, Luca, Logo, Zirve, Mikro, Datev ve QuickBooks standartlarında çıktı sağlar.
+        ### 🛡️ Kurumsal Finans & Güvenlik Mimarisi
+        LedgerAI, Türkiye Tek Düzen Hesap Planı, VUK ve uluslararası finansal standartlara tam uyumlu bir otonom ön muhasebe altyapısıdır:
+        * **1. Çift Göz Prensibi (Dual Control):** Yapay zeka veri ayıklayıcı ve tasnif edici olarak çalışır; yasal defter kaydı yetkili SMMM/YMM onayına bağlıdır.
+        * **2. Tevkifat & Stopaj Ayrıştırma:** 5/10, 7/10, 9/10 KDV tevkifatlarını ve serbest meslek stopajlarını ayrı hesap kodlarına (360) dengeli olarak dağıtır.
+        * **3. Çift Bakiye Doğrulama:** Borç ve Alacak tutarları kuruşu kuruşuna eşitlenmeden sistem dışa aktarıma izin vermez.
+        * **4. ERP Entegrasyon Standartları:** ETA V.11, Luca, Logo, Zirve, Datev ve QuickBooks uyumlu veri çıktıları sağlar.
         """,
-        "step1_title": "1. Belge & Tevkifat Okuma",
-        "step1_desc": "OCR ile çoklu KDV, tevkifat ve stopaj kuruşu kuruşuna ayıklanır.",
-        "step2_title": "2. Sektörel Eşleme & Öneri",
-        "step2_desc": "Faaliyete göre 153, 150 veya 770 kodları otomatik önerilir.",
-        "step3_title": "3. İnsan Onayı & Denge",
-        "step3_desc": "Borç/Alacak dengesi mühürlenir, uzman onayına sunulur.",
-        "badge_erp": "✓ ETA • LUCA • DATEV • QUICKBOOKS UYUMLU",
-        "badge_audit": "✓ %100 MATEMATİKSEL DENGE GARANTİSİ",
-        "badge_sec": "✓ %100 VERİ GİZLİLİĞİ & GÜVENLİK",
-        "bot_title": "👾 LedgerBot Finans Mentorü",
-        "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya fatura mantığını sormak için aşağıdaki hap sorulara tıklayabilirsin:",
-        "bot_placeholder": "Muhasebe sorunuzu yazın (Örn: 153 ile 770 farkı nedir?)...",
-        "bot_clear": "🧹 Temizle",
-        "quick_chips": [
-            "💡 Muhasebeciye ne kazandırır?",
-            "🔒 Verilerim güvende mi?",
-            "⚖️ Tevkifat & Stopaj mantığı nedir?",
-            "🎯 153 ile 770 arasındaki fark nedir?"
-        ],
         "cockpit_card1_title": "🏛️ Mevzuat & Tevkifat Uyumu",
         "cockpit_card1_desc": "5/10, 7/10, 9/10 KDV tevkifatları ve Serbest Meslek stopajları kuruş farkı olmadan 360 hesabına aktarılır.",
         "cockpit_card2_title": "⚡ ERP Aktarım Formatları",
@@ -145,7 +197,7 @@ LANG_DATA = {
     "🇺🇸 EN": {
         "badge": "HUMAN + AI COLLABORATIVE TERMINAL",
         "title": "LedgerAI",
-        "subtitle": "AI parses invoices and tax withholdings; human accounting professionals audit and approve.",
+        "subtitle": "Autonomous AI journal voucher generator with continuous CPA audit & verification.",
         "drop_title": "Drop Financial Documents Here or Browse",
         "drop_sub": "PDF, PNG, JPG • Invoices, Receipts & Vouchers • Up to 5 files",
         "process_btn": "⚡ Process & Prepare Vouchers",
@@ -167,32 +219,20 @@ LANG_DATA = {
             "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"
         ],
         "themes": [
-            "🌑 Platinum Slate",
-            "✨ Aurora",
-            "🌌 Cyberpunk"
+            "🌑 Platinum Titanium (Corporate)",
+            "✨ Nebula Aurora (Modern)",
+            "⚡ Cyber Matrix (Academy)"
         ],
-        "about_btn": "ℹ️ How it Works & Philosophy",
-        "about_title": "LedgerAI Architecture & Human-AI Collaboration",
-        "about_content": "LedgerAI empowers financial teams by automating data entry while keeping human experts in full control.",
-        "step1_title": "1. Multi-Tax Extraction",
-        "step1_desc": "Sub-millisecond extraction of multi-tier tax rates and withholdings.",
-        "step2_title": "2. Contextual Mapping",
-        "step2_desc": "Automated account mapping to OpEx, Inventory, or Capital Assets.",
-        "step3_title": "3. Human Audit & Balance",
-        "step3_desc": "Mathematical verification guaranteeing Total Debit equals Total Credit.",
-        "badge_erp": "✓ QUICKBOOKS • XERO • DATEV • SAP READY",
-        "badge_audit": "✓ 100% DEBIT/CREDIT BALANCE GUARANTEE",
-        "badge_sec": "✓ SOC2 & BANK-GRADE ENCRYPTION",
-        "bot_title": "👾 LedgerBot Finance Mentor",
-        "bot_welcome": "Hi! I am your AI finance mentor. Tap any quick pill question below or ask me directly:",
-        "bot_placeholder": "Ask a question...",
-        "bot_clear": "🧹 Clear",
-        "quick_chips": [
-            "💡 How does it save time?",
-            "🔒 Is our data secure?",
-            "⚖️ Explain Debit vs Credit",
-            "🎯 Inventory vs OpEx accounts"
-        ],
+        "about_btn": "ℹ️ Architecture & Standards",
+        "about_title": "LedgerAI Regulatory & Architectural Standards",
+        "about_content": """
+        ### 🛡️ Enterprise Financial & Security Architecture
+        Autonomous multi-GAAP accounting terminal compliant with US GAAP, IFRS, and SOC2:
+        * **1. Human-in-the-Loop Audit:** AI structures journal entries; certified financial controllers provide final clearance.
+        * **2. Mathematical Parity Lock:** Absolute verification guaranteeing Debit strictly equals Credit.
+        * **3. Withholding Reconciliation:** Automatic allocation of multi-rate sales taxes and tax withholdings.
+        * **4. ERP Interoperability:** Certified CSV/Excel templates for QuickBooks, SAP, Datev, and Xero.
+        """,
         "cockpit_card1_title": "🏛️ Tax Withholding Engine",
         "cockpit_card1_desc": "Automatic handling of multi-rate sales taxes and withholding accounts with zero cent deviation.",
         "cockpit_card2_title": "⚡ ERP Interoperability",
@@ -208,7 +248,7 @@ LANG_DATA = {
     "🇩🇪 DE": {
         "badge": "MENSCH + KI FINANZTERMINAL",
         "title": "LedgerAI",
-        "subtitle": "KI bereitet Buchungen und Steuern vor; Finanzexperten prüfen und geben frei.",
+        "subtitle": "Autonome Belegerfassung und Datev-konforme Kontierung unter ständiger Expertenkontrolle.",
         "drop_title": "Belege hier ablegen oder durchsuchen",
         "drop_sub": "PDF, PNG, JPG • Rechnungen & Quittungen",
         "process_btn": "⚡ Buchungssätze Erstellen",
@@ -230,31 +270,13 @@ LANG_DATA = {
             "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"
         ],
         "themes": [
-            "🌑 Platin Titan",
-            "✨ Aurora",
-            "🌌 Cyberpunk"
+            "🌑 Platin Titan (Business)",
+            "✨ Nebula Aurora (Modern)",
+            "⚡ Cyber Matrix (Akademie)"
         ],
-        "about_btn": "ℹ️ Funktionsweise & Philosophie",
-        "about_title": "LedgerAI Architektur & Mensch-KI Standard",
-        "about_content": "LedgerAI entlastet Buchhalter durch intelligente Vorkontierung unter ständiger Expertenkontrolle.",
-        "step1_title": "1. Belegprüfung",
-        "step1_desc": "Präzise Vorsteueraufteilung und USt-IdNr Validierung in Sekunden.",
-        "step2_title": "2. SKR03/04 Zuordnung",
-        "step2_desc": "Automatische Kontierung nach Wareneinkauf, Kosten oder Anlagevermögen.",
-        "step3_title": "3. Soll/Haben-Check",
-        "step3_desc": "Revisionssichere Prüfung auf mathematische Ausgeglichenheit.",
-        "badge_erp": "✓ DATEV SKR03/04 • SAP KOMPATIBEL",
-        "badge_audit": "✓ 100% SOLL/HABEN AUSGEGLICHENHEIT",
-        "badge_sec": "✓ DSGVO-KONFORME DATENVERARBEITUNG",
-        "bot_title": "👾 LedgerBot Finanzmentor",
-        "bot_welcome": "Hallo! Tippen Sie auf eine Frage oder fragen Sie mich direkt nach Buchungssätzen:",
-        "bot_placeholder": "Frage eingeben...",
-        "bot_clear": "🧹 Leeren",
-        "quick_chips": [
-            "💡 Wie spart es Arbeitszeit?",
-            "🔒 Datenschutz & Sicherheit",
-            "⚖️ Soll an Haben Prinzip"
-        ],
+        "about_btn": "ℹ️ Architektur & Datev",
+        "about_title": "LedgerAI Architektur & Datev SKR03/04 Standard",
+        "about_content": "Vollautomatisierte Buchungssatzerstellung nach GoBD und Datev-Richtlinien mit strengem Soll/Haben-Ausgleich.",
         "cockpit_card1_title": "🏛️ Vorsteuer- & Steuerlogik",
         "cockpit_card1_desc": "Automatische Zuordnung von SKR03/04 Vorsteuern und USt-IdNr Validierung.",
         "cockpit_card2_title": "⚡ Datev Export",
@@ -292,31 +314,13 @@ LANG_DATA = {
             "🏢 Services / Conseil", "🏭 Production / Industrie"
         ],
         "themes": [
-            "🌑 Platine Titane",
-            "✨ Aurora",
-            "🌌 Cyberpunk"
+            "🌑 Platine Titane (Entreprise)",
+            "✨ Nebula Aurora (Moderne)",
+            "⚡ Cyber Matrix (Académie)"
         ],
-        "about_btn": "ℹ️ Fonctionnement & Philosophie",
-        "about_title": "Architecture LedgerAI & Co-Pilotage",
-        "about_content": "L'alliance de l'intelligence artificielle et du discernement de l'expert-comptable.",
-        "step1_title": "1. Lecture OCR",
-        "step1_desc": "Extraction des montants HT, TVA et identification du fournisseur.",
-        "step2_title": "2. Ventilation PCG",
-        "step2_desc": "Affectation automatique aux comptes de classe 6 selon l'activité.",
-        "step3_title": "3. Contrôle Débit/Crédit",
-        "step3_desc": "Vérification stricte de l'équilibre de chaque écriture de journal.",
-        "badge_erp": "✓ CONFORME PCG • SAGE & CEGID READY",
-        "badge_audit": "✓ ÉQUILIBRE DÉBIT/CRÉDIT GARANTI",
-        "badge_sec": "✓ SÉCURITÉ CONFORME RGPD",
-        "bot_title": "👾 LedgerBot Mentor",
-        "bot_welcome": "Bonjour! Choisissez une question rapide ou posez votre question comptable:",
-        "bot_placeholder": "Poser une question...",
-        "bot_clear": "🧹 Effacer",
-        "quick_chips": [
-            "💡 Gain de temps en cabinet",
-            "🔒 Sécurité des données",
-            "⚖️ Principe Débit / Crédit"
-        ],
+        "about_btn": "ℹ️ Architecture & Normes",
+        "about_title": "Architecture Comptable & Normes PCG",
+        "about_content": "Conformité Plan Comptable Général (PCG) avec vérification stricte du principe Débit = Crédit.",
         "cockpit_card1_title": "🏛️ Ventilation PCG",
         "cockpit_card1_desc": "Affectation automatique aux comptes de charges et TVA déductible.",
         "cockpit_card2_title": "⚡ Formats Export",
@@ -354,31 +358,13 @@ LANG_DATA = {
             "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"
         ],
         "themes": [
-            "🌑 Platino Titanio",
-            "✨ Aurora",
-            "🌌 Cyberpunk"
+            "🌑 Platino Titanio (Corporativo)",
+            "✨ Nebula Aurora (Moderno)",
+            "⚡ Cyber Matrix (Academia)"
         ],
-        "about_btn": "ℹ️ Filosofía y Seguridad",
-        "about_title": "Arquitectura y Simbiosis Humano-IA",
-        "about_content": "Potenciando al contador mediante automatización sin sustituir su criterio profesional.",
-        "step1_title": "1. Análisis de Factura",
-        "step1_desc": "Lectura OCR avanzada de bases imponibles y tipos impositivos.",
-        "step2_title": "2. Asignación PGC",
-        "step2_desc": "Distribución en cuentas de gastos o existencias según la empresa.",
-        "step3_title": "3. Cuadre de Asiento",
-        "step3_desc": "Garantía matemática de que el Debe coincide con el Haber.",
-        "badge_erp": "✓ COMPATIBLE A3 • SAGE • SOFTWARE FISCAL",
-        "badge_audit": "✓ CUADRE DEBE = HABER GARANTIZADO",
-        "badge_sec": "✓ CIFRADO DE DATOS BANCARIO",
-        "bot_title": "👾 LedgerBot Mentor",
-        "bot_welcome": "¡Hola! Pulsa una pregunta rápida o escribe tu consulta contable:",
-        "bot_placeholder": "Escribe tu duda...",
-        "bot_clear": "🧹 Limpiar",
-        "quick_chips": [
-            "💡 Ventajas para la asesoría",
-            "🔒 Seguridad y confidencialidad",
-            "⚖️ Cuadre de Debe y Haber"
-        ],
+        "about_btn": "ℹ️ Normativa y PGC",
+        "about_title": "Estándares Contables y Seguridad Fiscal",
+        "about_content": "Asientos contables conformes al Plan General Contable (PGC) con cuadre matemático de Debe y Haber.",
         "cockpit_card1_title": "🏛️ Cuadre Fiscal",
         "cockpit_card1_desc": "Gestión automática de retenciones e IVA soportado.",
         "cockpit_card2_title": "⚡ Compatibilidad ERP",
@@ -416,31 +402,13 @@ LANG_DATA = {
             "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"
         ],
         "themes": [
-            "🌑 Platino Titanio",
-            "✨ Aurora",
-            "🌌 Cyberpunk"
+            "🌑 Platino Titanio (Business)",
+            "✨ Nebula Aurora (Moderno)",
+            "⚡ Cyber Matrix (Accademia)"
         ],
-        "about_btn": "ℹ️ Filosofia e Sicurezza",
-        "about_title": "Architettura di Collaborazione Uomo-IA",
-        "about_content": "Automazione contabile trasparente che esalta il valore del consulente aziendale.",
-        "step1_title": "1. Acquisizione Dati",
-        "step1_desc": "Scansione OCR di aliquote IVA, imponibili e fornitore.",
-        "step2_title": "2. Piano dei Conti",
-        "step2_desc": "Classificazione tra costi di gestione, merci o cespiti ammortizzabili.",
-        "step3_title": "3. Quadratura Dare/Avere",
-        "step3_desc": "Verifica della perfetta parità contabile della scrittura.",
-        "badge_erp": "✓ PRONTO PER ZUCCHETTI • TEAMSYSTEM • SAP",
-        "badge_audit": "✓ QUADRATURA DARE/AVERE GARANTITA",
-        "badge_sec": "✓ PROTEZIONE DATI STANDARD BANCARIO",
-        "bot_title": "👾 LedgerBot Mentor",
-        "bot_welcome": "Ciao! Seleziona una domanda pillola o scrivimi direttamente:",
-        "bot_placeholder": "Fai una domanda contabile...",
-        "bot_clear": "🧹 Cancella",
-        "quick_chips": [
-            "💡 Vantaggi per lo studio",
-            "🔒 Sicurezza dei dati fiscali",
-            "⚖️ Pareggio Dare / Avere"
-        ],
+        "about_btn": "ℹ️ Architettura & Norme",
+        "about_title": "Standard di Conformità e Partita Doppia",
+        "about_content": "Generazione automatica di scritture in partita doppia perfettamente bilanciate per gestionali Zucchetti e Teamsystem.",
         "cockpit_card1_title": "🏛️ Scritture Bilanciate",
         "cockpit_card1_desc": "Gestione automatica ritenute d'acconto ed IVA a credito.",
         "cockpit_card2_title": "⚡ Compatibilità Gestionale",
@@ -460,24 +428,20 @@ if st.session_state["user_lang"] not in LANG_DATA:
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
-# HIZLI VE KESİNTİSİZ CEVAP ÖNBELLEĞİ (0.01 SN ŞİMŞEK YANIT)
+# HIZLI VE KESİNTİSİZ CEVAP ÖNBELLEĞİ
 INSTANT_FAQ_CACHE = {
-    "💡 Muhasebeciye ne kazandırır?": "LedgerAI manuel fatura girişini ve tevkifat hesaplamalarını %80 hızlandırır. Yapay zeka fişi hazırlar, son kontrolü mali müşavir yapar; hata payını sıfıra indirir.\n\nPratik Fiş Kaydı: Borç: 770 Genel Yönetim Giderleri / 191 İndirilecek KDV — Alacak: 320 Satıcılar",
-    "🔒 Verilerim güvende mi?": "Verileriniz TLS 256-bit bankacılık standardında şifrelenir; belgeleriniz model eğitiminde kullanılmaz ve oturumunuz kapandığında sistemde kalıcı olarak saklanmaz.",
-    "⚖️ Tevkifat & Stopaj mantığı nedir?": "Tevkifatlı faturada KDV'nin belirlenen oranı (örn. 5/10, 9/10) satıcı yerine devlete beyan edilmek üzere '360 Ödenecek Vergi' hesabına aktarılır. Böylece bakiye kuruşu kuruşuna denkleşir.\n\nPratik Kayıt Örneği: Borç: 770 & 191 — Alacak: 360 (Tevkifat) & 320 (Satıcıya Ödenecek Net)",
-    "🎯 153 ile 770 arasındaki fark nedir?": "153 Ticari Mallar hesabı şirketin satmak amacıyla aldığı ürünler içindir. 770 Genel Yönetim Giderleri ise işletmenin kendi idari tüketimleri (ofis kırtasiyesi, kira, danışmanlık vb.) için kullanılır.\n\nPratik Kayıt Örneği: Borç: 153 (veya 770) / 191 — Alacak: 320 Satıcılar",
-    "💡 How does it save time?": "LedgerAI automates repetitive invoice typing and multi-tier tax splitting by 80%, leaving the final executive approval to the CPA.\n\nPractical Entry: Debit: 6000 OpEx / 2200 Tax — Credit: 2000 AP",
-    "🔒 Is our data secure?": "Yes. Encrypted via TLS 256-bit bank-grade protocols. Your financial files are processed strictly within the active session and never stored permanently.",
-    "⚖️ Explain Debit vs Credit": "Every transaction impacts two sides equally. What enters the company or creates an expense is Debited; how it was financed or owed is Credited.",
-    "🎯 Inventory vs OpEx accounts": "Inventory (1200) holds merchandise meant for resale. Operating Expenses (6000) are consumables and services used to operate the business."
+    "💡 Muhasebeciye ne kazandırır?": "LedgerAI, manuel veri girişini %80 azaltarak mali müşavirlerin rutin fiş işleme yükünü ortadan kaldırır. Yapay zeka fiş taslağını oluşturur, uzman insan sadece onaylar ve denetler.",
+    "🔒 Verilerim güvende mi?": "Evet. Tüm finansal verileriniz TLS 256-bit uçtan uca şifreleme ile işlenir. Belgeleriniz kalıcı sunucularda saklanmaz ve model eğitiminde (training) kullanılmaz.",
+    "⚖️ Tevkifat & Stopaj mantığı nedir?": "Tevkifat ve stopaj, faturadaki verginin bir kısmının alıcı tarafından kesilerek doğrudan vergi dairesine (360 hesabına) ödenmesidir. Böylece satıcı cari hesabı net tutara oturur ve yevmiye fişi kuruş farkı olmadan dengelenir.",
+    "🎯 153 ile 770 arasındaki fark nedir?": "153 Ticari Mallar satılmak amacıyla alınan ticari ürünlerin stok hesabıdır. 770 Genel Yönetim Giderleri ise işletmenin kendi idari faaliyetlerinde tükettiği (ofis kırtasiyesi, kira, danışmanlık vb.) giderlerin kaydedildiği hesaptır."
 }
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (WHITELABEL + ZARİF GİTHUB DOCK)
+# 4. DYNAMIC STYLING ENGINE (GERÇEK GİTHUB HAPLARI & MİKRO SESLİ CSS)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
-    # 🌑 Platin Gri
+    # 🌑 Platin Titanyum (Kurumsal / CFO)
     bg_style = """
         @keyframes slateShimmer {
             0% { background-position: 0% 50%; }
@@ -494,7 +458,7 @@ if st.session_state["theme_idx"] == 0:
         }
     """
 elif st.session_state["theme_idx"] == 1:
-    # ✨ Ultra Canlı Aurora
+    # ✨ Nebula Aurora (Modern / Startup)
     bg_style = """
         @keyframes auroraRealFlow {
             0% { background-position: 0% 30%; filter: hue-rotate(0deg); }
@@ -512,7 +476,7 @@ elif st.session_state["theme_idx"] == 1:
         }
     """
 else:
-    # 🌌 Cyberpunk Gece
+    # ⚡ Siber Matris (Akademi / Eğitim)
     bg_style = """
         @keyframes cyberpunkPulse {
             0% { background-position: 0% 0%, 100% 100%; filter: brightness(1); }
@@ -629,7 +593,6 @@ st.markdown(f"""
         background: rgba(30, 41, 59, 0.8);
     }}
 
-    /* SEPETE EKLE MODELİ OVAL İŞLEM BUTONU */
     div.stButton > button:first-child {{
         background: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
@@ -680,8 +643,8 @@ st.markdown(f"""
         background: rgba(255, 255, 255, 0.06) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
         border-radius: 9999px !important;
-        min-height: 28px !important;
-        height: 28px !important;
+        min-height: 30px !important;
+        height: 30px !important;
         padding: 0 10px !important;
         font-size: 0.75rem !important;
         box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
@@ -692,8 +655,8 @@ st.markdown(f"""
         background: rgba(255, 255, 255, 0.06) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
         border-radius: 9999px !important;
-        min-height: 28px !important;
-        height: 28px !important;
+        min-height: 30px !important;
+        height: 30px !important;
         padding: 0 14px !important;
         font-size: 0.75rem !important;
         font-weight: 600 !important;
@@ -723,7 +686,6 @@ st.markdown(f"""
         transform: scale(1.03) !important;
     }}
 
-    /* CHAT MESAJ BALONLARI */
     .chat-scroll-area {{
         max-height: 280px;
         overflow-y: auto;
@@ -763,7 +725,6 @@ st.markdown(f"""
         line-height: 1.45;
     }}
 
-    /* SEKME MENÜSÜ LÜKS ÇİZGİSİ */
     div[data-testid="stTabs"] button[role="tab"] {{
         background: transparent !important;
         border: none !important;
@@ -821,7 +782,7 @@ def sesli_bildirim_cal(tur="success"):
     st.markdown(ses_js, unsafe_allow_html=True)
 
 # ==============================================================================
-# 4. INSTITUTIONAL MULTI-TAB EXCEL ENGINE
+# 5. INSTITUTIONAL MULTI-TAB EXCEL ENGINE
 # ==============================================================================
 
 def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
@@ -837,7 +798,6 @@ def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
         data_font = Font(name="Plus Jakarta Sans", size=10)
         num_font = Font(name="Consolas", size=10)
 
-        # TAB 1: TÜM FİŞLER (KONSOLİDE)
         df.to_excel(writer, index=False, sheet_name="Yevmiye Fisi")
         ws1 = writer.sheets["Yevmiye Fisi"]
         h_fill1 = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
@@ -865,7 +825,6 @@ def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
                         cell.font = data_font
             ws1.column_dimensions[c_letter].width = max(m_len + 5, 14)
 
-        # TAB 2: 153 TİCARİ MALLAR (YEŞİL TEMA)
         df_153 = df[df[headers["code"]].astype(str).str.startswith("153") | df[headers["code"]].astype(str).str.startswith("1200")].copy()
         if not df_153.empty:
             df_153.to_excel(writer, index=False, sheet_name="153 Ticari Mallar")
@@ -886,7 +845,6 @@ def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
                         cell.alignment = Alignment(vertical="center")
                 ws2.column_dimensions[c_letter].width = max(m_len + 5, 14)
 
-        # TAB 3: 770 GENEL YÖNETİM MASRAFLARI (MAVİ TEMA)
         df_770 = df[df[headers["code"]].astype(str).str.startswith("770") | df[headers["code"]].astype(str).str.startswith("6000")].copy()
         if not df_770.empty:
             df_770.to_excel(writer, index=False, sheet_name="770 Genel Masraflar")
@@ -922,7 +880,7 @@ def export_eta_csv(df: pd.DataFrame) -> bytes:
     return eta_df.to_csv(sep=";", index=False, encoding="utf-8-sig").encode("utf-8-sig")
 
 # ==============================================================================
-# 5. CORE AI RECOGNITION ENGINE (TEVKİFAT, MULTI-TAX & DUAL AUDIT)
+# 6. CORE AI RECOGNITION ENGINE (TEVKİFAT, MULTI-TAX & DUAL AUDIT)
 # ==============================================================================
 
 def execute_document_audit(uploaded_files, sector_directive: str):
@@ -1005,19 +963,19 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 6. MASTER MULTI-DECK COCKPIT (MODÜLER KURUMSAL SEKME YAPISI)
+# 7. MULTI-DECK COCKPIT (KURUMSAL / AKADEMİ / HUKUK)
 # ==============================================================================
 
 st.markdown("<div class='cockpit-container'>", unsafe_allow_html=True)
 
 sekme_terminal, sekme_akademi, sekme_hukuk = st.tabs([
     "🏢 Kurumsal Finans Terminali", 
-    "🎓 Siber Akademi & Simülatör (Öğrenci)", 
+    "🎓 Siber Akademi (Kademeli Oyun & Simülasyon)", 
     "⚖️ Hukuki Çerçeve, KVKK & SLA"
 ])
 
 # ------------------------------------------------------------------------------
-# SEKME 1: KURUMSAL FİNANS TERMİNALİ (TAM DONANIMLI MEVCUT SİSTEM)
+# SEKME 1: KURUMSAL FİNANS TERMİNALİ
 # ------------------------------------------------------------------------------
 with sekme_terminal:
     col_left, col_right = st.columns([1.35, 1.0], gap="large")
@@ -1166,7 +1124,7 @@ with sekme_terminal:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # TAM HİZALI KURUMSAL MİKRO DOCK
+        # TAM HİZALI MİKRO DOCK (GÖRSEL 35 DÜZELTİLDİ)
         st.markdown("<div style='margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
         c_m1, c_m2, c_m3, c_m4 = st.columns([1.6, 3.4, 3.4, 1.6])
         with c_m1:
@@ -1321,7 +1279,7 @@ with sekme_terminal:
                 use_container_width=True
             )
 
-    # ASİSTAN ÇUBUĞU
+    # ASİSTAN ÇUBUĞU (AKILLI PROMPT MOTORU İLE SAÇMALAMALAR SIFIRLANDI)
     st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
     c_bot_l, c_bot_center, c_bot_r = st.columns([1, 4, 1])
 
@@ -1358,127 +1316,158 @@ with sekme_terminal:
             if aktif_soru:
                 st.session_state["chat_messages"].append({"role": "user", "content": aktif_soru})
                 
-                # 0.01 SN ANINDA CEVAP ÖNBELLEĞİ
+                # 1. ADIM: HIZLI VE KESİNTİSİZ CEVAP ÖNBELLEĞİ (0.01 SN)
                 if aktif_soru in INSTANT_FAQ_CACHE:
                     bot_cevap = INSTANT_FAQ_CACHE[aktif_soru]
                     st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
                     st.rerun()
                 else:
-                    with st.spinner("● ● ● LedgerAI muhasebe mevzuatını tarıyor ve hesaplıyor..."):
+                    # 2. ADIM: AKILLI GEMİNİ PROMPT MOTORU (SAÇMA FİŞ ÜRETMEYİ ENGELLEYEN FİLTRE)
+                    with st.spinner("● ● ● Analiz ediliyor..."):
                         prompt_bot = f"""
-                        Sen LedgerAI'ın kurumsal finans mentorü ve pratik muhasebe uzmanısın.
+                        Sen LedgerAI'ın kurumsal finans ve muhasebe asistanısın.
                         Kullanıcı Dili: {st.session_state['user_lang']}
-                        Kullanıcı Sorusu: "{aktif_soru}"
+                        Kullanıcı Mesajı: "{aktif_soru}"
 
-                        TALİMATLAR:
-                        1. Asla lafı uzatma, 2-3 cümlede net cevap ver.
-                        2. Sonda tek satırlık somut fiş kaydı ekle (Borç: 153/191 - Alacak: 320).
+                        ÇOK KESİN TALİMATLAR:
+                        1. Eğer kullanıcı selam veriyorsa, hal hatır soruyorsa veya anlamsız/şaka bir şey yazdıysa (Örn: "ne yapıyorsun", "naber", "hebele hübele"):
+                           - Asla fiş kaydı veya muhasebe hesabı uydurma!
+                           - Kısa, esprili ve profesyonel bir selam ver, muhasebe ile ilgili ne öğrenmek istediğini sor.
+                        2. Eğer kullanıcı GERÇEKTEN bir muhasebe, gider, fatura veya hesap planı sorusu soruyorsa:
+                           - 2-3 cümlede doğrudan cevabı ver.
+                           - SADECE BU DURUMDA sonuna tek satırlık pratik yevmiye fişi ekle (Örn: Borç 770 / Alacak 320).
                         """
                         try:
                             yanit = client.models.generate_content(
                                 model="gemini-3.5-flash-lite",
                                 contents=prompt_bot
                             )
-                            bot_cevap = yanit.text.strip() if yanit and yanit.text else "Kayıt Tek Düzen standartlarına göre tasnif edilmiştir."
+                            bot_cevap = yanit.text.strip() if yanit and yanit.text else "Harika bir gün! Muhasebe ve fatura süreçlerinizde size nasıl yardımcı olabilirim?"
                         except Exception:
-                            bot_cevap = "Tevkifat ve gider tasnifi mevzuata göre otomatik yapılmıştır. Uzman onayından sonra fiş ERP sistemine aktarılabilir."
+                            bot_cevap = "Muhasebe ve vergi mevzuatıyla ilgili sorularınızı kısaca yanıtlamaya hazırım."
                         
                         st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
                         st.rerun()
 
 # ------------------------------------------------------------------------------
-# SEKME 2: 🎓 SİBER AKADEMİ & İNTERAKTİF FATURA OYUNU (ÖĞRENCİLER & OKULLAR)
+# SEKME 2: 🎓 SİBER AKADEMİ (KADEMELİ OYUN, PUZZLE & SEVİYE SİSTEMİ)
 # ------------------------------------------------------------------------------
 with sekme_akademi:
+    # SEVİYE VE XP HESAPLAMA MOTORU
+    xp = st.session_state["academy_xp"]
+    if xp >= 700:
+        st.session_state["academy_level"] = "🏆 Baş Denetçi (Senior Auditor)"
+    elif xp >= 350:
+        st.session_state["academy_level"] = "⭐ Kıdemli Denetçi Yardımcısı"
+    else:
+        st.session_state["academy_level"] = "🌱 Mali Stajyer (Junior)"
+
+    curr_p = ACADEMY_PUZZLES[st.session_state["puzzle_step"] % len(ACADEMY_PUZZLES)]
+
     st.markdown(f"""
-    <div style='background:rgba(30,41,59,0.65); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:24px 28px; margin-bottom:20px;'>
-        <div style='display:flex; justify-content:space-between; align-items:center;'>
+    <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:22px 28px; margin-bottom:20px;'>
+        <div style='display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;'>
             <div>
-                <span class='top-badge' style='background:rgba(217,70,239,0.15); border-color:#D946EF; color:#F0ABFC;'>🎮 SİBER MUHASEBE AKADEMİSİ</span>
-                <h3 style='margin:4px 0; color:#FFFFFF;'>Geleceğin Mali Müşaviri Simülasyonu</h3>
-                <p style='font-size:0.85rem; color:#CBD5E1; margin:0;'>Öğrenciler ve yeni başlayanlar için interaktif hesap kodu ve tevkifat yapbozu. Boşlukları doldur, seviye atla!</p>
+                <span class='top-badge' style='background:rgba(217,70,239,0.15); border-color:#D946EF; color:#F0ABFC;'>🎮 SİBER MUHASEBE SİMÜLASYONU</span>
+                <h3 style='margin:4px 0; color:#FFFFFF;'>Geleceğin Finans Lideri Yetiştirme Platformu</h3>
+                <p style='font-size:0.85rem; color:#CBD5E1; margin:0;'>Fatura vakalarını inceleyin, eksik hesap kodlarını ve tevkifatı doğru seçerek XP kazanın, seviye atlayın!</p>
             </div>
             <div style='text-align:right;'>
-                <div style='font-size:1.4rem; font-weight:800; color:#D946EF;'>🏆 {st.session_state["academy_xp"]} XP</div>
-                <div style='font-size:0.75rem; color:#A7F3D0;'>Unvan: {st.session_state["academy_level"]}</div>
+                <div style='font-size:1.6rem; font-weight:800; color:#D946EF;'>🏆 {st.session_state["academy_xp"]} XP</div>
+                <div style='font-size:0.8rem; color:#A7F3D0; font-weight:700;'>{st.session_state["academy_level"]}</div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    c_sim1, c_sim2 = st.columns([1.2, 1.0], gap="medium")
+    c_puz1, c_puz2 = st.columns([1.25, 1.0], gap="large")
 
-    with c_sim1:
-        st.markdown("""
-        <div style='background:rgba(15,23,42,0.7); border:1px dashed rgba(255,255,255,0.2); border-radius:18px; padding:20px;'>
-            <div style='font-size:0.75rem; font-weight:700; color:#38BDF8; letter-spacing:1px;'>GÖREV 1: FATURA ANALİZ BULMACASI</div>
-            <h4 style='color:#FFFFFF; margin:6px 0 14px 0;'>Örnek Ticari Vaka:</h4>
-            <div style='background:rgba(0,0,0,0.3); border-radius:12px; padding:14px; font-family:"Consolas", monospace; font-size:0.82rem; color:#E2E8F0; line-height:1.6;'>
-                <b>Satıcı:</b> Delta Teknoloji A.Ş.<br>
-                <b>Açıklama:</b> 20 Adet Ofis Sandalyesi & Çalışma Masası<br>
-                <b>Tutar:</b> 40.000 TL + %20 KDV (8.000 TL) = 48.000 TL<br>
-                <b>Şirket Türü:</b> Yazılım Şirketi (Ofis Yönetimi İçin Alındı)
+    with c_puz1:
+        st.markdown(f"""
+        <div style='background:rgba(15,23,42,0.75); border:1px dashed rgba(255,255,255,0.22); border-radius:20px; padding:22px;'>
+            <div style='display:flex; justify-content:space-between; align-items:center;'>
+                <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1px;'>VAKA #{curr_p['id']} / {len(ACADEMY_PUZZLES)}</span>
+                <span style='font-size:0.75rem; color:#F0ABFC; font-weight:700;'>Ödül: +{curr_p['reward_xp']} XP</span>
             </div>
-            <div style='margin-top:14px; font-size:0.82rem; color:#CBD5E1;'>
-                ❓ <b>Soru:</b> Bu eşyalar satılmak için değil, ofis çalışanları tarafından kullanılmak üzere alındı. Hangi hesaba kaydedilmelidir?
+            <h4 style='color:#FFFFFF; margin:8px 0 12px 0;'>{curr_p['title']}</h4>
+            <div style='font-size:0.85rem; color:#CBD5E1; margin-bottom:14px; line-height:1.5;'>
+                <b>Senaryo:</b> {curr_p['scenario']}
+            </div>
+            <div style='background:rgba(0,0,0,0.35); border-radius:12px; padding:14px; font-family:"Consolas", monospace; font-size:0.82rem; color:#E2E8F0; line-height:1.6;'>
+                📄 <b>FATURA VERİLERİ:</b><br>{curr_p['invoice_data']}
+            </div>
+            <div style='margin-top:14px; font-size:0.85rem; color:#F8FAFC; font-weight:600;'>
+                ❓ {curr_p['question']}
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-    with c_sim2:
-        st.markdown("<div style='background:rgba(30,41,59,0.65); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:20px;'>", unsafe_allow_html=True)
-        st.markdown("<div style='font-size:0.8rem; font-weight:700; color:#F1F5F9; margin-bottom:8px;'>🎯 Yapboz Parçalarını Seçin:</div>", unsafe_allow_html=True)
-        
-        sim_kod = st.selectbox("1. Boşluk (Gider/Varlık Hesabı):", [
-            "153.01 Ticari Mallar (Satmak için)",
-            "770.01 Genel Yönetim Giderleri (Ofis içi tüketim)",
-            "600.01 Yurtiçi Satışlar",
-            "100.01 Kasa Hesabı"
-        ], key="sim_sel_kod")
-        
-        sim_tev = st.selectbox("2. Boşluk (Tevkifat / Vergi Durumu):", [
-            "Tevkifatsız Normal Alım (%20 KDV Doğrudan 191'e)",
-            "5/10 KDV Tevkifatı (Yarısı devlete)",
-            "9/10 KDV Tevkifatı"
-        ], key="sim_sel_tev")
-        
-        if st.button("🛡️ Fişi Mühürle & XP Kazan", use_container_width=True):
-            if "770.01" in sim_kod and "Tevkifatsız" in sim_tev:
-                st.session_state["academy_xp"] += 100
-                st.session_state["academy_level"] = "Uzman Denetçi Yardımcısı"
-                st.balloons()
-                sesli_bildirim_cal("success")
-                st.success("🎉 TEBRİKLER! Sandalyeler ofis içi kullanım olduğu için 770 seçimi doğru. (+100 XP)")
-            else:
-                sesli_bildirim_cal("error")
-                st.error("⚠️ HATA! Satılmayacak olan ofis mobilyaları 153'e yazılamaz, idari gider (770) olmalıdır. Tekrar deneyin!")
+    with c_puz2:
+        st.markdown("<div style='background:rgba(30,41,59,0.72); border:1px solid rgba(255,255,255,0.14); border-radius:20px; padding:22px;'>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:0.82rem; font-weight:700; color:#F1F5F9; margin-bottom:10px;'>🎯 Yapboz Parçalarını Doğru Yerleştirin:</div>", unsafe_allow_html=True)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+        user_sel_code = st.selectbox("1. Parça (Borç Hesabı):", curr_p["options_code"], key=f"sel_code_{curr_p['id']}")
+        user_sel_tax = st.selectbox("2. Parça (Alacak & Tevkifat Dengesi):", curr_p["options_tax"], key=f"sel_tax_{curr_p['id']}")
+
+        btn_col_a, btn_col_b = st.columns(2)
+        with btn_col_a:
+            if st.button("🛡️ Fişi Mühürle & Doğrula", use_container_width=True):
+                if user_sel_code == curr_p["correct_code"] and user_sel_tax == curr_p["correct_tax"]:
+                    st.session_state["academy_xp"] += curr_p["reward_xp"]
+                    st.session_state["puzzle_solved"] = True
+                    sesli_bildirim_cal("success")
+                    st.balloons()
+                    st.success(f"🎉 {curr_p['success_msg']} (+{curr_p['reward_xp']} XP Kazandınız!)")
+                else:
+                    sesli_bildirim_cal("error")
+                    st.error(f"⚠️ {curr_p['error_msg']}")
+
+        with btn_col_b:
+            if st.button("➡️ Sonraki Göreve Geç", use_container_width=True):
+                st.session_state["puzzle_step"] += 1
+                st.session_state["puzzle_solved"] = False
+                st.rerun()
+
+        st.markdown(f"""
+            <div style='margin-top:16px; padding:12px; background:rgba(0,0,0,0.3); border-radius:12px; font-size:0.75rem; color:#CBD5E1;'>
+                💡 <b>İpucu:</b> Tüm seviyeleri başarıyla tamamlayan öğrenciler "Baş Denetçi" unvanı kazanır ve ERP sınavlarına hazır hale gelir.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 # ------------------------------------------------------------------------------
-# SEKME 3: ⚖️ HUKUKİ ÇERÇEVE, KVKK & SLA (SATIŞTA GÜVENLİK ZIRHI)
+# SEKME 3: ⚖️ HUKUKİ ÇERÇEVE, KVKK & SLA (TAM VE KUSURSUZ METİN)
 # ------------------------------------------------------------------------------
 with sekme_hukuk:
-    st.markdown("""
-    <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:28px 32px;'>
-        <span class='top-badge' style='background:rgba(56,189,248,0.12); border-color:#38BDF8; color:#38BDF8;'>HUKUKİ ÇERÇEVE & REGÜLASYON</span>
-        <h3 style='color:#FFFFFF; margin:8px 0 16px 0;'>Kurumsal Hizmet Şartları, KVKK & Sorumluluk Dağılımı</h3>
-        
-        <div style='font-size:0.85rem; color:#CBD5E1; line-height:1.7;'>
-            <p><b>1. İnsan-Yapay Zeka Ortaklığı (Dual-Control İlkesi):</b><br>
-            LedgerAI, bir otonom ön muhasebe ve optik veri ayrıştırma terminalidir. Sistem tarafından üretilen yevmiye fişleri, 
-            3568 Sayılı Kanun kapsamında yetkili Serbest Muhasebeci Mali Müşavir (SMMM) veya Yeminli Mali Müşavir (YMM) onayına sunulmak üzere <b>öneri ve taslak</b> niteliğindedir. 
-            Nihai yasal defter kaydı ve beyanname onay yetkisi her zaman kurumun yetkili meslek mensubuna aittir.</p>
-            
-            <p><b>2. Veri Güvenliği ve KVKK / GDPR Uyumluluğu:</b><br>
-            Yüklenen fatura ve belgeler uçtan uca TLS 256-bit protokolü ile işlenir. Finansal verileriniz model eğitimi (training) amacıyla kullanılmaz. 
-            Oturum sonlandırıldığında yüklenen geçici belge baytları bellekten (RAM) kalıcı olarak silinir.</p>
+    # GÖRSEL 33'TEKİ HAM HTML HATASI GİDERİLDİ
+    st.markdown("### ⚖️ Kurumsal Hizmet Seviyesi Anlaşması (SLA), KVKK & Yasal Sorumluluk Çerçevesi")
+    st.caption("Bu metin LedgerAI altyapısını kullanan kurumlar, bağımsız denetçiler ve eğitim kurumları için bağlayıcı regülasyon çerçevesini belirler.")
 
-            <p><b>3. Okul & Eğitim Kurumları Lisanslama Çerçevesi:</b><br>
-            Eğitim kurumları için sağlanan demo ve akademi modülleri, öğrencilere Tek Düzen Hesap Planı, KDV Tevkifatı ve 
-            ERP aktarım formatlarını öğretmek üzere hazırlanmış simülasyon ortamıdır. Ticari bağlayıcılığı bulunmaz.</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    h_col1, h_col2 = st.columns(2, gap="large")
+
+    with h_col1:
+        st.markdown("""
+        #### 1. Dual-Control (Çift Kontrol) İlkesi & Mesleki Sorumluluk
+        * **Öneri ve Taslak Niteliği:** LedgerAI, optik karakter tanıma (OCR) ve semantik yapay zeka modelleri kullanarak faturaları muhasebeleştiren otonom bir ön muhasebe terminalidir. Sistem tarafından üretilen yevmiye fişleri kesin yasal kayıt değil, **uzman onayına sunulan taslaktır**.
+        * **Yetkili Meslek Mensubu Onayı:** 3568 Sayılı Serbest Muhasebeci Mali Müşavirlik ve Yeminli Mali Müşavirlik Kanunu uyarınca, yasal defterlere işleme ve beyanname verme yetkisi yalnızca yetkili meslek mensuplarına aittir. LedgerAI personelin yerini almaz, personele mekanik veri girişinde süper güç sağlar.
+        * **Vergi ve Ceza Sorumluluğu:** Kullanıcı tarafından son incelemesi yapılmadan ERP sistemlerine aktarılan fişlerdeki olası matrah veya tevkifat uyuşmazlıklarında nihai sorumluluk mükellefe ve ilgili işletmeye aittir.
+
+        #### 2. KVKK & GDPR Kapsamında Veri Güvenliği Taahhüdü
+        * **Sıfır Kalıcı Depolama (Zero-Retention):** Kullanıcı tarafından oturum süresince yüklenen fatura, makbuz ve finansal dökümanlar geçici bellek (RAM) üzerinde işlenir. Oturum kapatıldığında veya sayfa yenilendiğinde belgeler sunuculardan kalıcı olarak silinir.
+        * **Model Eğitimi Yasağı:** Finansal belgeleriniz, ticari sırlarınız ve müşteri bilgileriniz kesinlikle yapay zeka modellerinin genel eğitiminde (training) kullanılmaz.
+        * **Aktarım Güvenliği:** Tüm iletişim TLS 256-bit bankacılık seviyesinde şifrelenmiş tüneller üzerinden yürütülür.
+        """)
+
+    with h_col2:
+        st.markdown("""
+        #### 3. Eğitim & Üniversite Lisanslama Çerçevesi
+        * **Simülasyon Ortamı:** "Siber Akademi" sekmesinde sunulan interaktif fatura bulmacaları ve hesap kodu senaryoları eğitim amacıyla kurgulanmış hayali vakalardır.
+        * **Öğrenci Gizliliği:** Akademi modülünde öğrencilerden veya kurumlardan hiçbir kişisel veri, TC Kimlik Numarası veya gerçek finansal döküman talep edilmez.
+        * **Ders Materyali Uyumluluğu:** Sistem; üniversitelerin İktisadi ve İdari Bilimler Fakülteleri, Meslek Yüksekokulları ve Ticaret Liseleri için müfredata uyumlu dijital laboratuvar materyali olarak kullanılabilir.
+
+        #### 4. Hizmet Seviyesi (SLA) & Kesintisiz Çalışma
+        * **Doğruluk Güvencesi:** Sistem matematiksel çift bakiye denetimi yaparak Borç ve Alacak eşitliği sağlanmayan fişlerin dışa aktarılmasına izin vermez.
+        * **API ve ERP Entegrasyonu:** Dışa aktarılan Excel (.xlsx) ve CSV formatları ETA V.11, Luca, Logo, Zirve ve Datev standartlarında kodlanmış olup biçimsel veri bütünlüğü garanti altındadır.
+        """)
 
 st.markdown("</div>", unsafe_allow_html=True)
