@@ -2,8 +2,8 @@
 ================================================================================
 LEDGERAI — INSTITUTIONAL ENTERPRISE ACCOUNTING TERMINAL
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: Minimal GitHub Pill Style / Open Slate Executive Dashboard (Whitelabel)
-Version: 3.7.0 Ultimate Production Master Edition
+Design: Dual-Wing Executive Cockpit / GitHub Pill Micro-UI (Whitelabel)
+Version: 4.0.0 Cockpit Master Edition
 ================================================================================
 """
 
@@ -34,7 +34,7 @@ st.set_page_config(
 
 SESSION_DEFAULTS = {
     "user_lang": "🇹🇷 TR",
-    "theme_idx": 0,  # 0: Platin Gri
+    "theme_idx": 0,  # 0: Platin Gri (Varsayılan Açılış)
     "industry_idx": 0,
     "chat_messages": [],
     "out_df": None,
@@ -127,6 +127,12 @@ LANG_DATA = {
             "⚖️ Tevkifat & Stopaj mantığı nedir?",
             "🎯 153 ile 770 arasındaki fark nedir?"
         ],
+        "cockpit_card1_title": "🏛️ Mevzuat & Tevkifat Uyumu",
+        "cockpit_card1_desc": "5/10, 7/10, 9/10 KDV tevkifatları ve Serbest Meslek stopajları kuruş farkı olmadan 360 hesabına aktarılır.",
+        "cockpit_card2_title": "⚡ ERP Aktarım Formatları",
+        "cockpit_card2_desc": "Tek tıkla ETA V.11 uyumlu CSV, Luca ve çok sayfalı (153 & 770 ayrılmış) kurumsal Excel üretimi.",
+        "cockpit_card3_title": "🛡️ Çift Taraflı Denetim Kilidi",
+        "cockpit_card3_desc": "Toplam Borç = Toplam Alacak eşitliği sağlanmadan yevmiye fişi kapatılmaz; bakiye farkı riski sıfırlanır.",
         "headers": {
             "vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu",
             "name": "Hesap Adı", "desc": "Açıklama", "curr": "Para Birimi",
@@ -160,7 +166,7 @@ LANG_DATA = {
         "themes": [
             "🌑 Platinum Slate",
             "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
+            "🌌 Cyberpunk Gece"
         ],
         "about_btn": "ℹ️ How it Works & Philosophy",
         "about_title": "LedgerAI Architecture & Human-AI Collaboration",
@@ -184,234 +190,16 @@ LANG_DATA = {
             "⚖️ Explain Debit vs Credit",
             "🎯 Inventory vs OpEx accounts"
         ],
+        "cockpit_card1_title": "🏛️ Tax Withholding Engine",
+        "cockpit_card1_desc": "Automatic handling of multi-rate sales taxes and withholding accounts with zero cent deviation.",
+        "cockpit_card2_title": "⚡ ERP Interoperability",
+        "cockpit_card2_desc": "Direct exports formatted for QuickBooks, SAP, Datev SKR03/04, and multi-tab Excel workbooks.",
+        "cockpit_card3_title": "🛡️ Dual-Audit Integrity Lock",
+        "cockpit_card3_desc": "Mathematical assurance guaranteeing that Total Debit strictly equals Total Credit before release.",
         "headers": {
             "vouch": "Voucher #", "date": "Date", "code": "Account Code",
             "name": "Account Name", "desc": "Memo", "curr": "Currency",
             "deb": "Debit", "crd": "Credit"
-        }
-    },
-    "🇩🇪 DE": {
-        "badge": "MENSCH + KI FINANZTERMINAL",
-        "title": "LedgerAI",
-        "subtitle": "KI bereitet Buchungen und Steuern vor; Finanzexperten prüfen und geben frei.",
-        "drop_title": "Belege hier ablegen oder durchsuchen",
-        "drop_sub": "PDF, PNG, JPG • Rechnungen & Quittungen",
-        "process_btn": "⚡ Buchungssätze Erstellen",
-        "limit_err": "🛑 Maximal 5 Dokumente im Demo-Modus.",
-        "ready_count": "Bereit: **{count}**",
-        "success": "✓ Buchungen erfolgreich erstellt und ausgeglichen.",
-        "failed": "❌ Belege konnten nicht gelesen werden.",
-        "preview_title": "📊 Buchungszeilen & Kontrollzentrum",
-        "preview_tip": "💡 Doppelklick zum Ändern von Konten oder Beträgen.",
-        "tot_deb": "Soll Gesamt",
-        "tot_crd": "Haben Gesamt",
-        "balanced": "✅ Ausgeglichen (Soll = Haben)",
-        "unbalanced": "⚠️ Differenz festgestellt!",
-        "download_btn": "📥 Excel Herunterladen (.xlsx)",
-        "download_eta": "💾 Datev Format (CSV)",
-        "download_luca": "💾 SAP Kompatibel",
-        "industries": [
-            "⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf",
-            "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"
-        ],
-        "themes": [
-            "🌑 Platin Titan",
-            "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
-        ],
-        "about_btn": "ℹ️ Funktionsweise & Philosophie",
-        "about_title": "LedgerAI Architektur & Mensch-KI Standard",
-        "about_content": "LedgerAI entlastet Buchhalter durch intelligente Vorkontierung unter ständiger Expertenkontrolle.",
-        "step1_title": "1. Belegprüfung",
-        "step1_desc": "Präzise Vorsteueraufteilung und USt-IdNr Validierung in Sekunden.",
-        "step2_title": "2. SKR03/04 Zuordnung",
-        "step2_desc": "Automatische Kontierung nach Wareneinkauf, Kosten oder Anlagevermögen.",
-        "step3_title": "3. Soll/Haben-Check",
-        "step3_desc": "Revisionssichere Prüfung auf mathematische Ausgeglichenheit.",
-        "badge_erp": "✓ DATEV SKR03/04 • SAP KOMPATIBEL",
-        "badge_audit": "✓ 100% SOLL/HABEN AUSGEGLICHENHEIT",
-        "badge_sec": "✓ DSGVO-KONFORME DATENVERARBEITUNG",
-        "bot_title": "👾 LedgerBot Finanzmentor",
-        "bot_welcome": "Hallo! Tippen Sie auf eine Frage oder fragen Sie mich direkt nach Buchungssätzen:",
-        "bot_placeholder": "Frage eingeben...",
-        "bot_clear": "🧹 Leeren",
-        "quick_chips": [
-            "💡 Wie spart es Arbeitszeit?",
-            "🔒 Datenschutz & Sicherheit",
-            "⚖️ Soll an Haben Prinzip"
-        ],
-        "headers": {
-            "vouch": "Beleg", "date": "Datum", "code": "Konto",
-            "name": "Bezeichnung", "desc": "Text", "curr": "Währung",
-            "deb": "Soll", "crd": "Haben"
-        }
-    },
-    "🇫🇷 FR": {
-        "badge": "TERMINAL COLLABORATIF IA + HUMAIN",
-        "title": "LedgerAI",
-        "subtitle": "L'IA prépare les imputations comptables; l'expert-comptable valide et approuve.",
-        "drop_title": "Déposer les pièces comptables ici",
-        "drop_sub": "Factures et reçus (PDF, PNG, JPG)",
-        "process_btn": "⚡ Générer les Écritures",
-        "limit_err": "🛑 Limite: 5 documents par lot.",
-        "ready_count": "Prêts: **{count}**",
-        "success": "✓ Écritures générées avec succès et équilibrées.",
-        "failed": "❌ Échec de lecture.",
-        "preview_title": "📊 Journal Comptable & Audit Expert",
-        "preview_tip": "💡 Double-cliquez sur une cellule pour modifier.",
-        "tot_deb": "Total Débit",
-        "tot_crd": "Total Crédit",
-        "balanced": "✅ Équilibré (Débit = Crédit)",
-        "unbalanced": "⚠️ Déséquilibre Détecté!",
-        "download_btn": "📥 Télécharger Excel (.xlsx)",
-        "download_eta": "💾 Format Standard PCG",
-        "download_luca": "💾 Sage / Cegid Ready",
-        "industries": [
-            "⚡ Auto (IA)", "🛒 Négoce / Stock",
-            "🏢 Services / Conseil", "🏭 Production / Industrie"
-        ],
-        "themes": [
-            "🌑 Platine Titane",
-            "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
-        ],
-        "about_btn": "ℹ️ Fonctionnement & Philosophie",
-        "about_title": "Architecture LedgerAI & Co-Pilotage",
-        "about_content": "L'alliance de l'intelligence artificielle et du discernement de l'expert-comptable.",
-        "step1_title": "1. Lecture OCR",
-        "step1_desc": "Extraction des montants HT, TVA et identification du fournisseur.",
-        "step2_title": "2. Ventilation PCG",
-        "step2_desc": "Affectation automatique aux comptes de classe 6 selon l'activité.",
-        "step3_title": "3. Contrôle Débit/Crédit",
-        "step3_desc": "Vérification stricte de l'équilibre de chaque écriture de journal.",
-        "badge_erp": "✓ CONFORME PCG • SAGE & CEGID READY",
-        "badge_audit": "✓ ÉQUILIBRE DÉBIT/CRÉDIT GARANTI",
-        "badge_sec": "✓ SÉCURITÉ CONFORME RGPD",
-        "bot_title": "👾 LedgerBot Mentor",
-        "bot_welcome": "Bonjour! Choisissez une question rapide ou posez votre question comptable:",
-        "bot_placeholder": "Poser une question...",
-        "bot_clear": "🧹 Effacer",
-        "quick_chips": [
-            "💡 Gain de temps en cabinet",
-            "🔒 Sécurité des données",
-            "⚖️ Principe Débit / Crédit"
-        ],
-        "headers": {
-            "vouch": "Pièce", "date": "Date", "code": "Compte",
-            "name": "Libellé", "desc": "Détail", "curr": "Devise",
-            "deb": "Débit", "crd": "Crédit"
-        }
-    },
-    "🇪🇸 ES": {
-        "badge": "TERMINAL COLABORATIVO IA + HUMANO",
-        "title": "LedgerAI",
-        "subtitle": "La IA estructura los asientos contables; el asesor profesional revisa y valida.",
-        "drop_title": "Arrastra los documentos aquí o examina",
-        "drop_sub": "PDF, PNG, JPG • Facturas y recibos",
-        "process_btn": "⚡ Generar Asientos",
-        "limit_err": "🛑 Máximo 5 documentos por lote.",
-        "ready_count": "Listos: **{count}**",
-        "success": "✓ Asientos generados y equilibrados.",
-        "failed": "❌ Error al procesar.",
-        "preview_title": "📊 Libro Diario & Mesa de Control",
-        "preview_tip": "💡 Haz doble clic para modificar cuentas.",
-        "tot_deb": "Total Debe",
-        "tot_crd": "Total Haber",
-        "balanced": "✅ Cuadrado (Debe = Haber)",
-        "unbalanced": "⚠️ Descuadre Detectado!",
-        "download_btn": "📥 Descargar Excel (.xlsx)",
-        "download_eta": "💾 Formato Contasol",
-        "download_luca": "💾 A3 / Sage Ready",
-        "industries": [
-            "⚡ Automático (IA)", "🛒 Comercio / Inventario",
-            "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"
-        ],
-        "themes": [
-            "🌑 Platino Titanio",
-            "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
-        ],
-        "about_btn": "ℹ️ Filosofía y Seguridad",
-        "about_title": "Arquitectura y Simbiosis Humano-IA",
-        "about_content": "Potenciando al contador mediante automatización sin sustituir su criterio profesional.",
-        "step1_title": "1. Análisis de Factura",
-        "step1_desc": "Lectura OCR avanzada de bases imponibles y tipos impositivos.",
-        "step2_title": "2. Asignación PGC",
-        "step2_desc": "Distribución en cuentas de gastos o existencias según la empresa.",
-        "step3_title": "3. Cuadre de Asiento",
-        "step3_desc": "Garantía matemática de que el Debe coincide con el Haber.",
-        "badge_erp": "✓ COMPATIBLE A3 • SAGE • SOFTWARE FISCAL",
-        "badge_audit": "✓ CUADRE DEBE = HABER GARANTIZADO",
-        "badge_sec": "✓ CIFRADO DE DATOS BANCARIO",
-        "bot_title": "👾 LedgerBot Mentor",
-        "bot_welcome": "¡Hola! Pulsa una pregunta rápida o escribe tu consulta contable:",
-        "bot_placeholder": "Escribe tu duda...",
-        "bot_clear": "🧹 Limpiar",
-        "quick_chips": [
-            "💡 Ventajas para la asesoría",
-            "🔒 Seguridad y confidencialidad",
-            "⚖️ Cuadre de Debe y Haber"
-        ],
-        "headers": {
-            "vouch": "Asiento", "date": "Fecha", "code": "Cuenta",
-            "name": "Nombre Cuenta", "desc": "Concepto", "curr": "Moneda",
-            "deb": "Debe", "crd": "Haber"
-        }
-    },
-    "🇮🇹 IT": {
-        "badge": "TERMINALE COLLABORATIVO IA + UOMO",
-        "title": "LedgerAI",
-        "subtitle": "L'IA prepara le scritture contabili; il commercialista esperto valida e autorizza.",
-        "drop_title": "Trascina qui le fatture o cerca file",
-        "drop_sub": "PDF, PNG, JPG • Ricevute e fatture",
-        "process_btn": "⚡ Genera Scritture",
-        "limit_err": "🛑 Massimo 5 documenti.",
-        "ready_count": "Pronti: **{count}**",
-        "success": "✓ Scritture generate e bilanciate.",
-        "failed": "❌ Impossibile elaborare.",
-        "preview_title": "📊 Prima Nota & Centro di Controllo",
-        "preview_tip": "💡 Fai doppio clic per modificare.",
-        "tot_deb": "Totale Dare",
-        "tot_crd": "Totale Avere",
-        "balanced": "✅ Quadratura Perfetta",
-        "unbalanced": "⚠️ Sbilancio!",
-        "download_btn": "📥 Scarica Excel (.xlsx)",
-        "download_eta": "💾 Formato Zucchetti",
-        "download_luca": "💾 Teamsystem Ready",
-        "industries": [
-            "⚡ Automatico (IA)", "🛒 Commercio / Magazzino",
-            "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"
-        ],
-        "themes": [
-            "🌑 Platino Titanio",
-            "✨ Ultra Vivid Aurora",
-            "🌌 Cyberpunk Night"
-        ],
-        "about_btn": "ℹ️ Filosofia e Sicurezza",
-        "about_title": "Architettura di Collaborazione Uomo-IA",
-        "about_content": "Automazione contabile trasparente che esalta il valore del consulente aziendale.",
-        "step1_title": "1. Acquisizione Dati",
-        "step1_desc": "Scansione OCR di aliquote IVA, imponibili e fornitore.",
-        "step2_title": "2. Piano dei Conti",
-        "step2_desc": "Classificazione tra costi di gestione, merci o cespiti ammortizzabili.",
-        "step3_title": "3. Quadratura Dare/Avere",
-        "step3_desc": "Verifica della perfetta parità contabile della scrittura.",
-        "badge_erp": "✓ PRONTO PER ZUCCHETTI • TEAMSYSTEM • SAP",
-        "badge_audit": "✓ QUADRATURA DARE/AVERE GARANTITA",
-        "badge_sec": "✓ PROTEZIONE DATI STANDARD BANCARIO",
-        "bot_title": "👾 LedgerBot Mentor",
-        "bot_welcome": "Ciao! Seleziona una domanda pillola o scrivimi direttamente:",
-        "bot_placeholder": "Fai una domanda contabile...",
-        "bot_clear": "🧹 Cancella",
-        "quick_chips": [
-            "💡 Vantaggi per lo studio",
-            "🔒 Sicurezza dei dati fiscali",
-            "⚖️ Pareggio Dare / Avere"
-        ],
-        "headers": {
-            "vouch": "Partita", "date": "Data", "code": "Conto",
-            "name": "Descrizione", "desc": "Causale", "curr": "Valuta",
-            "deb": "Dare", "crd": "Avere"
         }
     }
 }
@@ -422,7 +210,7 @@ if st.session_state["user_lang"] not in LANG_DATA:
 T = LANG_DATA[st.session_state["user_lang"]]
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (GERÇEK GITHUB HAPI MİKRO BUTONLARI & WHİTELABEL)
+# 3. DYNAMIC STYLING ENGINE (KOKPİT DÜZENİ & GITHUB.COM MİKRO HAPLARI)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -499,215 +287,165 @@ st.markdown(f"""
     
     .stApp {{
         color: #F8FAFC;
-        padding-top: 15px;
-        padding-bottom: 70px;
+        padding-top: 10px;
+        padding-bottom: 60px;
     }}
 
-    /* MASTER GLASS TERMINAL */
-    .master-console {{
-        max-width: 980px;
-        margin: 10px auto 0 auto;
+    /* DUAL WING COCKPIT CONSOLE (MASAÜSTÜNDE BOŞLUĞU BİTİREN KART) */
+    .cockpit-card {{
         background: rgba(30, 41, 59, 0.72);
         border: 1px solid rgba(255, 255, 255, 0.16);
-        border-radius: 28px;
+        border-radius: 24px;
         backdrop-filter: blur(28px);
         -webkit-backdrop-filter: blur(28px);
-        padding: clamp(24px, 4vw, 40px) clamp(18px, 4vw, 44px);
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 
-                    inset 0 1px 0 rgba(255, 255, 255, 0.22);
-        text-align: center;
+        padding: clamp(20px, 3vw, 32px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 
+                    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+        height: 100%;
     }}
 
     .top-badge {{
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 5px 16px;
+        padding: 4px 14px;
         background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.20);
+        border: 1px solid rgba(255, 255, 255, 0.18);
         border-radius: 9999px;
-        font-size: clamp(0.65rem, 1vw, 0.72rem);
+        font-size: 0.68rem;
         font-weight: 700;
-        letter-spacing: 1.4px;
+        letter-spacing: 1.2px;
         color: #E2E8F0;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         text-transform: uppercase;
     }}
 
     .hero-title {{
-        font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+        font-size: clamp(2.0rem, 3.5vw, 2.7rem);
         font-weight: 800;
         letter-spacing: -1.2px;
         background: linear-gradient(135deg, #FFFFFF 40%, #CBD5E1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         line-height: 1.05;
     }}
     
     .hero-sub {{
-        font-size: clamp(0.88rem, 1.5vw, 0.98rem);
+        font-size: 0.90rem;
         color: #CBD5E1;
         font-weight: 400;
-        line-height: 1.5;
-        max-width: 660px;
-        margin: 0 auto 24px auto;
+        line-height: 1.45;
+        margin-bottom: 18px;
     }}
 
     /* FILE UPLOADER */
     div[data-testid="stFileUploader"] {{
         background: rgba(15, 23, 42, 0.65);
-        border: 1px dashed rgba(255, 255, 255, 0.25);
-        border-radius: 20px;
-        padding: 24px 16px;
+        border: 1px dashed rgba(255, 255, 255, 0.22);
+        border-radius: 18px;
+        padding: 18px 14px;
         transition: all 0.25s ease;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }}
     div[data-testid="stFileUploader"]:hover {{
         border-color: rgba(203, 213, 225, 0.9);
-        box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
         background: rgba(30, 41, 59, 0.8);
     }}
 
-    /* İŞLEM BUTONU: KURUMSAL GİTHUB HAPI */
+    /* GITHUB.COM BALONU ŞEKLİNDE SİYAH OVAL İŞLEM BUTONU */
     div.stButton > button:first-child {{
         background: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
         border-radius: 9999px !important;
         font-weight: 700 !important;
-        font-size: clamp(0.92rem, 1.3vw, 1.02rem) !important;
-        padding: 12px 34px !important;
+        font-size: 0.92rem !important;
+        padding: 10px 28px !important;
         color: #FFFFFF !important;
-        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6) !important;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        margin-top: 6px !important;
-        letter-spacing: 0.3px !important;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        letter-spacing: 0.2px !important;
     }}
     div.stButton > button:first-child:hover {{
         background: #111827 !important;
         border-color: rgba(255, 255, 255, 0.6) !important;
-        box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 6px 25px rgba(255, 255, 255, 0.2) !important;
         transform: scale(1.02) !important;
     }}
 
-    /* SÜREÇ KARTLARI */
-    .steps-container {{
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 16px;
-        margin: 24px auto 0 auto;
-        text-align: left;
+    /* SAĞ KANAT KARTLARI */
+    .cockpit-info-box {{
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        backdrop-filter: blur(10px);
+        transition: all 0.2s;
     }}
-    .step-card {{
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: 18px;
-        padding: 16px 18px;
-        backdrop-filter: blur(12px);
-        transition: all 0.25s;
+    .cockpit-info-box:hover {{
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.2);
     }}
-    .step-card:hover {{
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.25);
-        transform: translateY(-2px);
-    }}
-    .step-title {{
-        font-size: 0.84rem;
+    .cockpit-info-title {{
+        font-size: 0.82rem;
         font-weight: 700;
         color: #F8FAFC;
         margin-bottom: 4px;
     }}
-    .step-desc {{
+    .cockpit-info-desc {{
         font-size: 0.74rem;
         color: #CBD5E1;
-        line-height: 1.45;
+        line-height: 1.4;
     }}
 
-    /* TRUST BADGES */
-    .trust-grid {{
+    /* MİKRO KONTROL ŞERİDİ (GITHUB.COM HAPLARI) */
+    .micro-dock {{
         display: flex;
-        justify-content: center;
         align-items: center;
-        gap: 20px;
+        gap: 8px;
         flex-wrap: wrap;
-        margin: 22px auto 0 auto;
-        padding-top: 18px;
-        border-top: 1px solid rgba(255, 255, 255, 0.10);
-    }}
-    .trust-item {{
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.8px;
-        color: #CBD5E1;
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
     }}
 
-    /* KONSOL İÇİ KONTROL ÇUBUĞU */
-    .console-controls {{
-        margin-top: 20px;
-        padding-top: 16px;
-        border-top: 1px solid rgba(255, 255, 255, 0.10);
-    }}
-
-    /* GITHUB BALONU MİKRO HAP BUTONLARI (PILL BUTTONS) */
-    .github-pill {{
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 4px 14px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 9999px;
-        font-size: 0.76rem;
-        font-weight: 600;
-        color: #F8FAFC;
-        text-decoration: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        cursor: pointer;
-        white-space: nowrap;
-    }}
-    .github-pill:hover {{
-        background: rgba(255, 255, 255, 0.16);
-        border-color: rgba(255, 255, 255, 0.45);
-        transform: scale(1.04);
-        color: #FFFFFF;
-    }}
-
-    /* EXPANDER VE CHAT BUTONLARINI GİTHUB HAPINA ÇEVİRME */
+    /* ASİSTAN İÇİ MİKRO GITHUB HAPLARI */
     div[data-testid="stExpander"] div.stButton button {{
-        background: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(255, 255, 255, 0.20) !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
         border-radius: 9999px !important;
-        font-size: 0.75rem !important;
+        font-size: 0.74rem !important;
         font-weight: 600 !important;
         color: #F8FAFC !important;
         padding: 4px 14px !important;
         min-height: 28px !important;
         height: 28px !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
         transition: all 0.2s ease !important;
         white-space: nowrap !important;
-        margin-top: 0px !important;
         line-height: 1 !important;
+        margin-top: 0px !important;
     }}
     div[data-testid="stExpander"] div.stButton button:hover {{
-        background: rgba(255, 255, 255, 0.16) !important;
-        border-color: rgba(255, 255, 255, 0.5) !important;
+        background: rgba(255, 255, 255, 0.14) !important;
+        border-color: rgba(255, 255, 255, 0.45) !important;
         transform: scale(1.03) !important;
     }}
 
     .chat-scroll-area {{
-        max-height: 300px;
+        max-height: 280px;
         overflow-y: auto;
-        padding: 12px 14px;
+        padding: 10px 12px;
         background: rgba(15, 23, 42, 0.65);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 16px;
-        margin-bottom: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 14px;
+        margin-bottom: 10px;
     }}
-    .chat-scroll-area::-webkit-scrollbar {{ width: 6px; }}
+    .chat-scroll-area::-webkit-scrollbar {{ width: 5px; }}
     .chat-scroll-area::-webkit-scrollbar-thumb {{
-        background: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.2);
         border-radius: 4px;
     }}
 </style>
@@ -901,216 +639,216 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 6. MASTER USER INTERFACE & MINIMAL TERMINAL
+# 6. DUAL WING EXECUTIVE COCKPIT (MASAÜSTÜNDE BOŞLUĞU BİTİREN KOKPİT)
 # ==============================================================================
 
-# ANA KONSOL KARTI (GEREKSİZ DİKEY BUTONLAR TAMAMEN KALDIRILDI)
-st.markdown(f"""
-<div class='master-console'>
-    <div class='top-badge'>● {T['badge']}</div>
-    <div class='hero-title'>{T['title']}</div>
-    <div class='hero-sub'>{T['subtitle']}</div>
-""", unsafe_allow_html=True)
+col_left, col_right = st.columns([1.35, 1.0], gap="large")
 
-uploaded_files = st.file_uploader(
-    T["drop_title"],
-    type=["pdf", "png", "jpg", "jpeg"],
-    accept_multiple_files=True,
-    label_visibility="collapsed",
-    help=T["drop_sub"]
-)
+with col_left:
+    st.markdown(f"""
+    <div class='cockpit-card'>
+        <div class='top-badge'>● {T['badge']}</div>
+        <div class='hero-title'>{T['title']}</div>
+        <div class='hero-sub'>{T['subtitle']}</div>
+    """, unsafe_allow_html=True)
 
-if uploaded_files:
-    if len(uploaded_files) > 5:
-        st.error(T["limit_err"])
-    else:
-        st.markdown(f"<div style='text-align:center; font-size:0.9rem; margin-top:8px;'>{T['ready_count'].format(count=len(uploaded_files))}</div>", unsafe_allow_html=True)
+    uploaded_files = st.file_uploader(
+        T["drop_title"],
+        type=["pdf", "png", "jpg", "jpeg"],
+        accept_multiple_files=True,
+        label_visibility="collapsed",
+        help=T["drop_sub"]
+    )
 
-        if st.button(T["process_btn"], use_container_width=True):
-            start_time = time.time()
-            
-            industry_name = T["industries"][st.session_state["industry_idx"]]
-            directive = f"Company Profile: {industry_name}. "
-            if "Ticaret" in industry_name or "Retail" in industry_name:
-                directive += "Company operates in wholesale/retail trade. Core commercial goods MUST be classified as '153.01 Commercial Inventory' (or GAAP 1200). Office/fuel/meals are operating expenses (770)."
-            elif "Hizmet" in industry_name or "Services" in industry_name:
-                directive += "Company operates as a professional service/consulting provider. Classify project costs as 740 and overhead as 770."
-            elif "Üretim" in industry_name or "Manufacturing" in industry_name:
-                directive += "Company is a manufacturer. Raw material purchases MUST be '150 Raw Materials', factory expenses '730', administrative overhead '770'."
-            else:
-                directive += "Classify contextually: resale goods -> 153, operational supplies -> 770, capital equipment/computers -> 255."
+    if uploaded_files:
+        if len(uploaded_files) > 5:
+            st.error(T["limit_err"])
+        else:
+            st.markdown(f"<div style='font-size:0.85rem; margin:6px 0 10px 0; color:#A7F3D0;'>{T['ready_count'].format(count=len(uploaded_files))}</div>", unsafe_allow_html=True)
 
-            parsed_data = execute_document_audit(uploaded_files, directive)
-            st.session_state["raw_audit_results"] = parsed_data
+            if st.button(T["process_btn"], use_container_width=True):
+                start_time = time.time()
+                
+                industry_name = T["industries"][st.session_state["industry_idx"]]
+                directive = f"Company Profile: {industry_name}. "
+                if "Ticaret" in industry_name or "Retail" in industry_name:
+                    directive += "Company operates in wholesale/retail trade. Core commercial goods MUST be classified as '153.01 Commercial Inventory' (or GAAP 1200). Office/fuel/meals are operating expenses (770)."
+                elif "Hizmet" in industry_name or "Services" in industry_name:
+                    directive += "Company operates as a professional service/consulting provider. Classify project costs as 740 and overhead as 770."
+                elif "Üretim" in industry_name or "Manufacturing" in industry_name:
+                    directive += "Company is a manufacturer. Raw material purchases MUST be '150 Raw Materials', factory expenses '730', administrative overhead '770'."
+                else:
+                    directive += "Classify contextually: resale goods -> 153, operational supplies -> 770, capital equipment/computers -> 255."
 
-            if parsed_data:
-                headers = T["headers"]
-                voucher_lines = []
-                voucher_num = 1
+                parsed_data = execute_document_audit(uploaded_files, directive)
+                st.session_state["raw_audit_results"] = parsed_data
 
-                for item in parsed_data:
-                    curr = item.get("currency", "TL")
-                    inv_no = str(item.get("invoice_no") or "").strip()
-                    date_val = str(item.get("date") or datetime.date.today().strftime("%Y-%m-%d")).strip()
-                    vendor = str(item.get("vendor") or "Satıcı / Vendor").strip()
-                    tax_id = str(item.get("tax_id") or "").strip()
-                    acc_code = str(item.get("account_code") or "770.01").strip()
-                    acc_name = str(item.get("account_name") or "Gider Hesabı").strip()
+                if parsed_data:
+                    headers = T["headers"]
+                    voucher_lines = []
+                    voucher_num = 1
 
-                    net = round(float(item.get("net") or 0.0), 2)
-                    tax = round(float(item.get("tax") or 0.0), 2)
-                    total = round(float(item.get("total") or (net + tax)), 2)
-                    tax_rate = item.get("tax_rate") or 20
-                    withholding = round(float(item.get("withholding") or 0.0), 2)
-                    payable = round(float(item.get("payable_to_vendor") or 0.0), 2)
+                    for item in parsed_data:
+                        curr = item.get("currency", "TL")
+                        inv_no = str(item.get("invoice_no") or "").strip()
+                        date_val = str(item.get("date") or datetime.date.today().strftime("%Y-%m-%d")).strip()
+                        vendor = str(item.get("vendor") or "Satıcı / Vendor").strip()
+                        tax_id = str(item.get("tax_id") or "").strip()
+                        acc_code = str(item.get("account_code") or "770.01").strip()
+                        acc_name = str(item.get("account_name") or "Gider Hesabı").strip()
 
-                    # Matematiksel Tevkifat & Bakiye Koruma Motoru
-                    if payable > 0 and abs((net + tax) - payable) > 0.05 and withholding == 0:
-                        withholding = round((net + tax) - payable, 2)
-                    
-                    if payable == 0:
-                        payable = round((net + tax) - withholding, 2)
+                        net = round(float(item.get("net") or 0.0), 2)
+                        tax = round(float(item.get("tax") or 0.0), 2)
+                        total = round(float(item.get("total") or (net + tax)), 2)
+                        tax_rate = item.get("tax_rate") or 20
+                        withholding = round(float(item.get("withholding") or 0.0), 2)
+                        payable = round(float(item.get("payable_to_vendor") or 0.0), 2)
 
-                    clean_name = "".join(c for c in vendor[:12] if c.isalnum()).upper() or "CARİ"
-                    if "TR" in st.session_state["user_lang"]:
-                        ap_code = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
-                        tax_code = f"191.{int(tax_rate):02d}"
-                        tax_name = f"%{tax_rate} İndirilecek KDV"
-                        tevkifat_code = "360.01"
-                        tevkifat_name = "Ödenecek KDV Tevkifatı / Stopaj"
-                    else:
-                        ap_code = f"2000-{tax_id}" if tax_id else f"VEND-{clean_name}"
-                        tax_code = f"2200-TAX{tax_rate}"
-                        tax_name = f"Sales Tax ({tax_rate}%)"
-                        tevkifat_code = "2250-WITHHOLDING"
-                        tevkifat_name = "Withholding Tax Payable"
+                        # Matematiksel Tevkifat & Bakiye Koruma Motoru
+                        if payable > 0 and abs((net + tax) - payable) > 0.05 and withholding == 0:
+                            withholding = round((net + tax) - payable, 2)
+                        
+                        if payable == 0:
+                            payable = round((net + tax) - withholding, 2)
 
-                    # 1. BORÇ: Gider / Mal Alışı
-                    voucher_lines.append({
-                        headers["vouch"]: voucher_num,
-                        headers["date"]: date_val,
-                        headers["code"]: acc_code,
-                        headers["name"]: acc_name,
-                        headers["desc"]: f"{vendor} - {inv_no}",
-                        headers["curr"]: curr,
-                        headers["deb"]: net,
-                        headers["crd"]: 0.0
-                    })
+                        clean_name = "".join(c for c in vendor[:12] if c.isalnum()).upper() or "CARİ"
+                        if "TR" in st.session_state["user_lang"]:
+                            ap_code = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
+                            tax_code = f"191.{int(tax_rate):02d}"
+                            tax_name = f"%{tax_rate} İndirilecek KDV"
+                            tevkifat_code = "360.01"
+                            tevkifat_name = "Ödenecek KDV Tevkifatı / Stopaj"
+                        else:
+                            ap_code = f"2000-{tax_id}" if tax_id else f"VEND-{clean_name}"
+                            tax_code = f"2200-TAX{tax_rate}"
+                            tax_name = f"Sales Tax ({tax_rate}%)"
+                            tevkifat_code = "2250-WITHHOLDING"
+                            tevkifat_name = "Withholding Tax Payable"
 
-                    # 2. BORÇ: KDV Tutarı
-                    if tax > 0:
+                        # 1. BORÇ: Gider / Mal Alışı
                         voucher_lines.append({
                             headers["vouch"]: voucher_num,
                             headers["date"]: date_val,
-                            headers["code"]: tax_code,
-                            headers["name"]: tax_name,
-                            headers["desc"]: f"{vendor} - KDV",
+                            headers["code"]: acc_code,
+                            headers["name"]: acc_name,
+                            headers["desc"]: f"{vendor} - {inv_no}",
                             headers["curr"]: curr,
-                            headers["deb"]: tax,
+                            headers["deb"]: net,
                             headers["crd"]: 0.0
                         })
 
-                    # 3. ALACAK: Tevkifat / Stopaj (Varsa)
-                    if withholding > 0:
+                        # 2. BORÇ: KDV Tutarı
+                        if tax > 0:
+                            voucher_lines.append({
+                                headers["vouch"]: voucher_num,
+                                headers["date"]: date_val,
+                                headers["code"]: tax_code,
+                                headers["name"]: tax_name,
+                                headers["desc"]: f"{vendor} - KDV",
+                                headers["curr"]: curr,
+                                headers["deb"]: tax,
+                                headers["crd"]: 0.0
+                            })
+
+                        # 3. ALACAK: Tevkifat / Stopaj (Varsa)
+                        if withholding > 0:
+                            voucher_lines.append({
+                                headers["vouch"]: voucher_num,
+                                headers["date"]: date_val,
+                                headers["code"]: tevkifat_code,
+                                headers["name"]: tevkifat_name,
+                                headers["desc"]: f"{vendor} - Tevkifat/Kesinti",
+                                headers["curr"]: curr,
+                                headers["deb"]: 0.0,
+                                headers["crd"]: withholding
+                            })
+
+                        # 4. ALACAK: Satıcı Cari Hesabı (Net Ödenecek Tutar)
                         voucher_lines.append({
                             headers["vouch"]: voucher_num,
                             headers["date"]: date_val,
-                            headers["code"]: tevkifat_code,
-                            headers["name"]: tevkifat_name,
-                            headers["desc"]: f"{vendor} - Tevkifat/Kesinti",
+                            headers["code"]: ap_code,
+                            headers["name"]: vendor,
+                            headers["desc"]: f"{vendor} - {inv_no}",
                             headers["curr"]: curr,
                             headers["deb"]: 0.0,
-                            headers["crd"]: withholding
+                            headers["crd"]: payable
                         })
 
-                    # 4. ALACAK: Satıcı Cari Hesabı (Net Ödenecek Tutar)
-                    voucher_lines.append({
-                        headers["vouch"]: voucher_num,
-                        headers["date"]: date_val,
-                        headers["code"]: ap_code,
-                        headers["name"]: vendor,
-                        headers["desc"]: f"{vendor} - {inv_no}",
-                        headers["curr"]: curr,
-                        headers["deb"]: 0.0,
-                        headers["crd"]: payable
-                    })
+                        voucher_num += 1
 
-                    voucher_num += 1
+                    st.session_state["out_df"] = pd.DataFrame(voucher_lines)
+                    st.session_state["h_deb"] = headers["deb"]
+                    st.session_state["h_crd"] = headers["crd"]
+                    st.session_state["last_processing_time"] = round(time.time() - start_time, 2)
+                    st.session_state["processed_docs_count"] = len(parsed_data)
+                    st.success(f"{T['success']} ({st.session_state['last_processing_time']} sn)")
 
-                st.session_state["out_df"] = pd.DataFrame(voucher_lines)
-                st.session_state["h_deb"] = headers["deb"]
-                st.session_state["h_crd"] = headers["crd"]
-                st.session_state["last_processing_time"] = round(time.time() - start_time, 2)
-                st.session_state["processed_docs_count"] = len(parsed_data)
-                st.success(f"{T['success']} ({st.session_state['last_processing_time']} sn)")
+    # KONSOL İÇİ MİKRO KONTROL ŞERİDİ (GITHUB.COM HAPLARI ŞEKLİNDE HİZALANDI)
+    st.markdown("<div class='micro-dock'>", unsafe_allow_html=True)
+    c_m1, c_m2, c_m3, c_m4 = st.columns([1.8, 3.2, 3.2, 1.8])
+    with c_m1:
+        lang_keys = list(LANG_DATA.keys())
+        curr_lang_idx = lang_keys.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in lang_keys else 0
+        new_lang = st.selectbox("Dil", lang_keys, index=curr_lang_idx, label_visibility="collapsed")
+        if new_lang != st.session_state["user_lang"]:
+            st.session_state["user_lang"] = new_lang
+            st.rerun()
+    with c_m2:
+        new_theme_str = st.selectbox("Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
+        new_t_idx = T["themes"].index(new_theme_str)
+        if new_t_idx != st.session_state["theme_idx"]:
+            st.session_state["theme_idx"] = new_t_idx
+            st.rerun()
+    with c_m3:
+        new_industry_str = st.selectbox("Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
+        new_i_idx = T["industries"].index(new_industry_str)
+        if new_i_idx != st.session_state["industry_idx"]:
+            st.session_state["industry_idx"] = new_i_idx
+            st.rerun()
+    with c_m4:
+        with st.popover(T["about_btn"]):
+            st.markdown(f"#### {T['about_title']}")
+            st.markdown(T["about_content"])
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
-# 3 Adımlı Süreç Kartları & Güven Rozetleri
-st.markdown(f"""
-    <div class='steps-container'>
-        <div class='step-card'>
-            <div class='step-title'>⚡ {T['step1_title']}</div>
-            <div class='step-desc'>{T['step1_desc']}</div>
+with col_right:
+    # SAĞ KANAT: KURUMSAL GÜVEN, DENETİM VE CANLI OPERASYON KARTI
+    st.markdown(f"""
+    <div class='cockpit-card'>
+        <div style='font-size:0.75rem; font-weight:800; letter-spacing:1px; color:#94A3B8; text-transform:uppercase; margin-bottom:12px;'>
+            🛡️ Kurumsal Finans & Güvence Masası
         </div>
-        <div class='step-card'>
-            <div class='step-title'>🎯 {T['step2_title']}</div>
-            <div class='step-desc'>{T['step2_desc']}</div>
+        <div class='cockpit-info-box'>
+            <div class='cockpit-info-title'>{T['cockpit_card1_title']}</div>
+            <div class='cockpit-info-desc'>{T['cockpit_card1_desc']}</div>
         </div>
-        <div class='step-card'>
-            <div class='step-title'>⚖️ {T['step3_title']}</div>
-            <div class='step-desc'>{T['step3_desc']}</div>
+        <div class='cockpit-info-box'>
+            <div class='cockpit-info-title'>{T['cockpit_card2_title']}</div>
+            <div class='cockpit-info-desc'>{T['cockpit_card2_desc']}</div>
+        </div>
+        <div class='cockpit-info-box'>
+            <div class='cockpit-info-title'>{T['cockpit_card3_title']}</div>
+            <div class='cockpit-info-desc'>{T['cockpit_card3_desc']}</div>
+        </div>
+        <div style='display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:10px 14px; background:rgba(0,0,0,0.25); border-radius:12px;'>
+            <span style='font-size:0.75rem; color:#A7F3D0;'>✓ %100 Bakiye Garantisi</span>
+            <span style='font-size:0.75rem; color:#CBD5E1;'>ETA • Luca • Datev Ready</span>
         </div>
     </div>
-    <div class='trust-grid'>
-        <div class='trust-item'>{T['badge_erp']}</div>
-        <div class='trust-item'>{T['badge_audit']}</div>
-        <div class='trust-item'>{T['badge_sec']}</div>
-    </div>
-""", unsafe_allow_html=True)
-
-# KONSOL İÇİ KONTROL ÇUBUĞU (TEMA, DİL VE SEKTÖR TEK SIRADA DÜZENLİ)
-st.markdown("<div class='console-controls'>", unsafe_allow_html=True)
-c_ctrl1, c_ctrl2, c_ctrl3, c_ctrl4 = st.columns([1.8, 3.2, 3.2, 1.8])
-
-with c_ctrl1:
-    lang_keys = list(LANG_DATA.keys())
-    curr_lang_idx = lang_keys.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in lang_keys else 0
-    new_lang = st.selectbox("Language / Dil", lang_keys, index=curr_lang_idx, label_visibility="collapsed")
-    if new_lang != st.session_state["user_lang"]:
-        st.session_state["user_lang"] = new_lang
-        st.rerun()
-
-with c_ctrl2:
-    new_theme_str = st.selectbox("Theme / Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
-    new_t_idx = T["themes"].index(new_theme_str)
-    if new_t_idx != st.session_state["theme_idx"]:
-        st.session_state["theme_idx"] = new_t_idx
-        st.rerun()
-
-with c_ctrl3:
-    new_industry_str = st.selectbox("Industry / Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
-    new_i_idx = T["industries"].index(new_industry_str)
-    if new_i_idx != st.session_state["industry_idx"]:
-        st.session_state["industry_idx"] = new_i_idx
-        st.rerun()
-
-with c_ctrl4:
-    with st.popover(T["about_btn"]):
-        st.markdown(f"#### {T['about_title']}")
-        st.markdown(T["about_content"])
-
-st.markdown("</div></div>", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 # ==============================================================================
 # 7. INTERACTIVE JOURNAL VOUCHER GRID, FILTERS & AUDIT CENTER
 # ==============================================================================
 
 if st.session_state["out_df"] is not None:
-    st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
     st.subheader(T["preview_title"])
     st.caption(T["preview_tip"])
 
     headers = T["headers"]
-    st.markdown("<div style='background:rgba(30,41,59,0.55); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:10px 16px; margin-bottom:14px;'>", unsafe_allow_html=True)
+    st.markdown("<div style='background:rgba(30,41,59,0.55); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:10px 16px; margin-bottom:14px;'>", unsafe_allow_html=True)
     f_col1, f_col2, f_col3 = st.columns([2.5, 3.5, 2])
     
     with f_col1:
@@ -1197,10 +935,10 @@ if st.session_state["out_df"] is not None:
         )
 
 # ==============================================================================
-# 8. MENTOR FINANS ASİSTANI (GITHUB.COM BALONU MİKRO BUTONLARI)
+# 8. MENTOR FINANS ASİSTANI (GITHUB.COM BALONU MİKRO HAPLAR)
 # ==============================================================================
 
-st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
 c_bot_l, c_bot_center, c_bot_r = st.columns([1, 4, 1])
 
 with c_bot_center:
@@ -1212,20 +950,18 @@ with c_bot_center:
                 st.session_state["chat_messages"] = []
                 st.rerun()
 
-        # GITHUB.COM STİLİ MİKRO BALON BUTONLARI (KOLONSUZ, DEVLEŞMEYEN MİKRO HAPLAR)
+        # GITHUB.COM STİLİ ASLA YIĞILMAYAN MİKRO HAP BUTONLAR
         secilen_chip = None
-        st.markdown("<div style='display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;'>", unsafe_allow_html=True)
         btn_cols = st.columns(len(T["quick_chips"]))
         for c_idx, chip_text in enumerate(T["quick_chips"]):
             with btn_cols[c_idx]:
                 if st.button(chip_text, key=f"gh_pill_btn_{c_idx}", use_container_width=True):
                     secilen_chip = chip_text
-        st.markdown("</div>", unsafe_allow_html=True)
 
         # SCROLLABLE CHAT ALANI
         st.markdown("<div class='chat-scroll-area'>", unsafe_allow_html=True)
         if not st.session_state["chat_messages"]:
-            st.markdown(f"<div style='color: #94A3B8; font-size: 0.85rem; padding: 10px 0;'>💡 <i>{T['bot_placeholder']}</i></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='color: #94A3B8; font-size: 0.82rem; padding: 8px 0;'>💡 <i>{T['bot_placeholder']}</i></div>", unsafe_allow_html=True)
         else:
             for msg in st.session_state["chat_messages"][-6:]:
                 with st.chat_message(msg["role"]):
