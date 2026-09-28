@@ -2,9 +2,9 @@
 ================================================================================
 LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY ENGINE
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: Minimal GitHub Pill Style / Full-Width Executive Cockpit (Whitelabel)
+Design: Minimal Top-Right Circular Pill Dock / Dual-Wing Executive Cockpit
 Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, US GAAP
-Version: 5.3.0 Ultimate Production Edition
+Version: 5.4.0 Production Bugfix & Top-Dock Edition
 ================================================================================
 """
 
@@ -50,8 +50,7 @@ SESSION_DEFAULTS = {
     "academy_xp": 100,
     "academy_level": "Mali Stajyer",
     "puzzle_step": 1,
-    "current_dynamic_vaka": None,
-    "last_puzzle_success": None
+    "current_dynamic_vaka": None
 }
 
 for key, default_val in SESSION_DEFAULTS.items():
@@ -72,10 +71,6 @@ client = genai.Client(api_key=API_KEY)
 # ==============================================================================
 
 def generate_procedural_puzzle(step_num: int):
-    """
-    Her adımda rastgele şirket, tutar, KDV ve işlem türü türeterek 
-    sonsuz sayıda farklı muhasebe vakası üretir.
-    """
     sirketler = ["Atlas Lojistik A.Ş.", "Nova Yazılım Ltd.", "Zen Mimarlık A.Ş.", "Mega Tekstil Sanayi", "Orion Medya Ltd."]
     masraf_turleri = [
         {"ad": "Ofis İçi Kırtasiye & Arşiv Malzemeleri", "tur": "770", "tev": "yok", "oran": 20},
@@ -142,7 +137,7 @@ if st.session_state["current_dynamic_vaka"] is None:
     st.session_state["current_dynamic_vaka"] = generate_procedural_puzzle(st.session_state["puzzle_step"])
 
 # ==============================================================================
-# 3. LOCALIZATION DATA DICTIONARY (6 DİLDE ÇÖKMEYİ ÖNLEYEN EKSİKSİZ ANAHTARLAR)
+# 3. LOCALIZATION DATA DICTIONARY
 # ==============================================================================
 
 LANG_DATA = {
@@ -172,23 +167,19 @@ LANG_DATA = {
             "🏢 Hizmet & Ofis (770/740)",
             "🏭 Üretim & Fabrika (150/730)"
         ],
-        "themes": [
-            "Kurumsal",
-            "Modern",
-            "Akademi"
-        ],
-        "about_btn": "ℹ️ Mimarî & Standartlar",
-        "about_title": "LedgerAI Sistem Mimarisi & Regülasyon Standartları",
+        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "about_btn": "ℹ️ Hakkında",
+        "about_title": "LedgerAI Kurumsal Mimari & Regülasyon",
         "about_content": """
         ### 🛡️ Kurumsal Finans & Güvenlik Mimarisi
-        LedgerAI, Türkiye Tek Düzen Hesap Planı, VUK ve uluslararası finansal standartlara tam uyumlu bir otonom ön muhasebe altyapısıdır:
-        * **1. Çift Göz Prensibi (Dual Control):** Yapay zeka veri ayıklayıcı ve tasnif edici olarak çalışır; yasal defter kaydı yetkili SMMM/YMM onayına bağlıdır.
-        * **2. Tevkifat & Stopaj Ayrıştırma:** 5/10, 7/10, 9/10 KDV tevkifatlarını ve serbest meslek stopajlarını ayrı hesap kodlarına (360) dengeli olarak dağıtır.
-        * **3. Çift Bakiye Doğrulama:** Borç ve Alacak tutarları kuruşu kuruşuna eşitlenmeden sistem dışa aktarıma izin vermez.
-        * **4. ERP Entegrasyon Standartları:** ETA V.11, Luca, Logo, Zirve, Datev ve QuickBooks uyumlu veri çıktıları sağlar.
+        LedgerAI, Türkiye Tek Düzen Hesap Planı, VUK ve uluslararası finansal standartlara tam uyumlu otonom ön muhasebe terminalidir:
+        * **1. Çift Göz Prensibi:** Yapay zeka fiş taslağını oluşturur, yasal onay ve beyanname yetkisi SMMM/YMM'ye aittir.
+        * **2. Tevkifat & Stopaj Ayrıştırma:** 5/10, 7/10, 9/10 KDV tevkifatlarını ve serbest meslek stopajlarını ayrı hesaplara (360) dengeler.
+        * **3. Çift Bakiye Doğrulama:** Borç ve Alacak tutarları kuruşu kuruşuna eşitlenmeden fiş onaylanmaz.
+        * **4. ERP Uyumluluğu:** ETA V.11, Luca, Logo, Zirve, Datev ve QuickBooks uyumlu veri çıktıları sağlar.
         """,
         "bot_title": "👾 LedgerBot Finans Mentorü",
-        "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya fatura mantığını sormak için aşağıdaki hap sorulara tıklayabilirsin:",
+        "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya fatura mantığını sormak için aşağıdaki sorulara tıklayabilirsin:",
         "bot_placeholder": "Muhasebe sorunuzu yazın...",
         "bot_clear": "🧹 Temizle",
         "quick_chips": [
@@ -233,13 +224,9 @@ LANG_DATA = {
             "⚡ Auto Industry (AI)", "🛒 Retail / Inventory (1200)",
             "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"
         ],
-        "themes": [
-            "Kurumsal",
-            "Modern",
-            "Akademi"
-        ],
-        "about_btn": "ℹ️ Architecture & Standards",
-        "about_title": "LedgerAI Regulatory & Architectural Standards",
+        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "about_btn": "ℹ️ About",
+        "about_title": "LedgerAI Architecture & Regulation",
         "about_content": "Autonomous double-entry journal voucher generator compliant with US GAAP, IFRS and SOC2.",
         "bot_title": "👾 LedgerBot Finance Mentor",
         "bot_welcome": "Hi! I am your AI finance mentor. Tap any quick pill question below or ask me directly:",
@@ -262,218 +249,6 @@ LANG_DATA = {
             "name": "Account Name", "desc": "Memo", "curr": "Currency",
             "deb": "Debit", "crd": "Credit"
         }
-    },
-    "🇩🇪 DE": {
-        "badge": "MENSCH + KI FINANZTERMINAL",
-        "title": "LedgerAI",
-        "subtitle": "Autonome Belegerfassung und Datev-konforme Kontierung unter ständiger Expertenkontrolle.",
-        "drop_title": "Belege hier ablegen oder durchsuchen",
-        "drop_sub": "PDF, PNG, JPG • Rechnungen & Quittungen",
-        "process_btn": "⚡ Buchungssätze Erstellen",
-        "limit_err": "🛑 Maximal 5 Dokumente im Demo-Modus.",
-        "ready_count": "Bereit: **{count}**",
-        "success": "✓ Buchungen erfolgreich erstellt und ausgeglichen.",
-        "failed": "❌ Belege konnten nicht gelesen werden.",
-        "preview_title": "📊 Buchungszeilen & Kontrollzentrum",
-        "preview_tip": "💡 Doppelklick zum Ändern von Konten oder Beträgen.",
-        "tot_deb": "Soll Gesamt",
-        "tot_crd": "Haben Gesamt",
-        "balanced": "✅ Ausgeglichen (Soll = Haben)",
-        "unbalanced": "⚠️ Differenz festgestellt!",
-        "download_btn": "📥 Excel Herunterladen (.xlsx)",
-        "download_eta": "💾 Datev Format (CSV)",
-        "download_luca": "💾 SAP Kompatibel",
-        "industries": [
-            "⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf",
-            "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"
-        ],
-        "themes": [
-            "Kurumsal",
-            "Modern",
-            "Akademi"
-        ],
-        "about_btn": "ℹ️ Architektur & Datev",
-        "about_title": "LedgerAI Architektur & Datev SKR03/04 Standard",
-        "about_content": "Vollautomatisierte Buchungssatzerstellung nach GoBD und Datev-Richtlinien mit strengem Soll/Haben-Ausgleich.",
-        "bot_title": "👾 LedgerBot Finanzmentor",
-        "bot_welcome": "Hallo! Tippen Sie auf eine Frage oder fragen Sie mich direkt nach Buchungssätzen:",
-        "bot_placeholder": "Frage eingeben...",
-        "bot_clear": "🧹 Leeren",
-        "quick_chips": [
-            "💡 Wie spart es Arbeitszeit?",
-            "🔒 Datenschutz & Sicherheit",
-            "⚖️ Soll an Haben Prinzip"
-        ],
-        "cockpit_card1_title": "🏛️ Vorsteuer- & Steuerlogik",
-        "cockpit_card1_desc": "Automatische Zuordnung von SKR03/04 Vorsteuern und USt-IdNr Validierung.",
-        "cockpit_card2_title": "⚡ Datev Export",
-        "cockpit_card2_desc": "Direkter Datev-konformer CSV-Export für das Steuerbüro.",
-        "cockpit_card3_title": "🛡️ Soll/Haben Garantie",
-        "cockpit_card3_desc": "Mathematische Prüfung auf absolute Ausgeglichenheit der Buchungssätze.",
-        "headers": {
-            "vouch": "Beleg", "date": "Datum", "code": "Konto",
-            "name": "Bezeichnung", "desc": "Text", "curr": "Währung",
-            "deb": "Soll", "crd": "Haben"
-        }
-    },
-    "🇫🇷 FR": {
-        "badge": "TERMINAL COLLABORATIF IA + HUMAIN",
-        "title": "LedgerAI",
-        "subtitle": "L'IA prépare les imputations comptables; l'expert-comptable valide et approuve.",
-        "drop_title": "Déposer les pièces comptables ici",
-        "drop_sub": "Factures et reçus (PDF, PNG, JPG)",
-        "process_btn": "⚡ Générer les Écritures",
-        "limit_err": "🛑 Limite: 5 documents par lot.",
-        "ready_count": "Prêts: **{count}**",
-        "success": "✓ Écritures générées avec succès et équilibrées.",
-        "failed": "❌ Échec de lecture.",
-        "preview_title": "📊 Journal Comptable & Audit Expert",
-        "preview_tip": "💡 Double-cliquez sur une cellule pour modifier.",
-        "tot_deb": "Total Débit",
-        "tot_crd": "Total Crédit",
-        "balanced": "✅ Équilibré (Débit = Crédit)",
-        "unbalanced": "⚠️ Déséquilibre Détecté!",
-        "download_btn": "📥 Télécharger Excel (.xlsx)",
-        "download_eta": "💾 Format Standard PCG",
-        "download_luca": "💾 Sage / Cegid Ready",
-        "industries": [
-            "⚡ Auto (IA)", "🛒 Négoce / Stock",
-            "🏢 Services / Conseil", "🏭 Production / Industrie"
-        ],
-        "themes": [
-            "Kurumsal",
-            "Modern",
-            "Akademi"
-        ],
-        "about_btn": "ℹ️ Architecture & Normes",
-        "about_title": "Architecture Comptable & Normes PCG",
-        "about_content": "Conformité Plan Comptable Général (PCG) avec vérification stricte du principe Débit = Crédit.",
-        "bot_title": "👾 LedgerBot Mentor",
-        "bot_welcome": "Bonjour! Choisissez une question rapide ou posez votre question comptable:",
-        "bot_placeholder": "Poser une question...",
-        "bot_clear": "🧹 Effacer",
-        "quick_chips": [
-            "💡 Gain de temps en cabinet",
-            "🔒 Sécurité des données",
-            "⚖️ Principe Débit / Crédit"
-        ],
-        "cockpit_card1_title": "🏛️ Ventilation PCG",
-        "cockpit_card1_desc": "Affectation automatique aux comptes de charges et TVA déductible.",
-        "cockpit_card2_title": "⚡ Formats Export",
-        "cockpit_card2_desc": "Compatible avec les logiciels Sage, Cegid et tableur multi-feuilles.",
-        "cockpit_card3_title": "🛡️ Équilibre Débit/Crédit",
-        "cockpit_card3_desc": "Vérification stricte de la balance avant validation finale.",
-        "headers": {
-            "vouch": "Pièce", "date": "Date", "code": "Compte",
-            "name": "Libellé", "desc": "Détail", "curr": "Devise",
-            "deb": "Débit", "crd": "Crédit"
-        }
-    },
-    "🇪🇸 ES": {
-        "badge": "TERMINAL COLABORATIVO IA + HUMANO",
-        "title": "LedgerAI",
-        "subtitle": "La IA estructura los asientos contables; el asesor profesional revisa y valida.",
-        "drop_title": "Arrastra los documentos aquí o examina",
-        "drop_sub": "PDF, PNG, JPG • Facturas y recibos",
-        "process_btn": "⚡ Generar Asientos",
-        "limit_err": "🛑 Máximo 5 documentos por lote.",
-        "ready_count": "Listos: **{count}**",
-        "success": "✓ Asientos generados y equilibrados.",
-        "failed": "❌ Error al procesar.",
-        "preview_title": "📊 Libro Diario & Mesa de Control",
-        "preview_tip": "💡 Haz doble clic para modificar cuentas.",
-        "tot_deb": "Total Debe",
-        "tot_crd": "Total Haber",
-        "balanced": "✅ Cuadrado (Debe = Haber)",
-        "unbalanced": "⚠️ Descuadre Detectado!",
-        "download_btn": "📥 Descargar Excel (.xlsx)",
-        "download_eta": "💾 Formato Contasol",
-        "download_luca": "💾 A3 / Sage Ready",
-        "industries": [
-            "⚡ Automático (IA)", "🛒 Comercio / Inventario",
-            "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"
-        ],
-        "themes": [
-            "Kurumsal",
-            "Modern",
-            "Akademi"
-        ],
-        "about_btn": "ℹ️ Normativa y PGC",
-        "about_title": "Estándares Contables y Seguridad Fiscal",
-        "about_content": "Asientos contables conformes al Plan General Contable (PGC) con cuadre matemático de Debe y Haber.",
-        "bot_title": "👾 LedgerBot Mentor",
-        "bot_welcome": "¡Hola! Pulsa una pregunta rápida o escribe tu consulta contable:",
-        "bot_placeholder": "Escribe tu duda...",
-        "bot_clear": "🧹 Limpiar",
-        "quick_chips": [
-            "💡 Ventajas para la asesoría",
-            "🔒 Seguridad y confidencialidad",
-            "⚖️ Cuadre de Debe y Haber"
-        ],
-        "cockpit_card1_title": "🏛️ Cuadre Fiscal",
-        "cockpit_card1_desc": "Gestión automática de retenciones e IVA soportado.",
-        "cockpit_card2_title": "⚡ Compatibilidad ERP",
-        "cockpit_card2_desc": "Exportación directa para Contasol, A3 y software contable estándar.",
-        "cockpit_card3_title": "🛡️ Control de Asiento",
-        "cockpit_card3_desc": "Validación matemática estricta de paridad Debe = Haber.",
-        "headers": {
-            "vouch": "Asiento", "date": "Fecha", "code": "Cuenta",
-            "name": "Nombre Cuenta", "desc": "Concepto", "curr": "Moneda",
-            "deb": "Debe", "crd": "Haber"
-        }
-    },
-    "🇮🇹 IT": {
-        "badge": "TERMINALE COLLABORATIVO IA + UOMO",
-        "title": "LedgerAI",
-        "subtitle": "L'IA prepara le scritture contabili; il commercialista esperto valida e autorizza.",
-        "drop_title": "Trascina qui le fatture o cerca file",
-        "drop_sub": "PDF, PNG, JPG • Ricevute e fatture",
-        "process_btn": "⚡ Genera Scritture",
-        "limit_err": "🛑 Massimo 5 documenti.",
-        "ready_count": "Pronti: **{count}**",
-        "success": "✓ Scritture generate e bilanciate.",
-        "failed": "❌ Impossibile elaborare.",
-        "preview_title": "📊 Prima Nota & Centro di Controllo",
-        "preview_tip": "💡 Fai doppio clic per modificare.",
-        "tot_deb": "Totale Dare",
-        "tot_crd": "Totale Avere",
-        "balanced": "✅ Quadratura Perfetta",
-        "unbalanced": "⚠️ Sbilancio!",
-        "download_btn": "📥 Scarica Excel (.xlsx)",
-        "download_eta": "💾 Formato Zucchetti",
-        "download_luca": "💾 Teamsystem Ready",
-        "industries": [
-            "⚡ Automatico (IA)", "🛒 Commercio / Magazzino",
-            "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"
-        ],
-        "themes": [
-            "Kurumsal",
-            "Modern",
-            "Akademi"
-        ],
-        "about_btn": "ℹ️ Architettura & Norme",
-        "about_title": "Standard di Conformità e Partita Doppia",
-        "about_content": "Generazione automatica di scritture in partita doppia perfettamente bilanciate per gestionali Zucchetti e Teamsystem.",
-        "bot_title": "👾 LedgerBot Mentor",
-        "bot_welcome": "Ciao! Seleziona una domanda pillola o scrivimi direttamente:",
-        "bot_placeholder": "Fai una domanda contabile...",
-        "bot_clear": "🧹 Cancella",
-        "quick_chips": [
-            "💡 Vantaggi per lo studio",
-            "🔒 Sicurezza dei dati fiscali",
-            "⚖️ Pareggio Dare / Avere"
-        ],
-        "cockpit_card1_title": "🏛️ Scritture Bilanciate",
-        "cockpit_card1_desc": "Gestione automatica ritenute d'acconto ed IVA a credito.",
-        "cockpit_card2_title": "⚡ Compatibilità Gestionale",
-        "cockpit_card2_desc": "File pronti per Zucchetti, Teamsystem e formati Excel avanzati.",
-        "cockpit_card3_title": "🛡️ Quadratura Certificata",
-        "cockpit_card3_desc": "Garanzia matematica di parità tra totale Dare e Avere.",
-        "headers": {
-            "vouch": "Partita", "date": "Data", "code": "Conto",
-            "name": "Descrizione", "desc": "Causale", "curr": "Valuta",
-            "deb": "Dare", "crd": "Avere"
-        }
     }
 }
 
@@ -482,12 +257,21 @@ if st.session_state["user_lang"] not in LANG_DATA:
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
+INSTANT_FAQ_CACHE = {
+    "💡 Muhasebeciye ne kazandırır?": "LedgerAI, manuel veri girişini %80 azaltarak mali müşavirlerin rutin fiş işleme yükünü ortadan kaldırır. Yapay zeka fiş taslağını oluşturur, uzman insan sadece onaylar ve denetler.",
+    "🔒 Verilerim güvende mi?": "Evet. Tüm finansal verileriniz TLS 256-bit uçtan uca şifreleme ile işlenir. Belgeleriniz kalıcı sunucularda saklanmaz ve model eğitiminde (training) kullanılmaz.",
+    "⚖️ Tevkifat & Stopaj mantığı nedir?": "Tevkifat ve stopaj, faturadaki verginin bir kısmının alıcı tarafından kesilerek doğrudan vergi dairesine (360 hesabına) ödenmesidir. Böylece satıcı cari hesabı net tutara oturur ve yevmiye fişi kuruş farkı olmadan dengelenir.",
+    "🎯 153 ile 770 arasındaki fark nedir?": "153 Ticari Mallar satılmak amacıyla alınan ticari ürünlerin stok hesabıdır. 770 Genel Yönetim Giderleri ise işletmenin kendi idari faaliyetlerinde tükettiği (ofis kırtasiyesi, kira, danışmanlık vb.) giderlerin kaydedildiği hesaptır.",
+    "💡 How does it save time?": "LedgerAI automates repetitive invoice typing and multi-tier tax splitting by 80%, leaving the final executive approval to the CPA.",
+    "🔒 Is our data secure?": "Yes. Encrypted via TLS 256-bit bank-grade protocols. Your financial files are processed strictly within the active session and never stored permanently."
+}
+
 # ==============================================================================
-# 4. DYNAMIC STYLING ENGINE (WHITELABEL + MİKRO SESLİ & ANİMASYONLU CSS)
+# 4. DYNAMIC STYLING ENGINE (SAĞ ÜST MİKRO DOCK + WHITELABEL CSS)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
-    # 🌑 Kurumsal (Platin Titanyum)
+    # 🌑 Kurumsal
     bg_style = """
         @keyframes slateShimmer {
             0% { background-position: 0% 50%; }
@@ -504,7 +288,7 @@ if st.session_state["theme_idx"] == 0:
         }
     """
 elif st.session_state["theme_idx"] == 1:
-    # ✨ Modern (Nebula Aurora)
+    # ✨ Modern
     bg_style = """
         @keyframes auroraRealFlow {
             0% { background-position: 0% 30%; filter: hue-rotate(0deg); }
@@ -522,7 +306,7 @@ elif st.session_state["theme_idx"] == 1:
         }
     """
 else:
-    # ⚡ Akademi (Siber Matris)
+    # ⚡ Akademi
     bg_style = """
         @keyframes cyberpunkPulse {
             0% { background-position: 0% 0%, 100% 100%; filter: brightness(1); }
@@ -547,7 +331,6 @@ st.markdown(f"""
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }}
     
-    /* WHITELABEL GİZLEME */
     header[data-testid="stHeader"] {{ display: none !important; }}
     #MainMenu {{ visibility: hidden !important; }}
     footer {{ visibility: hidden !important; }}
@@ -572,6 +355,14 @@ st.markdown(f"""
         max-width: 1280px;
         margin: 0 auto;
         padding: 0 10px;
+    }}
+
+    .top-navbar-dock {{
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
     }}
 
     .cockpit-card {{
@@ -684,7 +475,6 @@ st.markdown(f"""
         line-height: 1.4;
     }}
 
-    /* GERÇEK GİTHUB.COM MİKRO HAPI (SELECTBOX VE BUTONLAR) */
     .github-pill-select div[data-baseweb="select"] > div {{
         background: rgba(255, 255, 255, 0.06) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
@@ -708,6 +498,12 @@ st.markdown(f"""
         font-weight: 600 !important;
         color: #F8FAFC !important;
         box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+        transition: all 0.2s ease !important;
+    }}
+    div[data-testid="stPopover"] > button:hover {{
+        background: rgba(255, 255, 255, 0.14) !important;
+        border-color: rgba(255, 255, 255, 0.45) !important;
+        transform: scale(1.04) !important;
     }}
 
     div[data-testid="stExpander"] div.stButton button {{
@@ -787,7 +583,6 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# SESLİ BİLDİRİM MOTORU (WEB AUDIO API)
 def sesli_bildirim_cal(tur="success"):
     if tur == "success":
         ses_js = """
@@ -1010,10 +805,38 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 7. MULTI-DECK COCKPIT (KURUMSAL / AKADEMİ / HUKUK)
+# 7. MULTI-DECK COCKPIT (EN SAĞ ÜSTTE MİKRO YUVARLAK KONTROL DOCK)
 # ==============================================================================
 
 st.markdown("<div class='cockpit-container'>", unsafe_allow_html=True)
+
+# EN SAĞ ÜST MİKRO DOCK (DİL, TEMALAR, HAKKINDA)
+nav_c1, nav_c2, nav_c3, nav_c4 = st.columns([6.5, 1.5, 2.2, 1.8])
+
+with nav_c2:
+    st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
+    lang_keys = list(LANG_DATA.keys())
+    curr_lang_idx = lang_keys.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in lang_keys else 0
+    new_lang = st.selectbox("Dil", lang_keys, index=curr_lang_idx, label_visibility="collapsed")
+    if new_lang != st.session_state["user_lang"]:
+        st.session_state["user_lang"] = new_lang
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with nav_c3:
+    st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
+    theme_names = T["themes"]
+    new_theme_str = st.selectbox("Temalar", theme_names, index=st.session_state["theme_idx"], label_visibility="collapsed")
+    new_t_idx = theme_names.index(new_theme_str)
+    if new_t_idx != st.session_state["theme_idx"]:
+        st.session_state["theme_idx"] = new_t_idx
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with nav_c4:
+    with st.popover(T.get("about_btn", "ℹ️ Hakkında")):
+        st.markdown(f"#### {T['about_title']}")
+        st.markdown(T["about_content"])
 
 sekme_terminal, sekme_akademi, sekme_hukuk = st.tabs([
     "🏢 Kurumsal Terminal", 
@@ -1088,7 +911,6 @@ with sekme_terminal:
                             withholding = round(float(item.get("withholding") or 0.0), 2)
                             payable = round(float(item.get("payable_to_vendor") or 0.0), 2)
 
-                            # Matematiksel Tevkifat & Bakiye Koruma Motoru
                             if payable > 0 and abs((net + tax) - payable) > 0.05 and withholding == 0:
                                 withholding = round((net + tax) - payable, 2)
                             
@@ -1124,28 +946,28 @@ with sekme_terminal:
                             # 2. BORÇ: KDV Tutarı
                             if tax > 0:
                                 voucher_lines.append({
-                                headers["vouch"]: voucher_num,
-                                headers["date"]: date_val,
-                                headers["code"]: tax_code,
-                                headers["name"]: tax_name,
-                                headers["desc"]: f"{vendor} - KDV",
-                                headers["curr"]: curr,
-                                headers["deb"]: tax,
-                                headers["crd"]: 0.0
-                            })
+                                    headers["vouch"]: voucher_num,
+                                    headers["date"]: date_val,
+                                    headers["code"]: tax_code,
+                                    headers["name"]: tax_name,
+                                    headers["desc"]: f"{vendor} - KDV",
+                                    headers["curr"]: curr,
+                                    headers["deb"]: tax,
+                                    headers["crd"]: 0.0
+                                })
 
                             # 3. ALACAK: Tevkifat / Stopaj (Varsa)
                             if withholding > 0:
                                 voucher_lines.append({
-                                headers["vouch"]: voucher_num,
-                                headers["date"]: date_val,
-                                headers["code"]: tevkifat_code,
-                                headers["name"]: tevkifat_name,
-                                headers["desc"]: f"{vendor} - Tevkifat/Kesinti",
-                                headers["curr"]: curr,
-                                headers["deb"]: 0.0,
-                                headers["crd"]: withholding
-                            })
+                                    headers["vouch"]: voucher_num,
+                                    headers["date"]: date_val,
+                                    headers["code"]: tevkifat_code,
+                                    headers["name"]: tevkifat_name,
+                                    headers["desc"]: f"{vendor} - Tevkifat/Kesinti",
+                                    headers["curr"]: curr,
+                                    headers["deb"]: 0.0,
+                                    headers["crd"]: withholding
+                                })
 
                             # 4. ALACAK: Satıcı Cari Hesabı (Net Ödenecek Tutar)
                             voucher_lines.append({
@@ -1171,40 +993,15 @@ with sekme_terminal:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # TAM HİZALI MİKRO DOCK
+        # SEKTÖR KONTROLÜ
         st.markdown("<div style='margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
-        c_m1, c_m2, c_m3, c_m4 = st.columns([1.6, 3.4, 3.4, 1.6])
-        with c_m1:
-            st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
-            lang_keys = list(LANG_DATA.keys())
-            curr_lang_idx = lang_keys.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in lang_keys else 0
-            new_lang = st.selectbox("Dil", lang_keys, index=curr_lang_idx, label_visibility="collapsed")
-            if new_lang != st.session_state["user_lang"]:
-                st.session_state["user_lang"] = new_lang
-                st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
-        with c_m2:
-            st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
-            theme_names = T["themes"]
-            new_theme_str = st.selectbox("Görünüm", theme_names, index=st.session_state["theme_idx"], label_visibility="collapsed")
-            new_t_idx = theme_names.index(new_theme_str)
-            if new_t_idx != st.session_state["theme_idx"]:
-                st.session_state["theme_idx"] = new_t_idx
-                st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
-        with c_m3:
-            st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
-            new_industry_str = st.selectbox("Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
-            new_i_idx = T["industries"].index(new_industry_str)
-            if new_i_idx != st.session_state["industry_idx"]:
-                st.session_state["industry_idx"] = new_i_idx
-                st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
-        with c_m4:
-            with st.popover(T["about_btn"]):
-                st.markdown(f"#### {T['about_title']}")
-                st.markdown(T["about_content"])
-        st.markdown("</div></div>", unsafe_allow_html=True)
+        st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
+        new_industry_str = st.selectbox("Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
+        new_i_idx = T["industries"].index(new_industry_str)
+        if new_i_idx != st.session_state["industry_idx"]:
+            st.session_state["industry_idx"] = new_i_idx
+            st.rerun()
+        st.markdown("</div></div></div>", unsafe_allow_html=True)
 
     with col_right:
         st.markdown(f"""
@@ -1327,7 +1124,7 @@ with sekme_terminal:
                 use_container_width=True
             )
 
-    # ASİSTAN ÇUBUĞU (KEYERROR KORUMALI)
+    # ASİSTAN ÇUBUĞU (KUSURSUZ DEĞİŞKEN AKIŞI)
     st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
     c_bot_l, c_bot_center, c_bot_r = st.columns([1, 4, 1])
 
@@ -1364,7 +1161,13 @@ with sekme_terminal:
             st.markdown("</div>", unsafe_allow_html=True)
 
             user_query = st.chat_input(T.get("bot_placeholder", "Sorunuzu yazın..."))
-            aktif_soru = user_query or secilen_chip
+            
+            # Değişken Tanımlama Garantisi
+            aktif_soru = None
+            if user_query:
+                aktif_soru = user_query
+            elif secilen_chip:
+                aktif_soru = secilen_chip
             
             if aktif_soru:
                 st.session_state["chat_messages"].append({"role": "user", "content": aktif_soru})
@@ -1406,7 +1209,6 @@ with sekme_terminal:
 with sekme_akademi:
     vaka = st.session_state["current_dynamic_vaka"]
     
-    # SEVİYE HESAPLAMA
     xp = st.session_state["academy_xp"]
     if xp >= 1200:
         st.session_state["academy_level"] = "🏆 Baş Denetçi (Senior Partner)"
@@ -1480,14 +1282,14 @@ with sekme_akademi:
                 st.rerun()
 
         st.markdown(f"""
-            <div style='margin-top:16px; padding:12px; background:rgba(0,0,0,0.3); border-radius:12px; font-size:0.75rem; color:#CBD5E1;'>
+            <div style='margin-top:16px; padding-left:4px; font-size:0.75rem; color:#CBD5E1;'>
                 💡 <b>Sonsuz Vaka Sistemi:</b> Her yeni görevde tutarlar, firmalar ve tevkifat modelleri dinamik olarak yeniden üretilir.
             </div>
         </div>
         """, unsafe_allow_html=True)
 
 # ------------------------------------------------------------------------------
-# SEKME 3: ⚖️ HUKUKİ ÇERÇEVE & SLA (KUSURSUZ VE AVUKAT ONAYLI METİN)
+# SEKME 3: ⚖️ HUKUKİ ÇERÇEVE & SLA
 # ------------------------------------------------------------------------------
 with sekme_hukuk:
     st.markdown("### ⚖️ Kurumsal Hizmet Seviyesi Anlaşması (SLA), KVKK & Yasal Sorumluluk Çerçevesi")
