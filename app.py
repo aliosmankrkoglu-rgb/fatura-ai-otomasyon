@@ -1,10 +1,10 @@
 """
 ================================================================================
-LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & CYBER ACADEMY
+LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY HUB
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL + HTML5 Canvas
-Design: Glassmorphic Capsule Hub / Cyberpunk HUD / Retro Canvas Arcade Snake
+Design: Minimal Circular Glass Nav / WhatsApp Legal Cards / Arcade Snake & Luca Sim
 Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, US GAAP
-Version: 7.0.0 Arcade & Executive Master Edition
+Version: 8.0.0 Masterpiece Production Edition
 ================================================================================
 """
 
@@ -54,7 +54,9 @@ SESSION_DEFAULTS = {
     "game_step": 1,
     "current_game_vaka": None,
     "matrix_step": 1,
-    "matrix_current_item": None
+    "matrix_current_item": None,
+    "sim_step": 1,
+    "sim_current_vaka": None
 }
 
 for key, default_val in SESSION_DEFAULTS.items():
@@ -71,9 +73,10 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. PROSEDÜREL OYUN MOTORU & VAKA ÜRETECİ
+# 2. PROSEDÜREL OYUN VE SİMÜLASYON MOTORU
 # ==============================================================================
 
+# OYUN 1: HESAP KODU AVCISI (ALIŞ, GİDER, DEMİRBAŞ, SATIŞ)
 def generate_simple_puzzle(step: int):
     vakalar = [
         {
@@ -124,25 +127,98 @@ def generate_simple_puzzle(step: int):
 if st.session_state["current_game_vaka"] is None:
     st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"])
 
-MATRIX_CARDS = [
-    {"hesap": "100 KASA", "dogru_sinif": 1, "aciklama": "1. Dönen Varlıklar sınıfıdır."},
-    {"hesap": "102 BANKALAR", "dogru_sinif": 1, "aciklama": "1. Dönen Varlıklar sınıfıdır."},
-    {"hesap": "153 TİCARİ MALLAR", "dogru_sinif": 1, "aciklama": "1. Dönen Varlıklar (Stoklar) grubudur."},
-    {"hesap": "255 DEMİRBAŞLAR", "dogru_sinif": 2, "aciklama": "2. Duran Varlıklar sınıfıdır."},
-    {"hesap": "254 TAŞITLAR", "dogru_sinif": 2, "aciklama": "2. Duran Varlıklar sınıfıdır."},
-    {"hesap": "320 SATICILAR", "dogru_sinif": 3, "aciklama": "3. Kısa Vadeli Yabancı Kaynaklar sınıfıdır."},
-    {"hesap": "360 ÖDENECEK VERGİ VE FONLAR", "dogru_sinif": 3, "aciklama": "3. Kısa Vadeli Yabancı Kaynaklar sınıfıdır."},
-    {"hesap": "400 BANKA KREDİLERİ (UZUN VADELİ)", "dogru_sinif": 4, "aciklama": "4. Uzun Vadeli Yabancı Kaynaklar sınıfıdır."},
-    {"hesap": "500 SERMAYE", "dogru_sinif": 5, "aciklama": "5. Öz Kaynaklar sınıfıdır."},
-    {"hesap": "600 YURTİÇİ SATIŞLAR", "dogru_sinif": 6, "aciklama": "6. Gelir Tablosu Hesapları sınıfıdır."},
-    {"hesap": "770 GENEL YÖNETİM GİDERLERİ", "dogru_sinif": 7, "aciklama": "7. Maliyet Hesapları sınıfıdır."}
+# OYUN 2: ZORLAŞTIRILMIŞ HESAP KARAKTERİ & BİLANÇO MATRİSİ (KOD NUMARASIZ TERS KÖŞE)
+TRICKY_MATRIX_CARDS = [
+    {
+        "hesap_adi": "BİRİKMİŞ AMORTİSMANLAR (-)",
+        "karakter": "Aktifi Düzenleyici Pasif Karakterli Hesap",
+        "dogru_sinif": 2,
+        "aciklama": "Duran varlıkların aşınma payıdır. 2 ile başlamasına rağmen alacak bakiyesi verir!"
+    },
+    {
+        "hesap_adi": "ALINAN SİPARİŞ AVANSLARI",
+        "karakter": "Kısa Vadeli Borç / Yabancı Kaynak",
+        "dogru_sinif": 3,
+        "aciklama": "Müşteriden mal teslim edilmeden önce alınan paradır, 340 grubunda kısa vadeli borçtur."
+    },
+    {
+        "hesap_adi": "GELECEK AYLARA AİT GİDERLER",
+        "karakter": "Dönen Varlık / Peşin Ödenen Gider",
+        "dogru_sinif": 1,
+        "aciklama": "Gelecek dönem için peşin ödenen kiralardır; 180 grubunda dönen varlık sayılır."
+    },
+    {
+        "hesap_adi": "DÖNEM NET KÂRI",
+        "karakter": "Öz Kaynaklar Unsuru",
+        "dogru_sinif": 5,
+        "aciklama": "İşletme faaliyetleri sonucu kalan net kârdır; 590 grubunda öz kaynaklarda yer alır."
+    },
+    {
+        "hesap_adi": "SATILAN TİCARİ MALLAR MALİYETİ (STMM)",
+        "karakter": "Gelir Tablosu Gider Hesabı",
+        "dogru_sinif": 6,
+        "aciklama": "Satılan malların işletmeye maliyetidir; 621 kodunda gelir tablosunu azaltır."
+    },
+    {
+        "hesap_adi": "BANKA KREDİLERİ (3 YIL VADELİ)",
+        "karakter": "Uzun Vadeli Yabancı Kaynak",
+        "dogru_sinif": 4,
+        "aciklama": "Vadesi 1 yılı aşan borçlanmalar 400 grubunda uzun vadeli yabancı kaynaktır."
+    }
 ]
 
 if st.session_state["matrix_current_item"] is None:
-    st.session_state["matrix_current_item"] = random.choice(MATRIX_CARDS)
+    st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
+
+# OYUN 4: ETA / LUCA YEVMİYE FİŞİ PROVA MOTORU
+def generate_luca_simulation(step: int):
+    senaryolar = [
+        {
+            "olay": "Banka hesabından satıcıya havale yapılarak ticari borç kapatıldı.",
+            "tutar": 45000.0,
+            "borc_kod": "320",
+            "alacak_kod": "102",
+            "borc_ad": "Satıcılar",
+            "alacak_ad": "Bankalar",
+            "aciklama": "Tedarikçi Borç Ödemesi"
+        },
+        {
+            "olay": "Şirket nakit ödeme yaparak ofis temizlik ve kırtasiye masrafını karşıladı.",
+            "tutar": 8500.0,
+            "borc_kod": "770",
+            "alacak_kod": "100",
+            "borc_ad": "Genel Yönetim Giderleri",
+            "alacak_ad": "Kasa",
+            "aciklama": "Nakit Ofis Gideri"
+        },
+        {
+            "olay": "Müşteriden yapılan toptan mal satış bedeli banka hesabına intikal etti.",
+            "tutar": 120000.0,
+            "borc_kod": "102",
+            "alacak_kod": "600",
+            "borc_ad": "Bankalar",
+            "alacak_ad": "Yurtiçi Satışlar",
+            "aciklama": "Nakit Satış Hasılatı"
+        }
+    ]
+    s = random.choice(senaryolar)
+    return {
+        "step": step,
+        "olay": s["olay"],
+        "tutar": s["tutar"],
+        "borc_kod": s["borc_kod"],
+        "alacak_kod": s["alacak_kod"],
+        "borc_ad": s["borc_ad"],
+        "alacak_ad": s["alacak_ad"],
+        "aciklama": s["aciklama"],
+        "xp": 200
+    }
+
+if st.session_state["sim_current_vaka"] is None:
+    st.session_state["sim_current_vaka"] = generate_luca_simulation(st.session_state["sim_step"])
 
 # ==============================================================================
-# 3. LOCALIZATION DATA DICTIONARY
+# 3. LOCALIZATION DATA DICTIONARY (6 DİLDE TAM EŞİTLENMİŞ LÜKS METİNLER)
 # ==============================================================================
 
 LANG_DATA = {
@@ -166,23 +242,11 @@ LANG_DATA = {
         "download_btn": "📥 Çok Sayfalı Kurumsal Excel'i İndir (.xlsx)",
         "download_eta": "💾 ETA V.11 Uyumlu CSV",
         "download_luca": "💾 Luca Uyumlu Aktarım",
-        "industries": [
-            "⚡ Otomatik (AI)",
-            "🛒 Ticaret / Mal",
-            "🏢 Hizmet / Ofis",
-            "🏭 Üretim / Sanayi"
-        ],
+        "industries": ["⚡ Otomatik (AI)", "🛒 Ticaret / Mal", "🏢 Hizmet / Ofis", "🏭 Üretim / Sanayi"],
         "themes": ["Kurumsal", "Modern", "Akademi"],
         "about_btn": "Hakkında",
         "about_title": "LedgerAI Kurumsal Mimari & Regülasyon",
-        "about_content": """
-        ### 🛡️ Kurumsal Finans & Güvenlik Mimarisi
-        LedgerAI, Türkiye Tek Düzen Hesap Planı, VUK ve uluslararası standartlara tam uyumlu bir otonom ön muhasebe altyapısıdır:
-        * **1. Çift Göz Prensibi (Dual Control):** Yapay zeka veri ayıklayıcı ve tasnif edici olarak çalışır; yasal defter kaydı yetkili SMMM/YMM onayına bağlıdır.
-        * **2. Tevkifat & Stopaj Ayrıştırma:** 5/10, 7/10, 9/10 KDV tevkifatlarını ve serbest meslek stopajlarını ayrı hesap kodlarına (360) dengeli olarak dağıtır.
-        * **3. Çift Bakiye Doğrulama:** Borç ve Alacak tutarları kuruşu kuruşuna eşitlenmeden sistem dışa aktarıma izin vermez.
-        * **4. ERP Entegrasyon Standartları:** ETA V.11, Luca, Logo, Zirve, Datev ve QuickBooks uyumlu veri çıktıları sağlar.
-        """,
+        "about_content": "LedgerAI, Türkiye Tek Düzen Hesap Planı, VUK ve uluslararası standartlara tam uyumlu otonom ön muhasebe terminalidir.",
         "bot_title": "👾 LedgerBot Finans Mentorü",
         "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya fatura mantığını sormak için aşağıdaki sorulara tıklayabilirsin:",
         "bot_placeholder": "Muhasebe sorunuzu yazın...",
@@ -199,11 +263,7 @@ LANG_DATA = {
         "cockpit_card2_desc": "Tek tıkla ETA V.11 uyumlu CSV, Luca ve çok sayfalı (153 & 770 ayrılmış) kurumsal Excel üretimi.",
         "cockpit_card3_title": "🛡️ Çift Taraflı Denetim Kilidi",
         "cockpit_card3_desc": "Toplam Borç = Toplam Alacak eşitliği sağlanmadan yevmiye fişi kapatılmaz; bakiye farkı riski sıfırlanır.",
-        "headers": {
-            "vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu",
-            "name": "Hesap Adı", "desc": "Açıklama", "curr": "Para Birimi",
-            "deb": "Borç", "crd": "Alacak"
-        }
+        "headers": {"vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu", "name": "Hesap Adı", "desc": "Açıklama", "curr": "Para Birimi", "deb": "Borç", "crd": "Alacak"}
     },
     "🇺🇸 EN": {
         "badge": "HUMAN + AI COLLABORATIVE TERMINAL",
@@ -225,12 +285,7 @@ LANG_DATA = {
         "download_btn": "📥 Download Multi-Tab Corporate Excel (.xlsx)",
         "download_eta": "💾 Generic CSV Format",
         "download_luca": "💾 QuickBooks Format",
-        "industries": [
-            "⚡ Auto (AI)",
-            "🛒 Trade / Retail",
-            "🏢 Services / SaaS",
-            "🏭 Manufacturing"
-        ],
+        "industries": ["⚡ Auto (AI)", "🛒 Trade / Retail", "🏢 Services / SaaS", "🏭 Manufacturing"],
         "themes": ["Kurumsal", "Modern", "Akademi"],
         "about_btn": "About",
         "about_title": "LedgerAI Architecture & Regulation",
@@ -251,11 +306,159 @@ LANG_DATA = {
         "cockpit_card2_desc": "Direct exports formatted for QuickBooks, SAP, Datev SKR03/04, and multi-tab Excel workbooks.",
         "cockpit_card3_title": "🛡️ Dual-Audit Integrity Lock",
         "cockpit_card3_desc": "Mathematical assurance guaranteeing that Total Debit strictly equals Total Credit before release.",
-        "headers": {
-            "vouch": "Voucher #", "date": "Date", "code": "Account Code",
-            "name": "Account Name", "desc": "Memo", "curr": "Currency",
-            "deb": "Debit", "crd": "Credit"
-        }
+        "headers": {"vouch": "Voucher #", "date": "Date", "code": "Account Code", "name": "Account Name", "desc": "Memo", "curr": "Currency", "deb": "Debit", "crd": "Credit"}
+    },
+    "🇩🇪 DE": {
+        "badge": "MENSCH + KI FINANZTERMINAL",
+        "title": "LedgerAI",
+        "subtitle": "Autonome Belegerfassung und Datev-konforme Kontierung unter ständiger Expertenkontrolle.",
+        "drop_title": "Belege hier ablegen oder durchsuchen",
+        "drop_sub": "PDF, PNG, JPG • Rechnungen & Quittungen",
+        "process_btn": "⚡ Buchungssätze Erstellen",
+        "limit_err": "🛑 Maximal 5 Dokumente im Demo-Modus.",
+        "ready_count": "Bereit: **{count}**",
+        "success": "✓ Buchungen erfolgreich erstellt und ausgeglichen.",
+        "failed": "❌ Belege konnten nicht gelesen werden.",
+        "preview_title": "📊 Buchungszeilen & Kontrollzentrum",
+        "preview_tip": "💡 Doppelklick zum Ändern von Konten oder Beträgen.",
+        "tot_deb": "Soll Gesamt",
+        "tot_crd": "Haben Gesamt",
+        "balanced": "✅ Ausgeglichen (Soll = Haben)",
+        "unbalanced": "⚠️ Differenz festgestellt!",
+        "download_btn": "📥 Excel Herunterladen (.xlsx)",
+        "download_eta": "💾 Datev Format (CSV)",
+        "download_luca": "💾 SAP Kompatibel",
+        "industries": ["⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf", "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"],
+        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "about_btn": "Über uns",
+        "about_title": "LedgerAI Architektur & Datev SKR03/04 Standard",
+        "about_content": "Vollautomatisierte Buchungssatzerstellung nach GoBD und Datev-Richtlinien mit strengem Soll/Haben-Ausgleich.",
+        "bot_title": "👾 LedgerBot Finanzmentor",
+        "bot_welcome": "Hallo! Tippen Sie auf eine Frage oder fragen Sie mich direkt nach Buchungssätzen:",
+        "bot_placeholder": "Frage eingeben...",
+        "bot_clear": "Löschen",
+        "quick_chips": ["💡 Wie spart es Arbeitszeit?", "🔒 Datenschutz & Sicherheit", "⚖️ Soll an Haben Prinzip"],
+        "cockpit_card1_title": "🏛️ Vorsteuer- & Steuerlogik",
+        "cockpit_card1_desc": "Automatische Zuordnung von SKR03/04 Vorsteuern und USt-IdNr Validierung.",
+        "cockpit_card2_title": "⚡ Datev Export",
+        "cockpit_card2_desc": "Direkter Datev-konformer CSV-Export für das Steuerbüro.",
+        "cockpit_card3_title": "🛡️ Soll/Haben Garantie",
+        "cockpit_card3_desc": "Mathematische Prüfung auf absolute Ausgeglichenheit der Buchungssätze.",
+        "headers": {"vouch": "Beleg", "date": "Datum", "code": "Konto", "name": "Bezeichnung", "desc": "Text", "curr": "Währung", "deb": "Soll", "crd": "Haben"}
+    },
+    "🇫🇷 FR": {
+        "badge": "TERMINAL COLLABORATIF IA + HUMAIN",
+        "title": "LedgerAI",
+        "subtitle": "L'IA prépare les imputations comptables; l'expert-comptable valide et approuve.",
+        "drop_title": "Déposer les pièces comptables ici",
+        "drop_sub": "Factures et reçus (PDF, PNG, JPG)",
+        "process_btn": "⚡ Générer les Écritures",
+        "limit_err": "🛑 Limite: 5 documents par lot.",
+        "ready_count": "Prêts: **{count}**",
+        "success": "✓ Écritures générées avec succès et équilibrées.",
+        "failed": "❌ Échec de lecture.",
+        "preview_title": "📊 Journal Comptable & Audit Expert",
+        "preview_tip": "💡 Double-cliquez sur une cellule pour modifier.",
+        "tot_deb": "Total Débit",
+        "tot_crd": "Total Crédit",
+        "balanced": "✅ Équilibré (Débit = Crédit)",
+        "unbalanced": "⚠️ Déséquilibre Détecté!",
+        "download_btn": "📥 Télécharger Excel (.xlsx)",
+        "download_eta": "💾 Format Standard PCG",
+        "download_luca": "💾 Sage / Cegid Ready",
+        "industries": ["⚡ Auto (IA)", "🛒 Négoce / Stock", "🏢 Services / Conseil", "🏭 Production / Industrie"],
+        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "about_btn": "À propos",
+        "about_title": "Architecture Comptable & Normes PCG",
+        "about_content": "Conformité Plan Comptable Général (PCG) avec vérification stricte du principe Débit = Crédit.",
+        "bot_title": "👾 LedgerBot Mentor",
+        "bot_welcome": "Bonjour! Choisissez une question rapide ou posez votre question comptable:",
+        "bot_placeholder": "Poser une question...",
+        "bot_clear": "Effacer",
+        "quick_chips": ["💡 Gain de temps en cabinet", "🔒 Sécurité des données", "⚖️ Principe Débit / Crédit"],
+        "cockpit_card1_title": "🏛️ Ventilation PCG",
+        "cockpit_card1_desc": "Affectation automatique aux comptes de charges et TVA déductible.",
+        "cockpit_card2_title": "⚡ Formats Export",
+        "cockpit_card2_desc": "Compatible avec les logiciels Sage, Cegid et tableur multi-feuilles.",
+        "cockpit_card3_title": "🛡️ Équilibre Débit/Crédit",
+        "cockpit_card3_desc": "Vérification stricte de la balance avant validation finale.",
+        "headers": {"vouch": "Pièce", "date": "Date", "code": "Compte", "name": "Libellé", "desc": "Détail", "curr": "Devise", "deb": "Débit", "crd": "Crédit"}
+    },
+    "🇪🇸 ES": {
+        "badge": "TERMINAL COLABORATIVO IA + HUMANO",
+        "title": "LedgerAI",
+        "subtitle": "La IA estructura los asientos contables; el asesor profesional revisa y valida.",
+        "drop_title": "Arrastra los documentos aquí o examina",
+        "drop_sub": "PDF, PNG, JPG • Facturas y recibos",
+        "process_btn": "⚡ Generar Asientos",
+        "limit_err": "🛑 Máximo 5 documentos por lote.",
+        "ready_count": "Listos: **{count}**",
+        "success": "✓ Asientos generados y equilibrados.",
+        "failed": "❌ Error al procesar.",
+        "preview_title": "📊 Libro Diario & Mesa de Control",
+        "preview_tip": "💡 Haz doble clic para modificar cuentas.",
+        "tot_deb": "Total Debe",
+        "tot_crd": "Total Haber",
+        "balanced": "✅ Cuadrado (Debe = Haber)",
+        "unbalanced": "⚠️ Descuadre Detectado!",
+        "download_btn": "📥 Descargar Excel (.xlsx)",
+        "download_eta": "💾 Formato Contasol",
+        "download_luca": "💾 A3 / Sage Ready",
+        "industries": ["⚡ Automático (IA)", "🛒 Comercio / Inventario", "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"],
+        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "about_btn": "Acerca de",
+        "about_title": "Estándares Contables y Seguridad Fiscal",
+        "about_content": "Asientos contables conformes al Plan General Contable (PGC) con cuadre matemático de Debe y Haber.",
+        "bot_title": "👾 LedgerBot Mentor",
+        "bot_welcome": "¡Hola! Pulsa una pregunta rápida o escribe tu consulta contable:",
+        "bot_placeholder": "Escribe tu duda...",
+        "bot_clear": "Limpiar",
+        "quick_chips": ["💡 Ventajas para la asesoría", "🔒 Seguridad y confidencialidad", "⚖️ Cuadre de Debe y Haber"],
+        "cockpit_card1_title": "🏛️ Cuadre Fiscal",
+        "cockpit_card1_desc": "Gestión automática de retenciones e IVA soportado.",
+        "cockpit_card2_title": "⚡ Compatibilidad ERP",
+        "cockpit_card2_desc": "Exportación directa para Contasol, A3 y software contable estándar.",
+        "cockpit_card3_title": "🛡️ Control de Asiento",
+        "cockpit_card3_desc": "Validación matemática estricta de paridad Debe = Haber.",
+        "headers": {"vouch": "Asiento", "date": "Fecha", "code": "Cuenta", "name": "Nombre Cuenta", "desc": "Concepto", "curr": "Moneda", "deb": "Debe", "crd": "Haber"}
+    },
+    "🇮🇹 IT": {
+        "badge": "TERMINALE COLLABORATIVO IA + UOMO",
+        "title": "LedgerAI",
+        "subtitle": "L'IA prepara le scritture contabili; il commercialista esperto valida e autorizza.",
+        "drop_title": "Trascina qui le fatture o cerca file",
+        "drop_sub": "PDF, PNG, JPG • Ricevute e fatture",
+        "process_btn": "⚡ Genera Scritture",
+        "limit_err": "🛑 Massimo 5 documenti.",
+        "ready_count": "Pronti: **{count}**",
+        "success": "✓ Scritture generate e bilanciate.",
+        "failed": "❌ Impossibile elaborare.",
+        "preview_title": "📊 Prima Nota & Centro di Controllo",
+        "preview_tip": "💡 Fai doppio clic per modificare.",
+        "tot_deb": "Totale Dare",
+        "tot_crd": "Totale Avere",
+        "balanced": "✅ Quadratura Perfetta",
+        "unbalanced": "⚠️ Sbilancio!",
+        "download_btn": "📥 Scarica Excel (.xlsx)",
+        "download_eta": "💾 Formato Zucchetti",
+        "download_luca": "💾 Teamsystem Ready",
+        "industries": ["⚡ Automatico (IA)", "🛒 Commercio / Magazzino", "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"],
+        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "about_btn": "Info",
+        "about_title": "Standard di Conformità e Partita Doppia",
+        "about_content": "Generazione automatica di scritture in partita doppia perfettamente bilanciate per gestionali Zucchetti e Teamsystem.",
+        "bot_title": "👾 LedgerBot Mentor",
+        "bot_welcome": "Ciao! Seleziona una domanda pillola o scrivimi direttamente:",
+        "bot_placeholder": "Fai una domanda contabile...",
+        "bot_clear": "Cancella",
+        "quick_chips": ["💡 Vantaggi per lo studio", "🔒 Sicurezza dei dati fiscali", "⚖️ Pareggio Dare / Avere"],
+        "cockpit_card1_title": "🏛️ Scritture Bilanciate",
+        "cockpit_card1_desc": "Gestione automatica ritenute d'acconto ed IVA a credito.",
+        "cockpit_card2_title": "⚡ Compatibilità Gestionale",
+        "cockpit_card2_desc": "File pronti per Zucchetti, Teamsystem e formati Excel avanzati.",
+        "cockpit_card3_title": "🛡️ Quadratura Certificata",
+        "cockpit_card3_desc": "Garanzia matematica di parità tra totale Dare e Avere.",
+        "headers": {"vouch": "Partita", "date": "Data", "code": "Conto", "name": "Descrizione", "desc": "Causale", "curr": "Valuta", "deb": "Dare", "crd": "Avere"}
     }
 }
 
@@ -274,7 +477,7 @@ INSTANT_FAQ_CACHE = {
 }
 
 # ==============================================================================
-# 4. DYNAMIC STYLING ENGINE (NEON CYBERPUNK HUD + CAM BUTONLAR)
+# 4. DYNAMIC STYLING ENGINE (IPHONE CIRCLE GLASS BUTTONS & NEON HUD)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -364,7 +567,7 @@ st.markdown(f"""
         padding: 0 10px;
     }}
 
-    /* IPHONE CIRCLE GLASS BUTTONS (GÖRSEL 38 STİLİ) */
+    /* IPHONE CIRCLE GLASS BUTTONS */
     div.circle-glass-btn div[data-testid="stPopover"] > button {{
         width: 44px !important;
         height: 44px !important;
@@ -431,11 +634,6 @@ st.markdown(f"""
         background: rgba(56, 189, 248, 0.2) !important;
         border-color: rgba(56, 189, 248, 0.4) !important;
         color: #FFFFFF !important;
-    }}
-    div.sector-pills div.stButton > button.active-sector {{
-        background: rgba(16, 185, 129, 0.25) !important;
-        border-color: #10B981 !important;
-        color: #A7F3D0 !important;
     }}
 
     .cockpit-card {{
@@ -1079,7 +1277,7 @@ with sekme_terminal:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # MİKRO CAM KAPSÜL FAALİYET SEKTÖRÜ (GÖRSEL VE KLAVYESİZ)
+        # MİKRO CAM KAPSÜL FAALİYET SEKTÖRÜ
         st.markdown("<div style='margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
         st.markdown("<div style='font-size:0.72rem; color:#94A3B8; font-weight:700; letter-spacing:0.5px; margin-bottom:6px;'>FAALİYET SEKTÖRÜ (TIKLAYARAK SEÇİN):</div>", unsafe_allow_html=True)
         
@@ -1277,9 +1475,9 @@ with sekme_terminal:
                         ÇOK KESİN KURALLAR:
                         1. Eğer kullanıcı hesap planını, bilanço sınıflarını veya belirli hesap aralıklarını sorarsa (Örn: "1 den 3 e kadar olan hesaplar", "hesap planını göster"):
                            - Asla hiçbir sınıfı atlama! 
-                             1. Dönen Varlıklar, 
-                             2. Duran Varlıklar (250, 252, 254, 255 Demirbaşlar vb.), 
-                             3. Kısa Vadeli Yabancı Kaynaklar 
+                             1. Dönen Varlıklar (100 Kasa, 102 Banka, 120 Alıcılar, 153 Ticari Mallar), 
+                             2. Duran Varlıklar (250 Binalar, 254 Taşıtlar, 255 Demirbaşlar, 257 Birikmiş Amortismanlar), 
+                             3. Kısa Vadeli Yabancı Kaynaklar (300 Banka Kredileri, 320 Satıcılar, 360 Ödenecek Vergi)
                              şeklinde eksiksiz listele.
                            - Bu teorik sorularda ASLA uydurma fatura yevmiye fişi yazma!
                         2. Eğer kullanıcı selam veriyorsa ("merhaba", "naber", "ne yapıyorsun"):
@@ -1299,18 +1497,19 @@ with sekme_terminal:
                         st.rerun()
 
 # ------------------------------------------------------------------------------
-# SEKME 2: 🎓 SİBER AKADEMİ (CANLI SAĞLIK BARI + YANMA MEKANİĞİ)
+# SEKME 2: 🎓 SİBER AKADEMİ (4'LÜ EĞLENCELİ OYUN MERKEZİ)
 # ------------------------------------------------------------------------------
 with sekme_akademi:
     xp = st.session_state["academy_xp"]
     lives = st.session_state["academy_lives"]
     
-    # SAĞLIK VE SEVİYE HUD
     kalpler = "❤️ " * lives + "🖤 " * (3 - lives)
-    if xp >= 1000:
-        st.session_state["academy_level"] = "🏆 Baş Denetçi (Senior Auditor)"
-    elif xp >= 500:
-        st.session_state["academy_level"] = "⭐ Kıdemli Denetçi Yardımcısı"
+    if xp >= 1500:
+        st.session_state["academy_level"] = "🏆 Yeminli Baş Denetçi (Partner)"
+    elif xp >= 800:
+        st.session_state["academy_level"] = "⭐ Kıdemli Denetçi"
+    elif xp >= 400:
+        st.session_state["academy_level"] = "📈 Denetim Uzmanı"
     else:
         st.session_state["academy_level"] = "🌱 Mali Stajyer (Junior)"
 
@@ -1318,12 +1517,12 @@ with sekme_akademi:
     <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:20px 26px; margin-bottom:20px;'>
         <div style='display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;'>
             <div>
-                <span class='top-badge' style='background:rgba(217,70,239,0.15); border-color:#D946EF; color:#F0ABFC;'>CYBER ACADEMY HUD</span>
-                <h3 style='margin:4px 0; color:#FFFFFF;'>Muhasebe Öğrenme & Oyunlaştırma Alanı</h3>
-                <p style='font-size:0.85rem; color:#CBD5E1; margin:0;'>Hata yaparsan canın azalır! 3 canı koru, kombo yap, XP kazanarak seviye atla.</p>
+                <span class='top-badge' style='background:rgba(217,70,239,0.15); border-color:#D946EF; color:#F0ABFC;'>SİBER AKADEMİ ARENA</span>
+                <h3 style='margin:4px 0; color:#FFFFFF;'>Geleceğin Finans Lideri Yetiştirme Simülasyonu</h3>
+                <p style='font-size:0.85rem; color:#CBD5E1; margin:0;'>Teorik ezber yok! 4 farklı modda interaktif görevleri tamamla, XP topla, rütbe atla.</p>
             </div>
             <div style='text-align:right;'>
-                <div style='font-size:1.2rem; margin-bottom:2px;'>CAN: <b>{kalpler}</b></div>
+                <div style='font-size:1.15rem; margin-bottom:2px;'>CAN: <b>{kalpler}</b></div>
                 <div style='font-size:1.6rem; font-weight:800; color:#D946EF;'>🏆 {st.session_state["academy_xp"]} XP</div>
                 <div style='font-size:0.8rem; color:#A7F3D0; font-weight:700;'>{st.session_state["academy_level"]} (Seri: {st.session_state["academy_streak"]}🔥)</div>
             </div>
@@ -1333,20 +1532,21 @@ with sekme_akademi:
 
     if lives <= 0:
         sesli_bildirim_cal("error")
-        st.error("💀 GAME OVER! Tüm canlarını kaybettin ve vergi cezası aldın! Seviye sıfırlandı.")
-        if st.button("🔄 Yeniden Canlan & Başla", use_container_width=True):
+        st.error("💀 GAME OVER! Tüm canlarını kaybettin ve vergi incelemesinden ceza aldın! Rütben sıfırlandı.")
+        if st.button("🔄 Yeniden Başla (Canları Doldur)", use_container_width=True):
             st.session_state["academy_lives"] = 3
             st.session_state["academy_streak"] = 0
-            st.session_state["academy_xp"] = max(0, st.session_state["academy_xp"] - 100)
+            st.session_state["academy_xp"] = max(0, st.session_state["academy_xp"] - 150)
             st.rerun()
     else:
-        oyun_sekme1, oyun_sekme2, oyun_sekme3 = st.tabs([
-            "🎮 Oyun 1: Hesap Kodu Avcısı", 
-            "🧩 Oyun 2: Tek Düzen Matris Eşleme",
-            "🐍 Oyun 3: Retro Bilanço Snake (Hesap Yeme)"
+        oyun_sekme1, oyun_sekme2, oyun_sekme3, oyun_sekme4 = st.tabs([
+            "🎮 1. Hesap Kodu Avcısı", 
+            "🧩 2. Bilanço Karakter Matrisi (Zor)",
+            "🐍 3. Hedefli Bilanço Snake",
+            "📑 4. ETA & Luca Fiş Provası"
         ])
 
-        # OYUN 1: AVCI (CAN AZALMA VE YANMA EKLENDİ)
+        # OYUN 1: HESAP KODU AVCISI (GÖRSEL 44'TEKİ KABA RADİO YERİNE NEON KART BUTONLAR)
         with oyun_sekme1:
             vaka = st.session_state["current_game_vaka"]
             c_game1, c_game2 = st.columns([1.2, 1.0], gap="large")
@@ -1371,42 +1571,41 @@ with sekme_akademi:
 
             with c_game2:
                 st.markdown("<div style='background:rgba(30,41,59,0.72); border:1px solid rgba(255,255,255,0.14); border-radius:20px; padding:22px;'>", unsafe_allow_html=True)
-                st.markdown("<div style='font-size:0.82rem; font-weight:700; color:#F1F5F9; margin-bottom:10px;'>🎯 Doğru Hesap Kodunu Seçin:</div>", unsafe_allow_html=True)
+                st.markdown("<div style='font-size:0.82rem; font-weight:700; color:#F1F5F9; margin-bottom:12px;'>🎯 Doğru Hesap Kartına Tıklayın:</div>", unsafe_allow_html=True)
 
-                user_choice = st.radio("Seçiminiz:", vaka["secenekler"], key=f"radio_game_{vaka['step']}")
-
-                btn_g1, btn_g2 = st.columns(2)
-                with btn_g1:
-                    if st.button("🛡️ Cevabı Onayla", use_container_width=True):
-                        if user_choice == vaka["dogru"]:
+                for opt in vaka["secenekler"]:
+                    if st.button(f"👉 {opt}", key=f"btn_opt_{opt}_{vaka['step']}", use_container_width=True):
+                        if opt == vaka["dogru"]:
                             st.session_state["academy_xp"] += vaka["xp"]
                             st.session_state["academy_streak"] += 1
                             sesli_bildirim_cal("success")
                             st.balloons()
-                            st.success(f"🎉 DOĞRU CEVAP! {vaka['ipucu']} (+{vaka['xp']} XP) 🔥 Kombo: {st.session_state['academy_streak']}")
+                            st.success(f"🎉 DOĞRU CEVAP! {vaka['ipucu']} (+{vaka['xp']} XP)")
+                            time.sleep(1.2)
+                            st.session_state["game_step"] += 1
+                            st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"])
+                            st.rerun()
                         else:
                             st.session_state["academy_lives"] -= 1
                             st.session_state["academy_streak"] = 0
                             sesli_bildirim_cal("error")
-                            st.error(f"💥 YANDIN! Yanlış hesap seçtin. (-1 Can) Doğrusu: {vaka['dogru']} olmalıydı.")
+                            st.error(f"💥 YANDIN! (-1 Can) Doğru hesap: {vaka['dogru']} olmalıydı. {vaka['ipucu']}")
+                            time.sleep(1.4)
+                            st.session_state["game_step"] += 1
+                            st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"])
                             st.rerun()
-
-                with btn_g2:
-                    if st.button("➡️ Yeni Soru Getir", use_container_width=True):
-                        st.session_state["game_step"] += 1
-                        st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"])
-                        st.rerun()
 
                 st.markdown("</div>", unsafe_allow_html=True)
 
-        # OYUN 2: İNTERAKTİF MATRİS EŞLEME KARTLARI (CAN AZALMA EKLENDİ)
+        # OYUN 2: BİLANÇO KARAKTER MATRİSİ (ZOR / TERS KÖŞE)
         with oyun_sekme2:
             m_item = st.session_state["matrix_current_item"]
             st.markdown(f"""
-            <div style='background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:18px; padding:20px; text-align:center; margin-bottom:16px;'>
-                <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1px;'>HEDEF HESAP KARTI</span>
-                <h2 style='color:#FFFFFF; margin:8px 0; letter-spacing:1px;'>{m_item['hesap']}</h2>
-                <p style='font-size:0.85rem; color:#CBD5E1;'>Bu hesap 1'den 7'ye kadar olan hangi ana sınıfa aittir? Yanlış tıklarsan canın yanar!</p>
+            <div style='background:rgba(15,23,42,0.75); border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:22px; text-align:center; margin-bottom:16px;'>
+                <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1.2px;'>ZORLUK: İLERİ SEVİYE | RAKAMSIZ KARAKTER ANALİZİ</span>
+                <h2 style='color:#FFFFFF; margin:8px 0; letter-spacing:1px;'>{m_item['hesap_adi']}</h2>
+                <div style='font-size:0.85rem; color:#A7F3D0; font-weight:600; margin-bottom:4px;'>Fonksiyonel Karakter: {m_item['karakter']}</div>
+                <p style='font-size:0.80rem; color:#CBD5E1;'>Bu hesap Tek Düzen Bilanço sisteminde 1'den 7'ye kadar olan hangi ana muhasebe grubuna aittir?</p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1423,30 +1622,36 @@ with sekme_akademi:
             m_cols = st.columns(4)
             for idx, (s_num, s_ad) in enumerate(siniflar):
                 with m_cols[idx % 4]:
-                    if st.button(s_ad, key=f"btn_mat_{s_num}_{st.session_state['matrix_step']}", use_container_width=True):
+                    if st.button(s_ad, key=f"btn_tricky_{s_num}_{st.session_state['matrix_step']}", use_container_width=True):
                         if s_num == m_item["dogru_sinif"]:
-                            st.session_state["academy_xp"] += 100
+                            st.session_state["academy_xp"] += 200
                             st.session_state["academy_streak"] += 1
                             sesli_bildirim_cal("success")
                             st.balloons()
-                            st.success(f"🎉 TEBRİKLER! {m_item['hesap']}, {m_item['aciklama']} (+100 XP)")
+                            st.success(f"🎉 TEBRİKLER! {m_item['hesap_adi']}: {m_item['aciklama']} (+200 XP)")
+                            time.sleep(1.2)
                             st.session_state["matrix_step"] += 1
-                            st.session_state["matrix_current_item"] = random.choice(MATRIX_CARDS)
-                            time.sleep(1.0)
+                            st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
                             st.rerun()
                         else:
                             st.session_state["academy_lives"] -= 1
                             st.session_state["academy_streak"] = 0
                             sesli_bildirim_cal("error")
-                            st.error(f"💥 HATALI SINIF! (-1 Can) {m_item['hesap']}, {m_item['aciklama']}")
+                            st.error(f"💥 HATALI TAHMİN! (-1 Can) {m_item['hesap_adi']}: {m_item['aciklama']}")
+                            time.sleep(1.4)
+                            st.session_state["matrix_step"] += 1
+                            st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
                             st.rerun()
 
-        # OYUN 3: RETRO CANVAS TABANLI BILANÇO SNAKE (DUVARA & KENDİNE ÇARPINCA YANMA TAM AKTİF)
+        # OYUN 3: HEDEFLİ BİLANÇO SNAKE (GÖREV ODAKLI & DURAKLAT/BAŞLAT MENÜLÜ)
         with oyun_sekme3:
             st.markdown("""
             <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:16px 20px; margin-bottom:12px;'>
-                <h4 style='color:#FFFFFF; margin:0 0 4px 0;'>🐍 Retro Bilanço Snake (Kenarlara ve Kendine Çarpınca Yanar!)</h4>
-                <p style='font-size:0.80rem; color:#CBD5E1; margin:0;'>Klavyendeki Yön Tuşlarıyla yılanı yönet! <b>Duvarlara veya kendi kuyruğuna çarparsan anında yanarsın!</b> Ekranda beliren hedef hesap kodunu ye, boyunu uzat.</p>
+                <h4 style='color:#FFFFFF; margin:0 0 4px 0;'>🐍 Görevli Bilanço Snake (Hesap Avı)</h4>
+                <p style='font-size:0.80rem; color:#CBD5E1; margin:0;'>
+                <b>Oyunun Amacı:</b> Ekranda beliren <b>GÖREV HESAP KODUNU</b> ye! Doğru kodu yersen +100 XP kazanırsın. Yanlış kodu yersen veya duvara/kuyruğuna çarparsan yanarsın! 
+                (Durdurmak için <b>[BOŞLUK / SPACE]</b> tuşuna bas).
+                </p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1461,17 +1666,22 @@ with sekme_akademi:
                     .touch-grid { display: grid; grid-template-columns: repeat(3, 55px); gap: 6px; margin-top: 10px; }
                     .t-btn { width: 55px; height: 42px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
                     .t-btn:active { background: #38BDF8; color: #000; }
-                    #msgOverlay { position: absolute; font-size: 20px; font-weight: 800; color: #EF4444; display: none; text-shadow: 0 0 10px rgba(239,68,68,0.8); }
+                    #menuOverlay { position: absolute; width: 440px; height: 300px; background: rgba(6, 9, 19, 0.85); border-radius: 14px; display: none; flex-direction: column; align-items: center; justify-content: center; }
+                    .menu-title { font-size: 20px; font-weight: 800; color: #F43F5E; margin-bottom: 12px; }
+                    .menu-btn { background: #38BDF8; color: #000; border: none; padding: 10px 24px; border-radius: 99px; font-weight: bold; cursor: pointer; }
                 </style>
             </head>
             <body>
                 <div class="hud">
-                    <span>REKOR: <span id="score">0</span> XP</span>
-                    <span>HEDEF: <span id="targetCode" style="color:#A7F3D0;">153 TİCARİ MAL</span></span>
+                    <span>SKOR: <span id="score">0</span> XP</span>
+                    <span>HEDEF: <span id="targetCode" style="color:#FACC15;">153 TİCARİ MAL</span></span>
                 </div>
                 <div style="position:relative; display:flex; align-items:center; justify-content:center;">
                     <canvas id="gameCanvas" width="440" height="300"></canvas>
-                    <div id="msgOverlay">💀 YANDIN! ÇARPIŞMA GERÇEKLEŞTİ</div>
+                    <div id="menuOverlay">
+                        <div class="menu-title" id="overlayTitle">💀 FATURA İPTAL OLDU!</div>
+                        <button class="menu-btn" onclick="restartGame()">YENİDEN BAŞLA</button>
+                    </div>
                 </div>
                 <div class="touch-grid">
                     <div></div><div class="t-btn" onclick="changeDir('UP')">▲</div><div></div>
@@ -1480,88 +1690,114 @@ with sekme_akademi:
                 <script>
                     const canvas = document.getElementById("gameCanvas");
                     const ctx = canvas.getContext("2d");
-                    const overlay = document.getElementById("msgOverlay");
+                    const overlay = document.getElementById("menuOverlay");
+                    const overlayTitle = document.getElementById("overlayTitle");
                     const grid = 20;
                     let count = 0;
                     let score = 0;
+                    let isPaused = false;
                     let isGameOver = false;
 
                     let snake = { x: 160, y: 160, dx: grid, dy: 0, cells: [], maxCells: 4 };
-                    const codes = ["153", "770", "102", "600", "255", "320"];
-                    let food = { x: 80, y: 80, code: "153" };
+                    const allCodes = ["153", "770", "102", "600", "255", "320"];
+                    let targetCode = "153";
+                    let foods = [];
 
                     function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
 
-                    function resetFood() {
-                        food.x = getRandomInt(0, 22) * grid;
-                        food.y = getRandomInt(0, 15) * grid;
-                        food.code = codes[Math.floor(Math.random() * codes.length)];
-                        document.getElementById("targetCode").innerText = food.code + " KODU";
+                    function spawnFoods() {
+                        foods = [];
+                        targetCode = allCodes[Math.floor(Math.random() * allCodes.length)];
+                        document.getElementById("targetCode").innerText = targetCode + " KODUNU YE!";
+
+                        // Doğru Hedef Yem
+                        foods.push({
+                            x: getRandomInt(0, 22) * grid,
+                            y: getRandomInt(0, 15) * grid,
+                            code: targetCode,
+                            isTarget: true
+                        });
+
+                        // Yanıltıcı Yem
+                        let fakeCode = allCodes[Math.floor(Math.random() * allCodes.length)];
+                        while(fakeCode === targetCode) fakeCode = allCodes[Math.floor(Math.random() * allCodes.length)];
+                        foods.push({
+                            x: getRandomInt(0, 22) * grid,
+                            y: getRandomInt(0, 15) * grid,
+                            code: fakeCode,
+                            isTarget: false
+                        });
                     }
 
-                    function triggerGameOver() {
+                    function triggerGameOver(msg) {
                         isGameOver = true;
-                        overlay.style.display = "block";
-                        setTimeout(() => {
-                            snake.x = 160; snake.y = 160;
-                            snake.cells = []; snake.maxCells = 4;
-                            snake.dx = grid; snake.dy = 0;
-                            score = 0;
-                            document.getElementById("score").innerText = score;
-                            resetFood();
-                            overlay.style.display = "none";
-                            isGameOver = false;
-                        }, 1400);
+                        overlayTitle.innerText = msg;
+                        overlay.style.display = "flex";
+                    }
+
+                    function restartGame() {
+                        snake.x = 160; snake.y = 160;
+                        snake.cells = []; snake.maxCells = 4;
+                        snake.dx = grid; snake.dy = 0;
+                        score = 0;
+                        document.getElementById("score").innerText = score;
+                        overlay.style.display = "none";
+                        isGameOver = false;
+                        spawnFoods();
                     }
 
                     function gameLoop() {
                         requestAnimationFrame(gameLoop);
-                        if (++count < 6 || isGameOver) return;
+                        if (++count < 6 || isPaused || isGameOver) return;
                         count = 0;
 
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                         snake.x += snake.dx;
                         snake.y += snake.dy;
 
-                        // 1. KENARLARA / DUVARA ÇARPINCA YANMA MEKANİĞİ
+                        // DUVARA ÇARPINCA YANMA
                         if (snake.x < 0 || snake.x >= canvas.width || snake.y < 0 || snake.y >= canvas.height) {
-                            triggerGameOver();
+                            triggerGameOver("💀 DUVARA ÇARPTIN! (BİLANÇO TAŞTI)");
                             return;
                         }
 
                         snake.cells.unshift({x: snake.x, y: snake.y});
                         if (snake.cells.length > snake.maxCells) snake.cells.pop();
 
-                        // YEM ÇİZ
-                        ctx.fillStyle = "#F43F5E";
-                        ctx.shadowColor = "#F43F5E";
-                        ctx.shadowBlur = 8;
-                        ctx.fillRect(food.x, food.y, grid-1, grid-1);
-                        ctx.shadowBlur = 0;
-                        ctx.fillStyle = "#FFF";
-                        ctx.font = "bold 9px monospace";
-                        ctx.fillText(food.code, food.x + 2, food.y + 13);
+                        // YEMLERİ ÇİZ
+                        foods.forEach(f => {
+                            ctx.fillStyle = f.isTarget ? "#FACC15" : "#EF4444";
+                            ctx.fillRect(f.x, f.y, grid-1, grid-1);
+                            ctx.fillStyle = "#000";
+                            ctx.font = "bold 9px monospace";
+                            ctx.fillText(f.code, f.x + 2, f.y + 13);
+                        });
 
-                        // YILAN ÇİZ & 2. KENDİNE ÇARPINCA YANMA MEKANİĞİ
+                        // YILAN ÇİZ & ÇARPIŞMALAR
                         ctx.fillStyle = "#10B981";
                         snake.cells.forEach(function(cell, index) {
-                            if (index === 0) ctx.fillStyle = "#34D399";
-                            else ctx.fillStyle = "#059669";
-
+                            if (index === 0) ctx.fillStyle = "#38BDF8";
+                            else ctx.fillStyle = "#10B981";
                             ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
 
-                            // YEMİ YEME
-                            if (cell.x === food.x && cell.y === food.y) {
-                                snake.maxCells++;
-                                score += 50;
-                                document.getElementById("score").innerText = score;
-                                resetFood();
-                            }
+                            // YEM YEME KONTROLÜ
+                            foods.forEach(f => {
+                                if (cell.x === f.x && cell.y === f.y) {
+                                    if (f.isTarget) {
+                                        snake.maxCells++;
+                                        score += 100;
+                                        document.getElementById("score").innerText = score;
+                                        spawnFoods();
+                                    } else {
+                                        triggerGameOver("❌ YANLIŞ HESABI YEDİN! (VERGİ CEZASI)");
+                                    }
+                                }
+                            });
 
-                            // KENDİ KUYRUĞUNA ÇARPMA KONTROLÜ
+                            // KUYRUĞA ÇARPMA
                             for (let i = index + 1; i < snake.cells.length; i++) {
                                 if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-                                    triggerGameOver();
+                                    triggerGameOver("💀 KUYRUĞUNA ÇARPTIN!");
                                     return;
                                 }
                             }
@@ -1576,19 +1812,69 @@ with sekme_akademi:
                     }
 
                     document.addEventListener('keydown', function(e) {
+                        if (e.which === 32) isPaused = !isPaused;
                         if (e.which === 37 && snake.dx === 0) changeDir('LEFT');
                         else if (e.which === 38 && snake.dy === 0) changeDir('UP');
                         else if (e.which === 39 && snake.dx === 0) changeDir('RIGHT');
                         else if (e.which === 40 && snake.dy === 0) changeDir('DOWN');
                     });
 
-                    resetFood();
+                    spawnFoods();
                     requestAnimationFrame(gameLoop);
                 </script>
             </body>
             </html>
             """
-            components.html(snake_html, height=440)
+            components.html(snake_html, height=430)
+
+        # OYUN 4: ETA & LUCA YEVMİYE FİŞİ PROVA MOTORU
+        with oyun_sekme4:
+            sim = st.session_state["sim_current_vaka"]
+            st.markdown(f"""
+            <div style='background:rgba(15,23,42,0.75); border:1px solid #38BDF8; border-radius:18px; padding:20px; margin-bottom:14px;'>
+                <div style='display:flex; justify-content:space-between; align-items:center;'>
+                    <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1.2px;'>ETA / LUCA PROVA VAKASI #{sim['step']}</span>
+                    <span style='font-size:0.75rem; color:#A7F3D0; font-weight:700;'>Tutar: {sim['tutar']:,.2f} TL</span>
+                </div>
+                <h4 style='color:#FFFFFF; margin:6px 0 8px 0;'>Senaryo: {sim['olay']}</h4>
+                <p style='font-size:0.80rem; color:#CBD5E1; margin:0;'>Bu ticari hareketi ETA V.11 / Luca formatında hatasız olarak yevmiye fişine bağla!</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+            f_c1, f_c2, f_c3, f_c4 = st.columns(4)
+            with f_c1:
+                in_b_kod = st.text_input("Borç Hesap Kodu (Örn: 320, 770):", key=f"in_b_k_{sim['step']}")
+            with f_c2:
+                in_b_tut = st.number_input("Borç Tutarı (TL):", min_value=0.0, value=0.0, step=100.0, key=f"in_b_t_{sim['step']}")
+            with f_c3:
+                in_a_kod = st.text_input("Alacak Hesap Kodu (Örn: 100, 102):", key=f"in_a_k_{sim['step']}")
+            with f_c4:
+                in_a_tut = st.number_input("Alacak Tutarı (TL):", min_value=0.0, value=0.0, step=100.0, key=f"in_a_t_{sim['step']}")
+
+            if st.button("💾 Fişi ETA'ya Kaydet & Mühürle", use_container_width=True):
+                # Doğruluk Kontrolü
+                kod_dogru = (sim["borc_kod"] in in_b_kod) and (sim["alacak_kod"] in in_a_kod)
+                tutar_dogru = (in_b_tut == sim["tutar"]) and (in_a_tut == sim["tutar"])
+
+                if kod_dogru and tutar_dogru:
+                    st.session_state["academy_xp"] += sim["xp"]
+                    st.session_state["academy_streak"] += 1
+                    sesli_bildirim_cal("success")
+                    st.balloons()
+                    st.success(f"🎉 MÜKEMMEL KAYIT! Fiş ETA V.11 yevmiye defterine başarıyla işlendi. (+{sim['xp']} XP)")
+                    time.sleep(1.4)
+                    st.session_state["sim_step"] += 1
+                    st.session_state["sim_current_vaka"] = generate_luca_simulation(st.session_state["sim_step"])
+                    st.rerun()
+                else:
+                    st.session_state["academy_lives"] -= 1
+                    st.session_state["academy_streak"] = 0
+                    sesli_bildirim_cal("error")
+                    st.error(f"💥 HATALI YEVMİYE FİŞİ! (-1 Can) Doğru Borç: {sim['borc_kod']} ({sim['borc_ad']}), Doğru Alacak: {sim['alacak_kod']} ({sim['alacak_ad']}) ve Tutar: {sim['tutar']:,.2f} TL olmalıydı.")
+                    time.sleep(1.5)
+                    st.session_state["sim_step"] += 1
+                    st.session_state["sim_current_vaka"] = generate_luca_simulation(st.session_state["sim_step"])
+                    st.rerun()
 
 # ------------------------------------------------------------------------------
 # SEKME 3: ⚖️ HUKUKİ ÇERÇEVE & SLA (WHATSAPP BALONLARI)
