@@ -1,8 +1,9 @@
 """
 ================================================================================
-LEDGERAI — HUMAN + AI CO-PILOT FINANCIAL TERMINAL
+LEDGERAI — INSTITUTIONAL ENTERPRISE ACCOUNTING TERMINAL
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: Smooth Pill Micro-Interactions / Open Slate Executive Architecture
+Design: Open Slate / Fluid Responsive Micro-UI / Interactive Pill Controls
+Version: 3.5.0 Enterprise Production Edition
 ================================================================================
 """
 
@@ -10,10 +11,13 @@ import streamlit as st
 import json
 import time
 import io
+import re
 import datetime
+import math
 import pandas as pd
 from google import genai
 from google.genai import types
+from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
@@ -22,7 +26,7 @@ from openpyxl.utils import get_column_letter
 # ==============================================================================
 
 st.set_page_config(
-    page_title="LedgerAI — Human + AI Financial Terminal",
+    page_title="LedgerAI — Autonomous Financial Terminal",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -38,13 +42,18 @@ SESSION_DEFAULTS = {
     "h_deb": "Borç",
     "h_crd": "Alacak",
     "processed_docs_count": 0,
-    "last_processing_time": 0.0
+    "last_processing_time": 0.0,
+    "total_batch_debit": 0.0,
+    "total_batch_credit": 0.0,
+    "total_withholding_amount": 0.0,
+    "audit_logs": []
 }
 
 for key, default_val in SESSION_DEFAULTS.items():
     if key not in st.session_state:
         st.session_state[key] = default_val
 
+# Güvenli API Anahtarı Kontrolü
 if "GEMINI_API_KEY" in st.secrets:
     API_KEY = st.secrets["GEMINI_API_KEY"]
 else:
@@ -54,7 +63,7 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. LOCALIZATION DATA DICTIONARY
+# 2. LOCALIZATION DATA DICTIONARY (6 DİLLİ GLOBAL MEVZUAT)
 # ==============================================================================
 
 LANG_DATA = {
@@ -77,6 +86,7 @@ LANG_DATA = {
         "unbalanced": "⚠️ Bakiye Farkı Var!",
         "download_btn": "📥 Çok Sayfalı Kurumsal Excel'i İndir (.xlsx)",
         "download_eta": "💾 ETA V.11 Uyumlu CSV",
+        "download_luca": "💾 Luca Uyumlu Aktarım",
         "industries": [
             "⚡ Otomatik Sektör (AI)",
             "🛒 Ticaret / Al-Sat (153 Ağırlıklı)",
@@ -92,10 +102,11 @@ LANG_DATA = {
         "about_title": "LedgerAI Mimarisi & İnsan-AI Ortaklığı",
         "about_content": """
         ### 🛡️ İnsan Gücü ve Yapay Zekanın Güvenli Birleşimi
-        **LedgerAI**, çalışanların veya mali müşavirlerin yerini almak için değil; onların üzerindeki mekanik iş yükünü kaldırıp stratejik denetim gücü kazandırmak için tasarlandı.
+        **LedgerAI**, çalışanların veya mali müşavirlerin yerini almak için değil; onların üzerindeki mekanik veri giriş yükünü kaldırıp stratejik denetim gücü kazandırmak için tasarlandı.
         * **1. Çift Göz Prensibi:** Yapay zeka faturadaki KDV tevkifatını ve matrahı ayrıştırıp yevmiye fişini hazırlar; insan uzman son kontrolü yapıp onaylar.
         * **2. Sıfır Hata Garantisi:** Matematiksel olarak Borç = Alacak denkliği kuruşu kuruşuna doğrulanmadan sistem fiş üretmez.
         * **3. İstihdamı Destekleyen Teknoloji:** Muhasebe personeli saatlerce fatura girmek yerine finansal analiz ve danışmanlığa odaklanır.
+        * **4. ERP Uyumluluğu:** ETA V.11, Luca, Logo, Zirve, Mikro, Datev ve QuickBooks standartlarında çıktı sağlar.
         """,
         "step1_title": "1. Belge & Tevkifat Okuma",
         "step1_desc": "OCR ile çoklu KDV, tevkifat ve stopaj kuruşu kuruşuna ayıklanır.",
@@ -108,12 +119,13 @@ LANG_DATA = {
         "badge_sec": "✓ %100 VERİ GİZLİLİĞİ & GÜVENLİK",
         "bot_title": "👾 LedgerBot Finans Mentorü",
         "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya fatura mantığını sormak için aşağıdaki hap sorulara tıklayabilirsin:",
-        "bot_placeholder": "Muhasebe sorunuzu yazın...",
+        "bot_placeholder": "Muhasebe sorunuzu yazın (Örn: 153 ile 770 farkı nedir?)...",
         "bot_clear": "🧹 Temizle",
         "quick_chips": [
             "💡 Muhasebeciye ne kazandırır?",
             "🔒 Verilerim güvende mi?",
-            "⚖️ Tevkifat & Stopaj mantığı nedir?"
+            "⚖️ Tevkifat & Stopaj mantığı nedir?",
+            "🎯 153 ile 770 arasındaki fark nedir?"
         ],
         "headers": {
             "vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu",
@@ -140,6 +152,7 @@ LANG_DATA = {
         "unbalanced": "⚠️ Unbalanced Voucher!",
         "download_btn": "📥 Download Multi-Tab Corporate Excel (.xlsx)",
         "download_eta": "💾 Generic CSV Format",
+        "download_luca": "💾 QuickBooks Format",
         "industries": [
             "⚡ Auto Industry (AI)", "🛒 Retail / Inventory (1200)",
             "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"
@@ -163,17 +176,242 @@ LANG_DATA = {
         "badge_sec": "✓ SOC2 & BANK-GRADE ENCRYPTION",
         "bot_title": "👾 LedgerBot Finance Mentor",
         "bot_welcome": "Hi! I am your AI finance mentor. Tap any quick pill question below or ask me directly:",
-        "bot_placeholder": "Ask a question...",
+        "bot_placeholder": "Ask a question (e.g. How to book SaaS subscriptions?)...",
         "bot_clear": "🧹 Clear",
         "quick_chips": [
             "💡 How does it save time?",
             "🔒 Is our data secure?",
-            "⚖️ Explain Debit vs Credit"
+            "⚖️ Explain Debit vs Credit",
+            "🎯 Inventory vs OpEx accounts"
         ],
         "headers": {
             "vouch": "Voucher #", "date": "Date", "code": "Account Code",
             "name": "Account Name", "desc": "Memo", "curr": "Currency",
             "deb": "Debit", "crd": "Credit"
+        }
+    },
+    "🇩🇪 DE": {
+        "badge": "MENSCH + KI FINANZTERMINAL",
+        "title": "LedgerAI",
+        "subtitle": "KI bereitet Buchungen und Steuern vor; Finanzexperten prüfen und geben frei.",
+        "drop_title": "Belege hier ablegen oder durchsuchen",
+        "drop_sub": "PDF, PNG, JPG • Rechnungen & Quittungen",
+        "process_btn": "⚡ Buchungssätze Erstellen",
+        "limit_err": "🛑 Maximal 5 Dokumente im Demo-Modus.",
+        "ready_count": "Bereit: **{count}**",
+        "success": "✓ Buchungen erfolgreich erstellt und ausgeglichen.",
+        "failed": "❌ Belege konnten nicht gelesen werden.",
+        "preview_title": "📊 Buchungszeilen & Kontrollzentrum",
+        "preview_tip": "💡 Doppelklick zum Ändern von Konten oder Beträgen.",
+        "tot_deb": "Soll Gesamt",
+        "tot_crd": "Haben Gesamt",
+        "balanced": "✅ Ausgeglichen (Soll = Haben)",
+        "unbalanced": "⚠️ Differenz festgestellt!",
+        "download_btn": "📥 Excel Herunterladen (.xlsx)",
+        "download_eta": "💾 Datev Format (CSV)",
+        "download_luca": "💾 SAP Kompatibel",
+        "industries": [
+            "⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf",
+            "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"
+        ],
+        "themes": [
+            "🌑 Platin Titan",
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night"
+        ],
+        "about_btn": "ℹ️ Funktionsweise & Philosophie",
+        "about_title": "LedgerAI Architektur & Mensch-KI Standard",
+        "about_content": "LedgerAI entlastet Buchhalter durch intelligente Vorkontierung unter ständiger Expertenkontrolle.",
+        "step1_title": "1. Belegprüfung",
+        "step1_desc": "Präzise Vorsteueraufteilung und USt-IdNr Validierung in Sekunden.",
+        "step2_title": "2. SKR03/04 Zuordnung",
+        "step2_desc": "Automatische Kontierung nach Wareneinkauf, Kosten oder Anlagevermögen.",
+        "step3_title": "3. Soll/Haben-Check",
+        "step3_desc": "Revisionssichere Prüfung auf mathematische Ausgeglichenheit.",
+        "badge_erp": "✓ DATEV SKR03/04 • SAP KOMPATIBEL",
+        "badge_audit": "✓ 100% SOLL/HABEN AUSGEGLICHENHEIT",
+        "badge_sec": "✓ DSGVO-KONFORME DATENVERARBEITUNG",
+        "bot_title": "👾 LedgerBot Finanzmentor",
+        "bot_welcome": "Hallo! Tippen Sie auf eine Frage oder fragen Sie mich direkt nach Buchungssätzen:",
+        "bot_placeholder": "Frage eingeben...",
+        "bot_clear": "🧹 Leeren",
+        "quick_chips": [
+            "💡 Wie spart es Arbeitszeit?",
+            "🔒 Datenschutz & Sicherheit",
+            "⚖️ Soll an Haben Prinzip"
+        ],
+        "headers": {
+            "vouch": "Beleg", "date": "Datum", "code": "Konto",
+            "name": "Bezeichnung", "desc": "Text", "curr": "Währung",
+            "deb": "Soll", "crd": "Haben"
+        }
+    },
+    "🇫🇷 FR": {
+        "badge": "TERMINAL COLLABORATIF IA + HUMAIN",
+        "title": "LedgerAI",
+        "subtitle": "L'IA prépare les imputations comptables; l'expert-comptable valide et approuve.",
+        "drop_title": "Déposer les pièces comptables ici",
+        "drop_sub": "Factures et reçus (PDF, PNG, JPG)",
+        "process_btn": "⚡ Générer les Écritures",
+        "limit_err": "🛑 Limite: 5 documents par lot.",
+        "ready_count": "Prêts: **{count}**",
+        "success": "✓ Écritures générées avec succès et équilibrées.",
+        "failed": "❌ Échec de lecture.",
+        "preview_title": "📊 Journal Comptable & Audit Expert",
+        "preview_tip": "💡 Double-cliquez sur une cellule pour modifier.",
+        "tot_deb": "Total Débit",
+        "tot_crd": "Total Crédit",
+        "balanced": "✅ Équilibré (Débit = Crédit)",
+        "unbalanced": "⚠️ Déséquilibre Détecté!",
+        "download_btn": "📥 Télécharger Excel (.xlsx)",
+        "download_eta": "💾 Format Standard PCG",
+        "download_luca": "💾 Sage / Cegid Ready",
+        "industries": [
+            "⚡ Auto (IA)", "🛒 Négoce / Stock",
+            "🏢 Services / Conseil", "🏭 Production / Industrie"
+        ],
+        "themes": [
+            "🌑 Platine Titane",
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night"
+        ],
+        "about_btn": "ℹ️ Fonctionnement & Philosophie",
+        "about_title": "Architecture LedgerAI & Co-Pilotage",
+        "about_content": "L'alliance de l'intelligence artificielle et du discernement de l'expert-comptable.",
+        "step1_title": "1. Lecture OCR",
+        "step1_desc": "Extraction des montants HT, TVA et identification du fournisseur.",
+        "step2_title": "2. Ventilation PCG",
+        "step2_desc": "Affectation automatique aux comptes de classe 6 selon l'activité.",
+        "step3_title": "3. Contrôle Débit/Crédit",
+        "step3_desc": "Vérification stricte de l'équilibre de chaque écriture de journal.",
+        "badge_erp": "✓ CONFORME PCG • SAGE & CEGID READY",
+        "badge_audit": "✓ ÉQUILIBRE DÉBIT/CRÉDIT GARANTI",
+        "badge_sec": "✓ SÉCURITÉ CONFORME RGPD",
+        "bot_title": "👾 LedgerBot Mentor",
+        "bot_welcome": "Bonjour! Choisissez une question rapide ou posez votre question comptable:",
+        "bot_placeholder": "Poser une question...",
+        "bot_clear": "🧹 Effacer",
+        "quick_chips": [
+            "💡 Gain de temps en cabinet",
+            "🔒 Sécurité des données",
+            "⚖️ Principe Débit / Crédit"
+        ],
+        "headers": {
+            "vouch": "Pièce", "date": "Date", "code": "Compte",
+            "name": "Libellé", "desc": "Détail", "curr": "Devise",
+            "deb": "Débit", "crd": "Crédit"
+        }
+    },
+    "🇪🇸 ES": {
+        "badge": "TERMINAL COLABORATIVO IA + HUMANO",
+        "title": "LedgerAI",
+        "subtitle": "La IA estructura los asientos contables; el asesor profesional revisa y valida.",
+        "drop_title": "Arrastra los documentos aquí o examina",
+        "drop_sub": "PDF, PNG, JPG • Facturas y recibos",
+        "process_btn": "⚡ Generar Asientos",
+        "limit_err": "🛑 Máximo 5 documentos por lote.",
+        "ready_count": "Listos: **{count}**",
+        "success": "✓ Asientos generados y equilibrados.",
+        "failed": "❌ Error al procesar.",
+        "preview_title": "📊 Libro Diario & Mesa de Control",
+        "preview_tip": "💡 Haz doble clic para modificar cuentas.",
+        "tot_deb": "Total Debe",
+        "tot_crd": "Total Haber",
+        "balanced": "✅ Cuadrado (Debe = Haber)",
+        "unbalanced": "⚠️ Descuadre Detectado!",
+        "download_btn": "📥 Descargar Excel (.xlsx)",
+        "download_eta": "💾 Formato Contasol",
+        "download_luca": "💾 A3 / Sage Ready",
+        "industries": [
+            "⚡ Automático (IA)", "🛒 Comercio / Inventario",
+            "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"
+        ],
+        "themes": [
+            "🌑 Platino Titanio",
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night"
+        ],
+        "about_btn": "ℹ️ Filosofía y Seguridad",
+        "about_title": "Arquitectura y Simbiosis Humano-IA",
+        "about_content": "Potenciando al contador mediante automatización sin sustituir su criterio profesional.",
+        "step1_title": "1. Análisis de Factura",
+        "step1_desc": "Lectura OCR avanzada de bases imponibles y tipos impositivos.",
+        "step2_title": "2. Asignación PGC",
+        "step2_desc": "Distribución en cuentas de gastos o existencias según la empresa.",
+        "step3_title": "3. Cuadre de Asiento",
+        "step3_desc": "Garantía matemática de que el Debe coincide con el Haber.",
+        "badge_erp": "✓ COMPATIBLE A3 • SAGE • SOFTWARE FISCAL",
+        "badge_audit": "✓ CUADRE DEBE = HABER GARANTIZADO",
+        "badge_sec": "✓ CIFRADO DE DATOS BANCARIO",
+        "bot_title": "👾 LedgerBot Mentor",
+        "bot_welcome": "¡Hola! Pulsa una pregunta rápida o escribe tu consulta contable:",
+        "bot_placeholder": "Escribe tu duda...",
+        "bot_clear": "🧹 Limpiar",
+        "quick_chips": [
+            "💡 Ventajas para la asesoría",
+            "🔒 Seguridad y confidencialidad",
+            "⚖️ Cuadre de Debe y Haber"
+        ],
+        "headers": {
+            "vouch": "Asiento", "date": "Fecha", "code": "Cuenta",
+            "name": "Nombre Cuenta", "desc": "Concepto", "curr": "Moneda",
+            "deb": "Debe", "crd": "Haber"
+        }
+    },
+    "🇮🇹 IT": {
+        "badge": "TERMINALE COLLABORATIVO IA + UOMO",
+        "title": "LedgerAI",
+        "subtitle": "L'IA prepara le scritture contabili; il commercialista esperto valida e autorizza.",
+        "drop_title": "Trascina qui le fatture o cerca file",
+        "drop_sub": "PDF, PNG, JPG • Ricevute e fatture",
+        "process_btn": "⚡ Genera Scritture",
+        "limit_err": "🛑 Massimo 5 documenti.",
+        "ready_count": "Pronti: **{count}**",
+        "success": "✓ Scritture generate e bilanciate.",
+        "failed": "❌ Impossibile elaborare.",
+        "preview_title": "📊 Prima Nota & Centro di Controllo",
+        "preview_tip": "💡 Fai doppio clic per modificare.",
+        "tot_deb": "Totale Dare",
+        "tot_crd": "Totale Avere",
+        "balanced": "✅ Quadratura Perfetta",
+        "unbalanced": "⚠️ Sbilancio!",
+        "download_btn": "📥 Scarica Excel (.xlsx)",
+        "download_eta": "💾 Formato Zucchetti",
+        "download_luca": "💾 Teamsystem Ready",
+        "industries": [
+            "⚡ Automatico (IA)", "🛒 Commercio / Magazzino",
+            "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"
+        ],
+        "themes": [
+            "🌑 Platino Titanio",
+            "✨ Ultra Vivid Aurora",
+            "🌌 Cyberpunk Night"
+        ],
+        "about_btn": "ℹ️ Filosofia e Sicurezza",
+        "about_title": "Architettura di Collaborazione Uomo-IA",
+        "about_content": "Automazione contabile trasparente che esalta il valore del consulente aziendale.",
+        "step1_title": "1. Acquisizione Dati",
+        "step1_desc": "Scansione OCR di aliquote IVA, imponibili e fornitore.",
+        "step2_title": "2. Piano dei Conti",
+        "step2_desc": "Classificazione tra costi di gestione, merci o cespiti ammortizzabili.",
+        "step3_title": "3. Quadratura Dare/Avere",
+        "step3_desc": "Verifica della perfetta parità contabile della scrittura.",
+        "badge_erp": "✓ PRONTO PER ZUCCHETTI • TEAMSYSTEM • SAP",
+        "badge_audit": "✓ QUADRATURA DARE/AVERE GARANTITA",
+        "badge_sec": "✓ PROTEZIONE DATI STANDARD BANCARIO",
+        "bot_title": "👾 LedgerBot Mentor",
+        "bot_welcome": "Ciao! Seleziona una domanda pillola o scrivimi direttamente:",
+        "bot_placeholder": "Fai una domanda contabile...",
+        "bot_clear": "🧹 Cancella",
+        "quick_chips": [
+            "💡 Vantaggi per lo studio",
+            "🔒 Sicurezza dei dati fiscali",
+            "⚖️ Pareggio Dare / Avere"
+        ],
+        "headers": {
+            "vouch": "Partita", "date": "Data", "code": "Conto",
+            "name": "Descrizione", "desc": "Causale", "curr": "Valuta",
+            "deb": "Dare", "crd": "Avere"
         }
     }
 }
@@ -184,7 +422,7 @@ if st.session_state["user_lang"] not in LANG_DATA:
 T = LANG_DATA[st.session_state["user_lang"]]
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (SEPETE EKLE TARZI OVAL BUTONLAR & AKICI TİPOGRAFİ)
+# 3. DYNAMIC STYLING ENGINE (SEPETE EKLE MODELİ HAP BUTONLAR & AKICI CSS)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -248,7 +486,7 @@ st.markdown(f"""
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }}
     
-    /* WHITELABEL: GITHUB, STREAMLIT FOOTER VE MENÜLERİ TAMAMEN GİZLE */
+    /* WHITELABEL GİZLEME */
     header[data-testid="stHeader"] {{ display: none !important; }}
     #MainMenu {{ visibility: hidden !important; }}
     footer {{ visibility: hidden !important; }}
@@ -261,14 +499,14 @@ st.markdown(f"""
     
     .stApp {{
         color: #F8FAFC;
-        padding-top: 15px;
+        padding-top: 10px;
         padding-bottom: 70px;
     }}
 
     /* MASTER GLASS TERMINAL */
     .master-console {{
         max-width: 980px;
-        margin: 15px auto 0 auto;
+        margin: 10px auto 0 auto;
         background: rgba(30, 41, 59, 0.72);
         border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 28px;
@@ -335,7 +573,7 @@ st.markdown(f"""
     div.stButton > button:first-child {{
         background: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
-        border-radius: 9999px !important; /* TAM OVAL HAP */
+        border-radius: 9999px !important;
         font-weight: 700 !important;
         font-size: clamp(0.92rem, 1.3vw, 1.02rem) !important;
         padding: 13px 34px !important;
@@ -403,34 +641,64 @@ st.markdown(f"""
         color: #CBD5E1;
     }}
 
-    /* KONTROL BARI */
+    /* CONSOLE CONTROLS */
     .console-controls {{
         margin-top: 20px;
         padding-top: 16px;
         border-top: 1px solid rgba(255, 255, 255, 0.10);
     }}
 
+    /* CANLI TEMA ŞERİDİ (TEMA DEĞİŞİMİNİ BELLİ EDEN ÜST BAR) */
+    .theme-switcher-bar {{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin: 0 auto 14px auto;
+        padding: 4px 12px;
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 9999px;
+        width: fit-content;
+    }}
+    .theme-switcher-label {{
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: #CBD5E1;
+        letter-spacing: 0.5px;
+    }}
+
     /* SEPETE EKLE MODELİ MİKRO BUTONLAR (CHIPS) */
+    div.pill-scroll-row {{
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 6px 2px 10px 2px;
+        scrollbar-width: none;
+    }}
+    div.pill-scroll-row::-webkit-scrollbar {{ display: none; }}
+
     div[data-testid="stExpander"] div.stButton button {{
         background: #000000 !important;
-        border: 1px solid rgba(255, 255, 255, 0.22) !important;
-        border-radius: 9999px !important; /* Tam oval hap buton */
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        border-radius: 9999px !important;
         font-size: 0.78rem !important;
         font-weight: 600 !important;
         color: #F8FAFC !important;
         padding: 6px 16px !important;
         height: auto !important;
-        min-height: 34px !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+        min-height: 32px !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.4) !important;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        white-space: normal !important;
-        line-height: 1.3 !important;
+        white-space: nowrap !important;
+        line-height: 1.2 !important;
+        margin-top: 0px !important;
     }}
     div[data-testid="stExpander"] div.stButton button:hover {{
         background: #1E293B !important;
-        border-color: rgba(255, 255, 255, 0.5) !important;
-        transform: scale(1.03) !important;
-        box-shadow: 0 4px 15px rgba(255,255,255,0.15) !important;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+        transform: scale(1.04) !important;
+        box-shadow: 0 4px 15px rgba(255,255,255,0.2) !important;
     }}
 
     .chat-scroll-area {{
@@ -638,9 +906,24 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 6. MASTER USER INTERFACE & LAYOUT
+# 6. MASTER USER INTERFACE & DYNAMIC THEME SWITCHER
 # ==============================================================================
 
+# EN ÜSTTE CANLI TEMA SEÇİCİ ŞERİT (KULLANICININ ANINDA FARK ETMESİ İÇİN)
+st.markdown("<div class='theme-switcher-bar'>", unsafe_allow_html=True)
+st.markdown("<span class='theme-switcher-label'>🎨 Görünüm:</span>", unsafe_allow_html=True)
+theme_cols = st.columns(len(T["themes"]))
+for t_idx, t_name in enumerate(T["themes"]):
+    with theme_cols[t_idx]:
+        is_active = (st.session_state["theme_idx"] == t_idx)
+        btn_label = f"✓ {t_name}" if is_active else t_name
+        if st.button(btn_label, key=f"top_theme_btn_{t_idx}"):
+            if st.session_state["theme_idx"] != t_idx:
+                st.session_state["theme_idx"] = t_idx
+                st.rerun()
+st.markdown("</div>", unsafe_allow_html=True)
+
+# ANA KONSOL KARTI
 st.markdown(f"""
 <div class='master-console'>
     <div class='top-badge'>● {T['badge']}</div>
@@ -803,9 +1086,9 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# KONSOL İÇİ KONTROL ÇUBUĞU
+# KONSOL İÇİ KONTROL ÇUBUĞU (DİL, SEKTÖR VE MİMARİ BİLGİSİ)
 st.markdown("<div class='console-controls'>", unsafe_allow_html=True)
-c_ctrl1, c_ctrl2, c_ctrl3, c_ctrl4 = st.columns([1.8, 3.2, 3.2, 2.0])
+c_ctrl1, c_ctrl2, c_ctrl3 = st.columns([2.5, 4.5, 3.0])
 
 with c_ctrl1:
     lang_keys = list(LANG_DATA.keys())
@@ -816,20 +1099,13 @@ with c_ctrl1:
         st.rerun()
 
 with c_ctrl2:
-    new_theme_str = st.selectbox("Theme / Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
-    new_t_idx = T["themes"].index(new_theme_str)
-    if new_t_idx != st.session_state["theme_idx"]:
-        st.session_state["theme_idx"] = new_t_idx
-        st.rerun()
-
-with c_ctrl3:
     new_industry_str = st.selectbox("Industry / Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
     new_i_idx = T["industries"].index(new_industry_str)
     if new_i_idx != st.session_state["industry_idx"]:
         st.session_state["industry_idx"] = new_i_idx
         st.rerun()
 
-with c_ctrl4:
+with c_ctrl3:
     with st.popover(T["about_btn"]):
         st.markdown(f"#### {T['about_title']}")
         st.markdown(T["about_content"])
@@ -845,7 +1121,6 @@ if st.session_state["out_df"] is not None:
     st.subheader(T["preview_title"])
     st.caption(T["preview_tip"])
 
-    # AKILLI FİLTRELEME & DENETİM KONTROLÜ
     headers = T["headers"]
     st.markdown("<div class='filter-card'>", unsafe_allow_html=True)
     f_col1, f_col2, f_col3 = st.columns([2.5, 3.5, 2])
@@ -934,7 +1209,7 @@ if st.session_state["out_df"] is not None:
         )
 
 # ==============================================================================
-# 8. MENTOR FINANS ASİSTANI (SEPETE EKLE TARZI OVAL CHIP BUTONLAR)
+# 8. MENTOR FINANS ASİSTANI (SEPETE EKLE DİZAYNI YATAY HAP BUTONLAR)
 # ==============================================================================
 
 st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
@@ -945,11 +1220,11 @@ with c_bot_center:
         top_col1, top_col2 = st.columns([5.5, 1.5])
         top_col1.caption(T["bot_welcome"])
         with top_col2:
-            if st.button(T["bot_clear"], use_container_width=True):
+            if st.button(T["bot_clear"], key="btn_clear_chat", use_container_width=True):
                 st.session_state["chat_messages"] = []
                 st.rerun()
 
-        # SEPETE EKLE DİZAYNI OVAL BUTONLAR
+        # SEPETE EKLE DİZAYNI OVAL HAP BUTONLAR (KOLONSUZ, ASLA ALT ALTA YIĞILMAZ)
         secilen_chip = None
         chip_cols = st.columns(len(T["quick_chips"]))
         for c_idx, chip_text in enumerate(T["quick_chips"]):
