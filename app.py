@@ -1,10 +1,10 @@
 """
 ================================================================================
 LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY HUB
-Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: iPhone Lockscreen Circular Glass Buttons / WhatsApp Legal Bubbles
+Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL + HTML5 Canvas
+Design: Minimal Circular Glass Nav / WhatsApp Legal Cards / Retro Canvas Snake
 Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, US GAAP
-Version: 6.0.0 Masterpiece Production Edition
+Version: 6.5.0 Master Edition
 ================================================================================
 """
 
@@ -16,6 +16,7 @@ import random
 import datetime
 import math
 import pandas as pd
+import streamlit.components.v1 as components
 from google import genai
 from google.genai import types
 from openpyxl import Workbook
@@ -50,7 +51,9 @@ SESSION_DEFAULTS = {
     "academy_xp": 100,
     "academy_level": "Mali Stajyer",
     "game_step": 1,
-    "current_game_vaka": None
+    "current_game_vaka": None,
+    "matrix_step": 1,
+    "matrix_current_item": None
 }
 
 for key, default_val in SESSION_DEFAULTS.items():
@@ -67,7 +70,7 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. PROSEDÜREL OYUN MOTORU (SADE VE NET: ALIŞ, GİDER, DEMİRBAŞ)
+# 2. OYUN MOTORU VERİTABANLARI (AVCI, MATRİS VE SNAKE)
 # ==============================================================================
 
 def generate_simple_puzzle(step: int):
@@ -120,8 +123,26 @@ def generate_simple_puzzle(step: int):
 if st.session_state["current_game_vaka"] is None:
     st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"])
 
+# OYUN 2 MATRİS ELEMANLARI
+MATRIX_CARDS = [
+    {"hesap": "100 KASA", "dogru_sinif": 1, "aciklama": "1. Dönen Varlıklar sınıfıdır."},
+    {"hesap": "102 BANKALAR", "dogru_sinif": 1, "aciklama": "1. Dönen Varlıklar sınıfıdır."},
+    {"hesap": "153 TİCARİ MALLAR", "dogru_sinif": 1, "aciklama": "1. Dönen Varlıklar (Stoklar) grubudur."},
+    {"hesap": "255 DEMİRBAŞLAR", "dogru_sinif": 2, "aciklama": "2. Duran Varlıklar sınıfıdır."},
+    {"hesap": "254 TAŞITLAR", "dogru_sinif": 2, "aciklama": "2. Duran Varlıklar sınıfıdır."},
+    {"hesap": "320 SATICILAR", "dogru_sinif": 3, "aciklama": "3. Kısa Vadeli Yabancı Kaynaklar sınıfıdır."},
+    {"hesap": "360 ÖDENECEK VERGİ VE FONLAR", "dogru_sinif": 3, "aciklama": "3. Kısa Vadeli Yabancı Kaynaklar sınıfıdır."},
+    {"hesap": "400 BANKA KREDİLERİ (UZUN VADELİ)", "dogru_sinif": 4, "aciklama": "4. Uzun Vadeli Yabancı Kaynaklar sınıfıdır."},
+    {"hesap": "500 SERMAYE", "dogru_sinif": 5, "aciklama": "5. Öz Kaynaklar sınıfıdır."},
+    {"hesap": "600 YURTİÇİ SATIŞLAR", "dogru_sinif": 6, "aciklama": "6. Gelir Tablosu Hesapları sınıfıdır."},
+    {"hesap": "770 GENEL YÖNETİM GİDERLERİ", "dogru_sinif": 7, "aciklama": "7. Maliyet Hesapları sınıfıdır."}
+]
+
+if st.session_state["matrix_current_item"] is None:
+    st.session_state["matrix_current_item"] = random.choice(MATRIX_CARDS)
+
 # ==============================================================================
-# 3. LOCALIZATION DATA DICTIONARY (6 DİLDE TAM EŞİTLENMİŞ LÜKS METİNLER)
+# 3. LOCALIZATION DATA DICTIONARY (6 GLOBAL STANDART)
 # ==============================================================================
 
 LANG_DATA = {
@@ -447,7 +468,7 @@ INSTANT_FAQ_CACHE = {
 }
 
 # ==============================================================================
-# 4. DYNAMIC STYLING ENGINE (IPHONE CIRCLE GLASS BUTTONS & WHATSAPP BUBBLES)
+# 4. DYNAMIC STYLING ENGINE (IPHONE CIRCLE BUTTONS & PURE POP-UP PILLS)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -543,7 +564,7 @@ st.markdown(f"""
         height: 44px !important;
         min-height: 44px !important;
         max-width: 44px !important;
-        border-radius: 50% !important; /* TAM DAİRE */
+        border-radius: 50% !important;
         background: rgba(255, 255, 255, 0.08) !important;
         border: 1px solid rgba(255, 255, 255, 0.22) !important;
         backdrop-filter: blur(16px) !important;
@@ -562,6 +583,27 @@ st.markdown(f"""
         border-color: rgba(255, 255, 255, 0.60) !important;
         transform: scale(1.08) !important;
         box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25) !important;
+    }}
+
+    /* POPOVER İÇİNDEKİ SEÇİM BUTONLARI (SIFIR YAZI, SADECE TIKLAMA) */
+    div.pop-pill-grid div.stButton > button {{
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        border-radius: 9999px !important;
+        font-size: 0.80rem !important;
+        font-weight: 600 !important;
+        color: #F8FAFC !important;
+        padding: 6px 14px !important;
+        margin-bottom: 6px !important;
+        height: auto !important;
+        min-height: 32px !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease !important;
+    }}
+    div.pop-pill-grid div.stButton > button:hover {{
+        background: rgba(56, 189, 248, 0.25) !important;
+        border-color: rgba(56, 189, 248, 0.50) !important;
+        transform: scale(1.02) !important;
     }}
 
     .cockpit-card {{
@@ -736,7 +778,7 @@ st.markdown(f"""
         line-height: 1.45;
     }}
 
-    /* WHATSAPP BALONLARI (HUKUKİ ÇERÇEVE) */
+    /* WHATSAPP BALONLARI */
     .wa-bubble-left {{
         background: rgba(30, 41, 59, 0.85);
         border: 1px solid rgba(255, 255, 255, 0.12);
@@ -1006,7 +1048,7 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 7. MULTI-DECK COCKPIT & IPHONE CIRCLE GLASS DOCK (GÖRSEL 38 STİLİ)
+# 7. MULTI-DECK COCKPIT (IPHONE CIRCLE GLASS BUTTONS)
 # ==============================================================================
 
 st.markdown("<div class='cockpit-container'>", unsafe_allow_html=True)
@@ -1019,26 +1061,27 @@ with nav_right:
     
     with btn_dock1:
         st.markdown("<div class='circle-glass-btn'>", unsafe_allow_html=True)
-        with st.popover("🌐", help="Dil Seçimi / Language"):
-            st.markdown("##### 🌐 Dil / Language")
-            lang_keys = list(LANG_DATA.keys())
-            curr_lang_idx = lang_keys.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in lang_keys else 0
-            new_lang = st.selectbox("Seçiniz:", lang_keys, index=curr_lang_idx)
-            if new_lang != st.session_state["user_lang"]:
-                st.session_state["user_lang"] = new_lang
-                st.rerun()
+        with st.popover("🌐", help="Dil Seçimi"):
+            st.markdown("<div style='font-size:0.85rem; font-weight:700; margin-bottom:8px;'>🌐 Dil / Language</div>", unsafe_allow_html=True)
+            st.markdown("<div class='pop-pill-grid'>", unsafe_allow_html=True)
+            for l_key in list(LANG_DATA.keys()):
+                if st.button(l_key, key=f"btn_lang_pop_{l_key}", use_container_width=True):
+                    st.session_state["user_lang"] = l_key
+                    st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with btn_dock2:
         st.markdown("<div class='circle-glass-btn'>", unsafe_allow_html=True)
         with st.popover("🎨", help="Görünüm & Temalar"):
-            st.markdown("##### 🎨 Tema Seçimi")
-            theme_names = T["themes"]
-            new_theme_str = st.selectbox("Tema:", theme_names, index=st.session_state["theme_idx"])
-            new_t_idx = theme_names.index(new_theme_str)
-            if new_t_idx != st.session_state["theme_idx"]:
-                st.session_state["theme_idx"] = new_t_idx
-                st.rerun()
+            st.markdown("<div style='font-size:0.85rem; font-weight:700; margin-bottom:8px;'>🎨 Tema Seçimi</div>", unsafe_allow_html=True)
+            st.markdown("<div class='pop-pill-grid'>", unsafe_allow_html=True)
+            theme_list = T["themes"]
+            for t_idx, t_name in enumerate(theme_list):
+                if st.button(t_name, key=f"btn_theme_pop_{t_idx}", use_container_width=True):
+                    st.session_state["theme_idx"] = t_idx
+                    st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with btn_dock3:
@@ -1204,7 +1247,7 @@ with sekme_terminal:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # SEKTÖR KONTROLÜ (TAM ENTEGRE ÇİZGİ)
+        # MİNİMAL SEKTÖR SEÇİM ÇUBUĞU
         st.markdown("<div style='margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
         st.markdown("<div style='font-size:0.75rem; color:#94A3B8; font-weight:700; margin-bottom:4px;'>FAALİYET SEKTÖRÜ</div>", unsafe_allow_html=True)
         new_industry_str = st.selectbox("Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
@@ -1335,7 +1378,7 @@ with sekme_terminal:
                 use_container_width=True
             )
 
-    # ASİSTAN ÇUBUĞU (KUSURSUZ VE NET FİLTRELİ CEVAPLAR)
+    # ASİSTAN ÇUBUĞU (KUSURSUZ TEORİK & PRATİK MİMARİ)
     st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
     c_bot_l, c_bot_center, c_bot_r = st.columns([1, 4, 1])
 
@@ -1389,18 +1432,17 @@ with sekme_terminal:
                 else:
                     with st.spinner("● ● ● Düşünüyor..."):
                         prompt_bot = f"""
-                        Sen LedgerAI'ın kurumsal finans ve muhasebe asistanısın.
+                        Sen LedgerAI'ın kurumsal finans ve Tek Düzen Hesap Planı uzmanısın.
                         Kullanıcı Dili: {st.session_state['user_lang']}
                         Kullanıcı Mesajı: "{aktif_soru}"
 
                         ÇOK KESİN KURALLAR:
-                        1. Eğer kullanıcı selam veriyorsa, hal hatır soruyorsa veya anlamsız/şaka bir şey yazdıysa:
-                           - ASLA fiş kaydı veya muhasebe hesabı yazma!
-                           - Kısa ve samimi bir selam ver, muhasebeyle ilgili ne öğrenmek istediğini sor.
-                        2. Eğer kullanıcı hesap planı, bilanço veya teorik bilgi soruyorsa:
-                           - Doğrudan Tek Düzen Hesap Planı yapısını açıkla, gereksiz yere uydurma fatura fişi üretme!
-                        3. SADECE kullanıcı doğrudan somut bir faturanın, harcamanın veya mal alımının yevmiye kaydını soruyorsa:
-                           - Borç / Alacak fiş satırını ekle.
+                        1. Eğer kullanıcı hesap planını, bilanço sınıflarını veya belirli hesap aralıklarını sorarsa (Örn: "1 den 3 e kadar olan hesaplar", "hesap planını göster"):
+                           - Asla hiçbir sınıfı atlama! 1. Dönen Varlıklar, 2. Duran Varlıklar, 3. Kısa Vadeli Yabancı Kaynaklar şeklinde eksiksiz, madde madde listele.
+                           - Bu teorik sorularda ASLA uydurma fatura yevmiye fişi yazma!
+                        2. Eğer kullanıcı selam veriyorsa ("merhaba", "naber", "ne yapıyorsun"):
+                           - Kısa, profesyonel bir selam ver, hangi muhasebe konusunda destek istediğini sor. ASLA fiş uydurma!
+                        3. SADECE kullanıcı somut bir mal alımı, gider veya harcama fiş kaydı soruyorsa sonuna Borç/Alacak kaydı ekle.
                         """
                         try:
                             yanit = client.models.generate_content(
@@ -1409,16 +1451,15 @@ with sekme_terminal:
                             )
                             bot_cevap = yanit.text.strip() if yanit and yanit.text else "Size finansal süreçlerde nasıl yardımcı olabilirim?"
                         except Exception:
-                            bot_cevap = "Muhasebe ve vergi mevzuatıyla ilgili sorularınızı kısaca yanıtlamaya hazırım."
+                            bot_cevap = "Muhasebe ve vergi mevzuatıyla ilgili sorularınızı yanıtlamaya hazırım."
                         
                         st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
                         st.rerun()
 
 # ------------------------------------------------------------------------------
-# SEKME 2: 🎓 SİBER AKADEMİ (ÇOKLU OYUN & EŞLEŞTİRME SİMÜLASYONU)
+# SEKME 2: 🎓 SİBER AKADEMİ (ÇOKLU OYUN & RETRO CANVAS SNAKE)
 # ------------------------------------------------------------------------------
 with sekme_akademi:
-    vaka = st.session_state["current_game_vaka"]
     xp = st.session_state["academy_xp"]
     if xp >= 1000:
         st.session_state["academy_level"] = "🏆 Baş Denetçi (Senior Auditor)"
@@ -1443,9 +1484,15 @@ with sekme_akademi:
     </div>
     """, unsafe_allow_html=True)
 
-    oyun_sekme1, oyun_sekme2 = st.tabs(["🎮 Oyun 1: Hesap Kodu Avcısı", "🧩 Oyun 2: Tek Düzen 1-9 Matrisi"])
+    oyun_sekme1, oyun_sekme2, oyun_sekme3 = st.tabs([
+        "🎮 Oyun 1: Hesap Kodu Avcısı", 
+        "🧩 Oyun 2: Tek Düzen Matris Eşleme",
+        "🐍 Oyun 3: Retro Bilanço Snake (Yılan Oyunu)"
+    ])
 
+    # OYUN 1: AVCI
     with oyun_sekme1:
+        vaka = st.session_state["current_game_vaka"]
         c_game1, c_game2 = st.columns([1.2, 1.0], gap="large")
         with c_game1:
             st.markdown(f"""
@@ -1492,33 +1539,160 @@ with sekme_akademi:
 
             st.markdown("</div>", unsafe_allow_html=True)
 
+    # OYUN 2: İNTERAKTİF MATRİS EŞLEME KARTLARI
     with oyun_sekme2:
-        st.markdown("""
-        <div style='background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:20px;'>
-            <h4 style='color:#FFFFFF; margin-bottom:8px;'>🧩 Tek Düzen Hesap Planı 1-9 Ana Sınıf Matrisi</h4>
-            <p style='font-size:0.82rem; color:#CBD5E1;'>Aşağıdaki temel grupları zihninde eşleştir. Muhasebenin temeli bu 9 sınıftan oluşur!</p>
+        m_item = st.session_state["matrix_current_item"]
+        st.markdown(f"""
+        <div style='background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:18px; padding:20px; text-align:center; margin-bottom:16px;'>
+            <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1px;'>HEDEF HESAP KARTI</span>
+            <h2 style='color:#FFFFFF; margin:8px 0; letter-spacing:1px;'>{m_item['hesap']}</h2>
+            <p style='font-size:0.85rem; color:#CBD5E1;'>Bu hesap 1'den 7'ye kadar olan hangi ana muhasebe sınıfına aittir? Doğru sınıf kutusuna tıkla!</p>
         </div>
         """, unsafe_allow_html=True)
 
-        m_c1, m_c2, m_c3 = st.columns(3)
-        with m_c1:
-            st.markdown("""
-            * **1. DÖNEN VARLIKLAR** (100 Kasa, 102 Banka, 120 Alıcılar, 153 Ticari Mallar)
-            * **2. DURAN VARLIKLAR** (255 Demirbaşlar, 254 Taşıtlar, 252 Binalar)
-            * **3. KISA VADELİ YABANCI KAYNAKLAR** (320 Satıcılar, 360 Ödenecek Vergi)
-            """)
-        with m_c2:
-            st.markdown("""
-            * **4. UZUN VADELİ YABANCI KAYNAKLAR** (400 Banka Kredileri)
-            * **5. ÖZ KAYNAKLAR** (500 Sermaye, 590 Dönem Net Kârı)
-            * **6. GELİR TABLOSU HESAPLARI** (600 Yurtiçi Satışlar, 621 STMM)
-            """)
-        with m_c3:
-            st.markdown("""
-            * **7. MALİYET HESAPLARI** (770 Genel Yönetim Gideri, 740 Hizmet Maliyeti)
-            * **8. SERBEST HESAPLAR**
-            * **9. NAZIM HESAPLAR** (Teminatlar, Kefaletler ve Takip Hesapları)
-            """)
+        siniflar = [
+            (1, "1. Dönen Varlıklar"),
+            (2, "2. Duran Varlıklar"),
+            (3, "3. Kısa Vadeli Yabancı Kaynak"),
+            (4, "4. Uzun Vadeli Yabancı Kaynak"),
+            (5, "5. Öz Kaynaklar"),
+            (6, "6. Gelir Tablosu"),
+            (7, "7. Maliyet Hesapları")
+        ]
+
+        m_cols = st.columns(4)
+        for idx, (s_num, s_ad) in enumerate(siniflar):
+            with m_cols[idx % 4]:
+                if st.button(s_ad, key=f"btn_mat_{s_num}_{st.session_state['matrix_step']}", use_container_width=True):
+                    if s_num == m_item["dogru_sinif"]:
+                        st.session_state["academy_xp"] += 100
+                        sesli_bildirim_cal("success")
+                        st.balloons()
+                        st.success(f"🎉 TEBRİKLER! {m_item['hesap']}, {m_item['aciklama']} (+100 XP)")
+                        st.session_state["matrix_step"] += 1
+                        st.session_state["matrix_current_item"] = random.choice(MATRIX_CARDS)
+                        time.sleep(1.0)
+                        st.rerun()
+                    else:
+                        sesli_bildirim_cal("error")
+                        st.error(f"⚠️ Hatalı Sınıf! {m_item['hesap']}, {m_item['aciklama']} Tekrar dene!")
+
+    # OYUN 3: RETRO CANVAS TABANLI BILANÇO SNAKE
+    with oyun_sekme3:
+        st.markdown("""
+        <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:16px 20px; margin-bottom:12px;'>
+            <h4 style='color:#FFFFFF; margin:0 0 4px 0;'>🐍 Retro Bilanço Snake (Hesap Kodu Yeme Oyunu)</h4>
+            <p style='font-size:0.80rem; color:#CBD5E1; margin:0;'>Klavyendeki Yön Tuşlarıyla (veya ekrandaki butonlarla) yılanı yönet! Ekranda beliren <b>153, 770, 102, 600</b> hesap kodlarını yedikçe yılan büyür, rekor kırarsın!</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        snake_html = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body { margin: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; color: #FFF; }
+                #gameCanvas { background: #0A0F1D; border: 2px solid #38BDF8; border-radius: 12px; box-shadow: 0 0 20px rgba(56,189,248,0.2); }
+                .score-board { font-size: 16px; font-weight: bold; margin-bottom: 8px; color: #38BDF8; }
+                .touch-controls { display: grid; grid-template-columns: repeat(3, 50px); gap: 6px; margin-top: 10px; }
+                .t-btn { width: 50px; height: 40px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; }
+                .t-btn:active { background: #38BDF8; color: black; }
+            </style>
+        </head>
+        <body>
+            <div class="score-board">REKOR: <span id="score">0</span> XP | HEDEF: <span id="targetCode">153 Ticari Mal</span></div>
+            <canvas id="gameCanvas" width="400" height="300"></canvas>
+            <div class="touch-controls">
+                <div></div><div class="t-btn" onclick="changeDir('UP')">▲</div><div></div>
+                <div class="t-btn" onclick="changeDir('LEFT')">◀</div><div class="t-btn" onclick="changeDir('DOWN')">▼</div><div class="t-btn" onclick="changeDir('RIGHT')">▶</div>
+            </div>
+            <script>
+                const canvas = document.getElementById("gameCanvas");
+                const ctx = canvas.getContext("2d");
+                const grid = 20;
+                let count = 0;
+                let score = 0;
+                let snake = { x: 160, y: 160, dx: grid, dy: 0, cells: [], maxCells: 4 };
+                const codes = ["153", "770", "102", "600", "255", "320"];
+                let food = { x: 80, y: 80, code: "153" };
+
+                function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+
+                function resetFood() {
+                    food.x = getRandomInt(0, 20) * grid;
+                    food.y = getRandomInt(0, 15) * grid;
+                    food.code = codes[Math.floor(Math.random() * codes.length)];
+                    document.getElementById("targetCode").innerText = food.code + " Hesap";
+                }
+
+                function gameLoop() {
+                    requestAnimationFrame(gameLoop);
+                    if (++count < 6) return;
+                    count = 0;
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    snake.x += snake.dx;
+                    snake.y += snake.dy;
+
+                    if (snake.x < 0) snake.x = canvas.width - grid;
+                    else if (snake.x >= canvas.width) snake.x = 0;
+                    if (snake.y < 0) snake.y = canvas.height - grid;
+                    else if (snake.y >= canvas.height) snake.y = 0;
+
+                    snake.cells.unshift({x: snake.x, y: snake.y});
+                    if (snake.cells.length > snake.maxCells) snake.cells.pop();
+
+                    // Food çiz
+                    ctx.fillStyle = "#F43F5E";
+                    ctx.fillRect(food.x, food.y, grid-1, grid-1);
+                    ctx.fillStyle = "#FFF";
+                    ctx.font = "10px monospace";
+                    ctx.fillText(food.code, food.x + 1, food.y + 14);
+
+                    // Yılan çiz
+                    ctx.fillStyle = "#10B981";
+                    snake.cells.forEach(function(cell, index) {
+                        ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
+                        if (cell.x === food.x && cell.y === food.y) {
+                            snake.maxCells++;
+                            score += 50;
+                            document.getElementById("score").innerText = score;
+                            resetFood();
+                        }
+                        for (let i = index + 1; i < snake.cells.length; i++) {
+                            if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+                                snake.x = 160; snake.y = 160;
+                                snake.cells = []; snake.maxCells = 4;
+                                snake.dx = grid; snake.dy = 0;
+                                score = 0;
+                                document.getElementById("score").innerText = score;
+                                resetFood();
+                            }
+                        }
+                    });
+                }
+
+                function changeDir(dir) {
+                    if (dir === 'LEFT' && snake.dx === 0) { snake.dx = -grid; snake.dy = 0; }
+                    else if (dir === 'UP' && snake.dy === 0) { snake.dy = -grid; snake.dx = 0; }
+                    else if (dir === 'RIGHT' && snake.dx === 0) { snake.dx = grid; snake.dy = 0; }
+                    else if (dir === 'DOWN' && snake.dy === 0) { snake.dy = grid; snake.dx = 0; }
+                }
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.which === 37 && snake.dx === 0) changeDir('LEFT');
+                    else if (e.which === 38 && snake.dy === 0) changeDir('UP');
+                    else if (e.which === 39 && snake.dx === 0) changeDir('RIGHT');
+                    else if (e.which === 40 && snake.dy === 0) changeDir('DOWN');
+                });
+
+                resetFood();
+                requestAnimationFrame(gameLoop);
+            </script>
+        </body>
+        </html>
+        """
+        components.html(snake_html, height=430)
 
 # ------------------------------------------------------------------------------
 # SEKME 3: ⚖️ HUKUKİ ÇERÇEVE & SLA (WHATSAPP BALONLARI TASARIMI)
