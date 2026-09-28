@@ -1,8 +1,10 @@
 """
 ================================================================================
-LEDGERAI — 3-TIER ADAPTIVE AUDIT TERMINAL & CO-PILOT
-Themes: Corporate Platinum (CFO) | Aurora Modern (Startup) | Cyberpunk (Academy)
+LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY COCKPIT
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
+Design: Minimal GitHub Pill Style / Multi-Deck Enterprise Architecture
+Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, GAAP
+Version: 5.0.0 Production Flagship Edition
 ================================================================================
 """
 
@@ -25,7 +27,7 @@ from openpyxl.utils import get_column_letter
 # ==============================================================================
 
 st.set_page_config(
-    page_title="LedgerAI — Autonomous Financial Terminal",
+    page_title="LedgerAI — Autonomous Financial Terminal & Academy",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -33,7 +35,7 @@ st.set_page_config(
 
 SESSION_DEFAULTS = {
     "user_lang": "🇹🇷 TR",
-    "theme_idx": 0,  # 0: Platin Gri (Kurumsal CFO), 1: Aurora, 2: Cyberpunk
+    "theme_idx": 0,  # 0: Platin Gri, 1: Aurora, 2: Cyberpunk
     "industry_idx": 0,
     "chat_messages": [],
     "out_df": None,
@@ -45,7 +47,9 @@ SESSION_DEFAULTS = {
     "total_batch_debit": 0.0,
     "total_batch_credit": 0.0,
     "total_withholding_amount": 0.0,
-    "audit_logs": []
+    "academy_xp": 150,
+    "academy_level": "Kıdemli Stajyer",
+    "active_puzzle_idx": 0
 }
 
 for key, default_val in SESSION_DEFAULTS.items():
@@ -93,9 +97,9 @@ LANG_DATA = {
             "🏭 Üretim & Fabrika (150/730)"
         ],
         "themes": [
-            "🌑 Platin Gri (CFO Kurumsal)",
-            "✨ Aurora (Yeni Nesil Girişim)",
-            "🌌 Cyberpunk (Eğitici Akademi)"
+            "🌑 Platin Gri",
+            "✨ Aurora",
+            "🌌 Cyberpunk"
         ],
         "about_btn": "ℹ️ İşleyiş & Felsefe",
         "about_title": "LedgerAI Mimarisi & İnsan-AI Ortaklığı",
@@ -163,9 +167,9 @@ LANG_DATA = {
             "🏢 Services / SaaS (OpEx)", "🏭 Manufacturing (COGS)"
         ],
         "themes": [
-            "🌑 Platinum Slate (CFO)",
-            "✨ Aurora (Modern Startup)",
-            "🌌 Cyberpunk (Student Academy)"
+            "🌑 Platinum Slate",
+            "✨ Aurora",
+            "🌌 Cyberpunk"
         ],
         "about_btn": "ℹ️ How it Works & Philosophy",
         "about_title": "LedgerAI Architecture & Human-AI Collaboration",
@@ -226,9 +230,9 @@ LANG_DATA = {
             "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"
         ],
         "themes": [
-            "🌑 Platin Titan (CFO)",
-            "✨ Aurora (Startup)",
-            "🌌 Cyberpunk (Akademie)"
+            "🌑 Platin Titan",
+            "✨ Aurora",
+            "🌌 Cyberpunk"
         ],
         "about_btn": "ℹ️ Funktionsweise & Philosophie",
         "about_title": "LedgerAI Architektur & Mensch-KI Standard",
@@ -288,9 +292,9 @@ LANG_DATA = {
             "🏢 Services / Conseil", "🏭 Production / Industrie"
         ],
         "themes": [
-            "🌑 Platine Titane (CFO)",
-            "✨ Aurora (Moderne)",
-            "🌌 Cyberpunk (Académie)"
+            "🌑 Platine Titane",
+            "✨ Aurora",
+            "🌌 Cyberpunk"
         ],
         "about_btn": "ℹ️ Fonctionnement & Philosophie",
         "about_title": "Architecture LedgerAI & Co-Pilotage",
@@ -350,9 +354,9 @@ LANG_DATA = {
             "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"
         ],
         "themes": [
-            "🌑 Platino Titanio (CFO)",
-            "✨ Aurora (Moderno)",
-            "🌌 Cyberpunk (Academia)"
+            "🌑 Platino Titanio",
+            "✨ Aurora",
+            "🌌 Cyberpunk"
         ],
         "about_btn": "ℹ️ Filosofía y Seguridad",
         "about_title": "Arquitectura y Simbiosis Humano-IA",
@@ -412,9 +416,9 @@ LANG_DATA = {
             "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"
         ],
         "themes": [
-            "🌑 Platino Titanio (CFO)",
-            "✨ Aurora (Moderno)",
-            "🌌 Cyberpunk (Accademia)"
+            "🌑 Platino Titanio",
+            "✨ Aurora",
+            "🌌 Cyberpunk"
         ],
         "about_btn": "ℹ️ Filosofia e Sicurezza",
         "about_title": "Architettura di Collaborazione Uomo-IA",
@@ -456,7 +460,7 @@ if st.session_state["user_lang"] not in LANG_DATA:
 
 T = LANG_DATA[st.session_state["user_lang"]]
 
-# HIZLI VE KESİNTİSİZ CEVAP ÖNBELLEĞİ (ŞİMŞEK GİBİ 0.01 SN DÖNÜŞ İÇİN)
+# HIZLI VE KESİNTİSİZ CEVAP ÖNBELLEĞİ (0.01 SN ŞİMŞEK YANIT)
 INSTANT_FAQ_CACHE = {
     "💡 Muhasebeciye ne kazandırır?": "LedgerAI manuel fatura girişini ve tevkifat hesaplamalarını %80 hızlandırır. Yapay zeka fişi hazırlar, son kontrolü mali müşavir yapar; hata payını sıfıra indirir.\n\nPratik Fiş Kaydı: Borç: 770 Genel Yönetim Giderleri / 191 İndirilecek KDV — Alacak: 320 Satıcılar",
     "🔒 Verilerim güvende mi?": "Verileriniz TLS 256-bit bankacılık standardında şifrelenir; belgeleriniz model eğitiminde kullanılmaz ve oturumunuz kapandığında sistemde kalıcı olarak saklanmaz.",
@@ -469,11 +473,11 @@ INSTANT_FAQ_CACHE = {
 }
 
 # ==============================================================================
-# 3. 3 FARKLI KİTLE İÇİN DİNAMİK TEMATİK STİL MOTORU
+# 3. DYNAMIC STYLING ENGINE (WHITELABEL + ZARİF GİTHUB DOCK)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
-    # 🌑 Platin Gri (Kurumsal CFO Modu - Ağırbaşlı & Keskin)
+    # 🌑 Platin Gri
     bg_style = """
         @keyframes slateShimmer {
             0% { background-position: 0% 50%; }
@@ -490,7 +494,7 @@ if st.session_state["theme_idx"] == 0:
         }
     """
 elif st.session_state["theme_idx"] == 1:
-    # ✨ Ultra Canlı Aurora (Yeni Nesil & Genç Girişimciler - Canlı SaaS)
+    # ✨ Ultra Canlı Aurora
     bg_style = """
         @keyframes auroraRealFlow {
             0% { background-position: 0% 30%; filter: hue-rotate(0deg); }
@@ -508,7 +512,7 @@ elif st.session_state["theme_idx"] == 1:
         }
     """
 else:
-    # 🌌 Cyberpunk Gece (Gençler & Öğrenciler - Eğitici Akademi & Canlı Neon)
+    # 🌌 Cyberpunk Gece
     bg_style = """
         @keyframes cyberpunkPulse {
             0% { background-position: 0% 0%, 100% 100%; filter: brightness(1); }
@@ -550,7 +554,7 @@ st.markdown(f"""
     
     .stApp {{
         color: #F8FAFC;
-        padding-top: 15px;
+        padding-top: 10px;
         padding-bottom: 60px;
     }}
 
@@ -625,7 +629,7 @@ st.markdown(f"""
         background: rgba(30, 41, 59, 0.8);
     }}
 
-    /* SEPETE EKLE MODELİ OVAL BUTON */
+    /* SEPETE EKLE MODELİ OVAL İŞLEM BUTONU */
     div.stButton > button:first-child {{
         background: #000000 !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
@@ -719,6 +723,7 @@ st.markdown(f"""
         transform: scale(1.03) !important;
     }}
 
+    /* CHAT MESAJ BALONLARI */
     .chat-scroll-area {{
         max-height: 280px;
         overflow-y: auto;
@@ -756,6 +761,20 @@ st.markdown(f"""
         font-size: 0.80rem;
         color: #CBD5E1;
         line-height: 1.45;
+    }}
+
+    /* SEKME MENÜSÜ LÜKS ÇİZGİSİ */
+    div[data-testid="stTabs"] button[role="tab"] {{
+        background: transparent !important;
+        border: none !important;
+        font-size: 0.88rem !important;
+        font-weight: 700 !important;
+        color: #94A3B8 !important;
+        padding: 8px 18px !important;
+    }}
+    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
+        color: #FFFFFF !important;
+        border-bottom: 2px solid #38BDF8 !important;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -986,109 +1005,120 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 6. DUAL-WING EXECUTIVE COCKPIT (TAM EKRAN LÜKS KOKPİT)
+# 6. MASTER MULTI-DECK COCKPIT (MODÜLER KURUMSAL SEKME YAPISI)
 # ==============================================================================
 
 st.markdown("<div class='cockpit-container'>", unsafe_allow_html=True)
-col_left, col_right = st.columns([1.35, 1.0], gap="large")
 
-with col_left:
-    st.markdown(f"""
-    <div class='cockpit-card'>
-        <div>
-            <div class='top-badge'>● {T['badge']}</div>
-            <div class='hero-title'>{T['title']}</div>
-            <div class='hero-sub'>{T['subtitle']}</div>
-    """, unsafe_allow_html=True)
+sekme_terminal, sekme_akademi, sekme_hukuk = st.tabs([
+    "🏢 Kurumsal Finans Terminali", 
+    "🎓 Siber Akademi & Simülatör (Öğrenci)", 
+    "⚖️ Hukuki Çerçeve, KVKK & SLA"
+])
 
-    uploaded_files = st.file_uploader(
-        T["drop_title"],
-        type=["pdf", "png", "jpg", "jpeg"],
-        accept_multiple_files=True,
-        label_visibility="collapsed",
-        help=T["drop_sub"]
-    )
+# ------------------------------------------------------------------------------
+# SEKME 1: KURUMSAL FİNANS TERMİNALİ (TAM DONANIMLI MEVCUT SİSTEM)
+# ------------------------------------------------------------------------------
+with sekme_terminal:
+    col_left, col_right = st.columns([1.35, 1.0], gap="large")
 
-    if uploaded_files:
-        if len(uploaded_files) > 5:
-            st.error(T["limit_err"])
-        else:
-            st.markdown(f"<div style='font-size:0.85rem; margin:4px 0 8px 0; color:#A7F3D0;'>{T['ready_count'].format(count=len(uploaded_files))}</div>", unsafe_allow_html=True)
+    with col_left:
+        st.markdown(f"""
+        <div class='cockpit-card'>
+            <div>
+                <div class='top-badge'>● {T['badge']}</div>
+                <div class='hero-title'>{T['title']}</div>
+                <div class='hero-sub'>{T['subtitle']}</div>
+        """, unsafe_allow_html=True)
 
-            if st.button(T["process_btn"], use_container_width=True):
-                start_time = time.time()
-                
-                industry_name = T["industries"][st.session_state["industry_idx"]]
-                directive = f"Company Profile: {industry_name}. "
-                if "Ticaret" in industry_name or "Retail" in industry_name:
-                    directive += "Company operates in wholesale/retail trade. Core commercial goods MUST be classified as '153.01 Commercial Inventory' (or GAAP 1200). Office/fuel/meals are operating expenses (770)."
-                elif "Hizmet" in industry_name or "Services" in industry_name:
-                    directive += "Company operates as a professional service/consulting provider. Classify project costs as 740 and overhead as 770."
-                elif "Üretim" in industry_name or "Manufacturing" in industry_name:
-                    directive += "Company is a manufacturer. Raw material purchases MUST be '150 Raw Materials', factory expenses '730', administrative overhead '770'."
-                else:
-                    directive += "Classify contextually: resale goods -> 153, operational supplies -> 770, capital equipment/computers -> 255."
+        uploaded_files = st.file_uploader(
+            T["drop_title"],
+            type=["pdf", "png", "jpg", "jpeg"],
+            accept_multiple_files=True,
+            label_visibility="collapsed",
+            help=T["drop_sub"]
+        )
 
-                parsed_data = execute_document_audit(uploaded_files, directive)
-                st.session_state["raw_audit_results"] = parsed_data
+        if uploaded_files:
+            if len(uploaded_files) > 5:
+                st.error(T["limit_err"])
+            else:
+                st.markdown(f"<div style='font-size:0.85rem; margin:4px 0 8px 0; color:#A7F3D0;'>{T['ready_count'].format(count=len(uploaded_files))}</div>", unsafe_allow_html=True)
 
-                if parsed_data:
-                    headers = T["headers"]
-                    voucher_lines = []
-                    voucher_num = 1
+                if st.button(T["process_btn"], use_container_width=True):
+                    start_time = time.time()
+                    
+                    industry_name = T["industries"][st.session_state["industry_idx"]]
+                    directive = f"Company Profile: {industry_name}. "
+                    if "Ticaret" in industry_name or "Retail" in industry_name:
+                        directive += "Company operates in wholesale/retail trade. Core commercial goods MUST be classified as '153.01 Commercial Inventory' (or GAAP 1200). Office/fuel/meals are operating expenses (770)."
+                    elif "Hizmet" in industry_name or "Services" in industry_name:
+                        directive += "Company operates as a professional service/consulting provider. Classify project costs as 740 and overhead as 770."
+                    elif "Üretim" in industry_name or "Manufacturing" in industry_name:
+                        directive += "Company is a manufacturer. Raw material purchases MUST be '150 Raw Materials', factory expenses '730', administrative overhead '770'."
+                    else:
+                        directive += "Classify contextually: resale goods -> 153, operational supplies -> 770, capital equipment/computers -> 255."
 
-                    for item in parsed_data:
-                        curr = item.get("currency", "TL")
-                        inv_no = str(item.get("invoice_no") or "").strip()
-                        date_val = str(item.get("date") or datetime.date.today().strftime("%Y-%m-%d")).strip()
-                        vendor = str(item.get("vendor") or "Satıcı / Vendor").strip()
-                        tax_id = str(item.get("tax_id") or "").strip()
-                        acc_code = str(item.get("account_code") or "770.01").strip()
-                        acc_name = str(item.get("account_name") or "Gider Hesabı").strip()
+                    parsed_data = execute_document_audit(uploaded_files, directive)
+                    st.session_state["raw_audit_results"] = parsed_data
 
-                        net = round(float(item.get("net") or 0.0), 2)
-                        tax = round(float(item.get("tax") or 0.0), 2)
-                        total = round(float(item.get("total") or (net + tax)), 2)
-                        tax_rate = item.get("tax_rate") or 20
-                        withholding = round(float(item.get("withholding") or 0.0), 2)
-                        payable = round(float(item.get("payable_to_vendor") or 0.0), 2)
+                    if parsed_data:
+                        headers = T["headers"]
+                        voucher_lines = []
+                        voucher_num = 1
 
-                        # Matematiksel Tevkifat & Bakiye Koruma Motoru
-                        if payable > 0 and abs((net + tax) - payable) > 0.05 and withholding == 0:
-                            withholding = round((net + tax) - payable, 2)
-                        
-                        if payable == 0:
-                            payable = round((net + tax) - withholding, 2)
+                        for item in parsed_data:
+                            curr = item.get("currency", "TL")
+                            inv_no = str(item.get("invoice_no") or "").strip()
+                            date_val = str(item.get("date") or datetime.date.today().strftime("%Y-%m-%d")).strip()
+                            vendor = str(item.get("vendor") or "Satıcı / Vendor").strip()
+                            tax_id = str(item.get("tax_id") or "").strip()
+                            acc_code = str(item.get("account_code") or "770.01").strip()
+                            acc_name = str(item.get("account_name") or "Gider Hesabı").strip()
 
-                        clean_name = "".join(c for c in vendor[:12] if c.isalnum()).upper() or "CARİ"
-                        if "TR" in st.session_state["user_lang"]:
-                            ap_code = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
-                            tax_code = f"191.{int(tax_rate):02d}"
-                            tax_name = f"%{tax_rate} İndirilecek KDV"
-                            tevkifat_code = "360.01"
-                            tevkifat_name = "Ödenecek KDV Tevkifatı / Stopaj"
-                        else:
-                            ap_code = f"2000-{tax_id}" if tax_id else f"VEND-{clean_name}"
-                            tax_code = f"2200-TAX{tax_rate}"
-                            tax_name = f"Sales Tax ({tax_rate}%)"
-                            tevkifat_code = "2250-WITHHOLDING"
-                            tevkifat_name = "Withholding Tax Payable"
+                            net = round(float(item.get("net") or 0.0), 2)
+                            tax = round(float(item.get("tax") or 0.0), 2)
+                            total = round(float(item.get("total") or (net + tax)), 2)
+                            tax_rate = item.get("tax_rate") or 20
+                            withholding = round(float(item.get("withholding") or 0.0), 2)
+                            payable = round(float(item.get("payable_to_vendor") or 0.0), 2)
 
-                        # 1. BORÇ: Gider / Mal Alışı
-                        voucher_lines.append({
-                            headers["vouch"]: voucher_num,
-                            headers["date"]: date_val,
-                            headers["code"]: acc_code,
-                            headers["name"]: acc_name,
-                            headers["desc"]: f"{vendor} - {inv_no}",
-                            headers["curr"]: curr,
-                            headers["deb"]: net,
-                            headers["crd"]: 0.0
-                        })
+                            # Matematiksel Tevkifat & Bakiye Koruma Motoru
+                            if payable > 0 and abs((net + tax) - payable) > 0.05 and withholding == 0:
+                                withholding = round((net + tax) - payable, 2)
+                            
+                            if payable == 0:
+                                payable = round((net + tax) - withholding, 2)
 
-                        # 2. BORÇ: KDV Tutarı
-                        if tax > 0:
+                            clean_name = "".join(c for c in vendor[:12] if c.isalnum()).upper() or "CARİ"
+                            if "TR" in st.session_state["user_lang"]:
+                                ap_code = f"320.{tax_id}" if tax_id else f"320.{clean_name}"
+                                tax_code = f"191.{int(tax_rate):02d}"
+                                tax_name = f"%{tax_rate} İndirilecek KDV"
+                                tevkifat_code = "360.01"
+                                tevkifat_name = "Ödenecek KDV Tevkifatı / Stopaj"
+                            else:
+                                ap_code = f"2000-{tax_id}" if tax_id else f"VEND-{clean_name}"
+                                tax_code = f"2200-TAX{tax_rate}"
+                                tax_name = f"Sales Tax ({tax_rate}%)"
+                                tevkifat_code = "2250-WITHHOLDING"
+                                tevkifat_name = "Withholding Tax Payable"
+
+                            # 1. BORÇ: Gider / Mal Alışı
                             voucher_lines.append({
+                                headers["vouch"]: voucher_num,
+                                headers["date"]: date_val,
+                                headers["code"]: acc_code,
+                                headers["name"]: acc_name,
+                                headers["desc"]: f"{vendor} - {inv_no}",
+                                headers["curr"]: curr,
+                                headers["deb"]: net,
+                                headers["crd"]: 0.0
+                            })
+
+                            # 2. BORÇ: KDV Tutarı
+                            if tax > 0:
+                                voucher_lines.append({
                                 headers["vouch"]: voucher_num,
                                 headers["date"]: date_val,
                                 headers["code"]: tax_code,
@@ -1099,9 +1129,9 @@ with col_left:
                                 headers["crd"]: 0.0
                             })
 
-                        # 3. ALACAK: Tevkifat / Stopaj (Varsa)
-                        if withholding > 0:
-                            voucher_lines.append({
+                            # 3. ALACAK: Tevkifat / Stopaj (Varsa)
+                            if withholding > 0:
+                                voucher_lines.append({
                                 headers["vouch"]: voucher_num,
                                 headers["date"]: date_val,
                                 headers["code"]: tevkifat_code,
@@ -1112,299 +1142,343 @@ with col_left:
                                 headers["crd"]: withholding
                             })
 
-                        # 4. ALACAK: Satıcı Cari Hesabı (Net Ödenecek Tutar)
-                        voucher_lines.append({
-                            headers["vouch"]: voucher_num,
-                            headers["date"]: date_val,
-                            headers["code"]: ap_code,
-                            headers["name"]: vendor,
-                            headers["desc"]: f"{vendor} - {inv_no}",
-                            headers["curr"]: curr,
-                            headers["deb"]: 0.0,
-                            headers["crd"]: payable
-                        })
+                            # 4. ALACAK: Satıcı Cari Hesabı (Net Ödenecek Tutar)
+                            voucher_lines.append({
+                                headers["vouch"]: voucher_num,
+                                headers["date"]: date_val,
+                                headers["code"]: ap_code,
+                                headers["name"]: vendor,
+                                headers["desc"]: f"{vendor} - {inv_no}",
+                                headers["curr"]: curr,
+                                headers["deb"]: 0.0,
+                                headers["crd"]: payable
+                            })
 
-                        voucher_num += 1
+                            voucher_num += 1
 
-                    st.session_state["out_df"] = pd.DataFrame(voucher_lines)
-                    st.session_state["h_deb"] = headers["deb"]
-                    st.session_state["h_crd"] = headers["crd"]
-                    st.session_state["last_processing_time"] = round(time.time() - start_time, 2)
-                    st.session_state["processed_docs_count"] = len(parsed_data)
-                    sesli_bildirim_cal("success")
-                    st.success(f"{T['success']} ({st.session_state['last_processing_time']} sn)")
+                        st.session_state["out_df"] = pd.DataFrame(voucher_lines)
+                        st.session_state["h_deb"] = headers["deb"]
+                        st.session_state["h_crd"] = headers["crd"]
+                        st.session_state["last_processing_time"] = round(time.time() - start_time, 2)
+                        st.session_state["processed_docs_count"] = len(parsed_data)
+                        sesli_bildirim_cal("success")
+                        st.success(f"{T['success']} ({st.session_state['last_processing_time']} sn)")
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # TAM HİZALI KURUMSAL MİKRO DOCK (GÖRSEL 31'DEKİ DAĞINIKLIĞI SIFIRLAR)
-    st.markdown("<div style='margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
-    c_m1, c_m2, c_m3, c_m4 = st.columns([1.6, 3.4, 3.4, 1.6])
-    with c_m1:
-        st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
-        lang_keys = list(LANG_DATA.keys())
-        curr_lang_idx = lang_keys.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in lang_keys else 0
-        new_lang = st.selectbox("Dil", lang_keys, index=curr_lang_idx, label_visibility="collapsed")
-        if new_lang != st.session_state["user_lang"]:
-            st.session_state["user_lang"] = new_lang
-            st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
-    with c_m2:
-        st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
-        new_theme_str = st.selectbox("Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
-        new_t_idx = T["themes"].index(new_theme_str)
-        if new_t_idx != st.session_state["theme_idx"]:
-            st.session_state["theme_idx"] = new_t_idx
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-    with c_m3:
-        st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
-        new_industry_str = st.selectbox("Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
-        new_i_idx = T["industries"].index(new_industry_str)
-        if new_i_idx != st.session_state["industry_idx"]:
-            st.session_state["industry_idx"] = new_i_idx
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-    with c_m4:
-        with st.popover(T["about_btn"]):
-            st.markdown(f"#### {T['about_title']}")
-            st.markdown(T["about_content"])
-    st.markdown("</div></div>", unsafe_allow_html=True)
 
-with col_right:
-    # SAĞ KANAT KARTLARI (TEMAYA GÖRE AKILLI İÇERİK DEĞİŞİMİ)
-    if st.session_state["theme_idx"] == 2:
-        # CYBERPUNK AKADEMİ (ÖĞRENCİLER & EĞİTİM MODU)
-        k_baslik = "🎮 Finans & Muhasebe Akademisi"
-        k1_t, k1_d = "🏆 Görev 1: Tevkifatı Çöz", "KDV'nin bir kısmını devlete emanet bırakma sanatını öğren! Borç/Alacak eşitle, seviye atla."
-        k2_t, k2_d = "⚡ Görev 2: ERP Sentezi", "ETA ve Luca için tek tuşla profesyonel CSV ve çok sekmeli Excel veri madenciliği."
-        k3_t, k3_d = "🛡️ Görev 3: Bakiye Kilidi", "Maliye denetçisi gibi düşün: Borç ve Alacak eşit değilse fiş geçersiz sayılır!"
-    elif st.session_state["theme_idx"] == 1:
-        # AURORA (YENİ NESİL MODERN SAAS)
-        k_baslik = "✨ Yeni Nesil Girişim Finansı"
-        k1_t, k1_d = "📈 Dinamik Vergi Eşleme", "Faturayı taratır taratmaz KDV matrahlarını ve gider dağılımını canlı olarak yakalar."
-        k2_t, k2_d = "🚀 Modern Export Hub", "QuickBooks, Xero ve çok sekmeli kurumsal Excel'e saniyeler içinde senkronize ol."
-        k3_t, k3_d = "💎 %100 Otonom Doğruluk", "Matematiksel çift kontrol ile manuel hesap hatalarını tarihe göm."
-    else:
-        # PLATİN GRİ (KURUMSAL CFO MODU)
-        k_baslik = "🛡️ Kurumsal Finans & Güvence Masası"
-        k1_t, k1_d = T['cockpit_card1_title'], T['cockpit_card1_desc']
-        k2_t, k2_d = T['cockpit_card2_title'], T['cockpit_card2_desc']
-        k3_t, k3_d = T['cockpit_card3_title'], T['cockpit_card3_desc']
+        # TAM HİZALI KURUMSAL MİKRO DOCK
+        st.markdown("<div style='margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);'>", unsafe_allow_html=True)
+        c_m1, c_m2, c_m3, c_m4 = st.columns([1.6, 3.4, 3.4, 1.6])
+        with c_m1:
+            st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
+            lang_keys = list(LANG_DATA.keys())
+            curr_lang_idx = lang_keys.index(st.session_state["user_lang"]) if st.session_state["user_lang"] in lang_keys else 0
+            new_lang = st.selectbox("Dil", lang_keys, index=curr_lang_idx, label_visibility="collapsed")
+            if new_lang != st.session_state["user_lang"]:
+                st.session_state["user_lang"] = new_lang
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+        with c_m2:
+            st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
+            new_theme_str = st.selectbox("Görünüm", T["themes"], index=st.session_state["theme_idx"], label_visibility="collapsed")
+            new_t_idx = T["themes"].index(new_theme_str)
+            if new_t_idx != st.session_state["theme_idx"]:
+                st.session_state["theme_idx"] = new_t_idx
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+        with c_m3:
+            st.markdown("<div class='github-pill-select'>", unsafe_allow_html=True)
+            new_industry_str = st.selectbox("Sektör", T["industries"], index=st.session_state["industry_idx"], label_visibility="collapsed")
+            new_i_idx = T["industries"].index(new_industry_str)
+            if new_i_idx != st.session_state["industry_idx"]:
+                st.session_state["industry_idx"] = new_i_idx
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
+        with c_m4:
+            with st.popover(T["about_btn"]):
+                st.markdown(f"#### {T['about_title']}")
+                st.markdown(T["about_content"])
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <div class='cockpit-card'>
-        <div>
-            <div style='font-size:0.75rem; font-weight:800; letter-spacing:1px; color:#94A3B8; text-transform:uppercase; margin-bottom:12px;'>
-                {k_baslik}
+    with col_right:
+        st.markdown(f"""
+        <div class='cockpit-card'>
+            <div>
+                <div style='font-size:0.75rem; font-weight:800; letter-spacing:1px; color:#94A3B8; text-transform:uppercase; margin-bottom:12px;'>
+                    🛡️ Kurumsal Finans & Güvence Masası
+                </div>
+                <div class='cockpit-info-box'>
+                    <div class='cockpit-info-title'>{T['cockpit_card1_title']}</div>
+                    <div class='cockpit-info-desc'>{T['cockpit_card1_desc']}</div>
+                </div>
+                <div class='cockpit-info-box'>
+                    <div class='cockpit-info-title'>{T['cockpit_card2_title']}</div>
+                    <div class='cockpit-info-desc'>{T['cockpit_card2_desc']}</div>
+                </div>
+                <div class='cockpit-info-box'>
+                    <div class='cockpit-info-title'>{T['cockpit_card3_title']}</div>
+                    <div class='cockpit-info-desc'>{T['cockpit_card3_desc']}</div>
+                </div>
             </div>
-            <div class='cockpit-info-box'>
-                <div class='cockpit-info-title'>{k1_t}</div>
-                <div class='cockpit-info-desc'>{k1_d}</div>
-            </div>
-            <div class='cockpit-info-box'>
-                <div class='cockpit-info-title'>{k2_t}</div>
-                <div class='cockpit-info-desc'>{k2_d}</div>
-            </div>
-            <div class='cockpit-info-box'>
-                <div class='cockpit-info-title'>{k3_t}</div>
-                <div class='cockpit-info-desc'>{k3_d}</div>
+            <div style='display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:10px 14px; background:rgba(0,0,0,0.25); border-radius:12px;'>
+                <span style='font-size:0.75rem; color:#A7F3D0;'>✓ %100 Bakiye Garantisi</span>
+                <span style='font-size:0.75rem; color:#CBD5E1;'>ETA • Luca • Datev Ready</span>
             </div>
         </div>
-        <div style='display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:10px 14px; background:rgba(0,0,0,0.25); border-radius:12px;'>
-            <span style='font-size:0.75rem; color:#A7F3D0;'>✓ %100 Bakiye Garantisi</span>
-            <span style='font-size:0.75rem; color:#CBD5E1;'>ETA • Luca • Datev Ready</span>
+        """, unsafe_allow_html=True)
+
+    # TABLO VE ÇIKTI ALANI
+    if st.session_state["out_df"] is not None:
+        st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+        st.subheader(T["preview_title"])
+        st.caption(T["preview_tip"])
+
+        headers = T["headers"]
+        st.markdown("<div style='background:rgba(30,41,59,0.55); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:10px 16px; margin-bottom:14px;'>", unsafe_allow_html=True)
+        f_col1, f_col2, f_col3 = st.columns([2.5, 3.5, 2])
+        
+        with f_col1:
+            filtre_turu = st.selectbox(
+                "Filtrele", 
+                ["Tüm Satırlar", "Sadece 153 (Ticari Mallar)", "Sadece 770 (Genel Masraflar)", "Tevkifat / Stopaj (360)", "Sadece Satıcılar (320)"],
+                label_visibility="collapsed"
+            )
+        
+        with f_col2:
+            if st.session_state.get("raw_audit_results"):
+                doc_cnt = len(st.session_state["raw_audit_results"])
+                avg_conf = sum(d.get("confidence", 95) for d in st.session_state["raw_audit_results"]) / max(doc_cnt, 1)
+                st.markdown(f"<div style='font-size:0.85rem; padding-top:6px; color:#A7F3D0;'>🛡️ <b>Mühürlü Denetim:</b> {doc_cnt} Belge %{avg_conf:.1f} Güven Skoruyla Hazırlandı.</div>", unsafe_allow_html=True)
+
+        with f_col3:
+            st.markdown("<div style='text-align:right; font-size:0.82rem; padding-top:6px; color:#CBD5E1;'>💡 Uzman Onay Masası</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        df_goruntule = st.session_state["out_df"].copy()
+        if filtre_turu == "Sadece 153 (Ticari Mallar)":
+            df_goruntule = df_goruntule[df_goruntule[headers["code"]].astype(str).str.startswith("153")]
+        elif filtre_turu == "Sadece 770 (Genel Masraflar)":
+            df_goruntule = df_goruntule[df_goruntule[headers["code"]].astype(str).str.startswith("770")]
+        elif filtre_turu == "Tevkifat / Stopaj (360)":
+            df_goruntule = df_goruntule[df_goruntule[headers["code"]].astype(str).str.startswith("360")]
+        elif filtre_turu == "Sadece Satıcılar (320)":
+            df_goruntule = df_goruntule[df_goruntule[headers["code"]].astype(str).str.startswith("320")]
+
+        edited_df = st.data_editor(
+            df_goruntule,
+            use_container_width=True,
+            num_rows="dynamic"
+        )
+
+        deb_col = st.session_state["h_deb"]
+        crd_col = st.session_state["h_crd"]
+
+        tot_deb = st.session_state["out_df"][deb_col].sum()
+        tot_crd = st.session_state["out_df"][crd_col].sum()
+        diff = abs(tot_deb - tot_crd)
+
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric(T["tot_deb"], f"{tot_deb:,.2f}")
+        m2.metric(T["tot_crd"], f"{tot_crd:,.2f}")
+        
+        if diff < 0.05:
+            m3.success(T["balanced"])
+        else:
+            m3.error(f"{T['unbalanced']} (Δ {diff:,.2f})")
+            sesli_bildirim_cal("error")
+            
+        m4.metric("İşlem Süresi", f"{st.session_state['last_processing_time']} sn")
+
+        exp_col1, exp_col2, exp_col3 = st.columns(3)
+        
+        with exp_col1:
+            xlsx_data = export_multitab_corporate_excel(st.session_state["out_df"])
+            st.download_button(
+                label=T["download_btn"],
+                data=xlsx_data,
+                file_name="ledger_kurumsal_muhasebe_raporu.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True
+            )
+
+        with exp_col2:
+            eta_data = export_eta_csv(st.session_state["out_df"])
+            st.download_button(
+                label=T["download_eta"],
+                data=eta_data,
+                file_name="eta_v11_aktarim.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
+
+        with exp_col3:
+            json_data = st.session_state["out_df"].to_json(orient="records", indent=2, force_ascii=False)
+            st.download_button(
+                label="💾 JSON Veri İndir",
+                data=json_data,
+                file_name="ledger_audit_data.json",
+                mime="application/json",
+                use_container_width=True
+            )
+
+    # ASİSTAN ÇUBUĞU
+    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+    c_bot_l, c_bot_center, c_bot_r = st.columns([1, 4, 1])
+
+    with c_bot_center:
+        with st.expander(T["bot_title"], expanded=False):
+            top_col1, top_col2 = st.columns([5.5, 1.5])
+            top_col1.caption(T["bot_welcome"])
+            with top_col2:
+                if st.button(T["bot_clear"], key="btn_clear_chat", use_container_width=True):
+                    st.session_state["chat_messages"] = []
+                    st.rerun()
+
+            secilen_chip = None
+            btn_cols = st.columns(len(T["quick_chips"]))
+            for c_idx, chip_text in enumerate(T["quick_chips"]):
+                with btn_cols[c_idx]:
+                    if st.button(chip_text, key=f"gh_pill_btn_{c_idx}", use_container_width=True):
+                        secilen_chip = chip_text
+
+            st.markdown("<div class='chat-scroll-area'>", unsafe_allow_html=True)
+            if not st.session_state["chat_messages"]:
+                st.markdown(f"<div style='color: #94A3B8; font-size: 0.82rem; padding: 8px 0;'>💡 <i>{T['bot_placeholder']}</i></div>", unsafe_allow_html=True)
+            else:
+                for msg in st.session_state["chat_messages"][-6:]:
+                    if msg["role"] == "user":
+                        st.markdown(f"<div class='user-bubble'><b>Soru:</b> {msg['content']}</div>", unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"<div class='assistant-bubble'>🤖 <b>LedgerAI:</b> {msg['content']}</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+            user_query = st.chat_input(T["bot_placeholder"])
+            aktif_soru = user_query or secilen_chip
+            
+            if aktif_soru:
+                st.session_state["chat_messages"].append({"role": "user", "content": aktif_soru})
+                
+                # 0.01 SN ANINDA CEVAP ÖNBELLEĞİ
+                if aktif_soru in INSTANT_FAQ_CACHE:
+                    bot_cevap = INSTANT_FAQ_CACHE[aktif_soru]
+                    st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
+                    st.rerun()
+                else:
+                    with st.spinner("● ● ● LedgerAI muhasebe mevzuatını tarıyor ve hesaplıyor..."):
+                        prompt_bot = f"""
+                        Sen LedgerAI'ın kurumsal finans mentorü ve pratik muhasebe uzmanısın.
+                        Kullanıcı Dili: {st.session_state['user_lang']}
+                        Kullanıcı Sorusu: "{aktif_soru}"
+
+                        TALİMATLAR:
+                        1. Asla lafı uzatma, 2-3 cümlede net cevap ver.
+                        2. Sonda tek satırlık somut fiş kaydı ekle (Borç: 153/191 - Alacak: 320).
+                        """
+                        try:
+                            yanit = client.models.generate_content(
+                                model="gemini-3.5-flash-lite",
+                                contents=prompt_bot
+                            )
+                            bot_cevap = yanit.text.strip() if yanit and yanit.text else "Kayıt Tek Düzen standartlarına göre tasnif edilmiştir."
+                        except Exception:
+                            bot_cevap = "Tevkifat ve gider tasnifi mevzuata göre otomatik yapılmıştır. Uzman onayından sonra fiş ERP sistemine aktarılabilir."
+                        
+                        st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
+                        st.rerun()
+
+# ------------------------------------------------------------------------------
+# SEKME 2: 🎓 SİBER AKADEMİ & İNTERAKTİF FATURA OYUNU (ÖĞRENCİLER & OKULLAR)
+# ------------------------------------------------------------------------------
+with sekme_akademi:
+    st.markdown(f"""
+    <div style='background:rgba(30,41,59,0.65); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:24px 28px; margin-bottom:20px;'>
+        <div style='display:flex; justify-content:space-between; align-items:center;'>
+            <div>
+                <span class='top-badge' style='background:rgba(217,70,239,0.15); border-color:#D946EF; color:#F0ABFC;'>🎮 SİBER MUHASEBE AKADEMİSİ</span>
+                <h3 style='margin:4px 0; color:#FFFFFF;'>Geleceğin Mali Müşaviri Simülasyonu</h3>
+                <p style='font-size:0.85rem; color:#CBD5E1; margin:0;'>Öğrenciler ve yeni başlayanlar için interaktif hesap kodu ve tevkifat yapbozu. Boşlukları doldur, seviye atla!</p>
+            </div>
+            <div style='text-align:right;'>
+                <div style='font-size:1.4rem; font-weight:800; color:#D946EF;'>🏆 {st.session_state["academy_xp"]} XP</div>
+                <div style='font-size:0.75rem; color:#A7F3D0;'>Unvan: {st.session_state["academy_level"]}</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    c_sim1, c_sim2 = st.columns([1.2, 1.0], gap="medium")
+
+    with c_sim1:
+        st.markdown("""
+        <div style='background:rgba(15,23,42,0.7); border:1px dashed rgba(255,255,255,0.2); border-radius:18px; padding:20px;'>
+            <div style='font-size:0.75rem; font-weight:700; color:#38BDF8; letter-spacing:1px;'>GÖREV 1: FATURA ANALİZ BULMACASI</div>
+            <h4 style='color:#FFFFFF; margin:6px 0 14px 0;'>Örnek Ticari Vaka:</h4>
+            <div style='background:rgba(0,0,0,0.3); border-radius:12px; padding:14px; font-family:"Consolas", monospace; font-size:0.82rem; color:#E2E8F0; line-height:1.6;'>
+                <b>Satıcı:</b> Delta Teknoloji A.Ş.<br>
+                <b>Açıklama:</b> 20 Adet Ofis Sandalyesi & Çalışma Masası<br>
+                <b>Tutar:</b> 40.000 TL + %20 KDV (8.000 TL) = 48.000 TL<br>
+                <b>Şirket Türü:</b> Yazılım Şirketi (Ofis Yönetimi İçin Alındı)
+            </div>
+            <div style='margin-top:14px; font-size:0.82rem; color:#CBD5E1;'>
+                ❓ <b>Soru:</b> Bu eşyalar satılmak için değil, ofis çalışanları tarafından kullanılmak üzere alındı. Hangi hesaba kaydedilmelidir?
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with c_sim2:
+        st.markdown("<div style='background:rgba(30,41,59,0.65); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:20px;'>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:0.8rem; font-weight:700; color:#F1F5F9; margin-bottom:8px;'>🎯 Yapboz Parçalarını Seçin:</div>", unsafe_allow_html=True)
+        
+        sim_kod = st.selectbox("1. Boşluk (Gider/Varlık Hesabı):", [
+            "153.01 Ticari Mallar (Satmak için)",
+            "770.01 Genel Yönetim Giderleri (Ofis içi tüketim)",
+            "600.01 Yurtiçi Satışlar",
+            "100.01 Kasa Hesabı"
+        ], key="sim_sel_kod")
+        
+        sim_tev = st.selectbox("2. Boşluk (Tevkifat / Vergi Durumu):", [
+            "Tevkifatsız Normal Alım (%20 KDV Doğrudan 191'e)",
+            "5/10 KDV Tevkifatı (Yarısı devlete)",
+            "9/10 KDV Tevkifatı"
+        ], key="sim_sel_tev")
+        
+        if st.button("🛡️ Fişi Mühürle & XP Kazan", use_container_width=True):
+            if "770.01" in sim_kod and "Tevkifatsız" in sim_tev:
+                st.session_state["academy_xp"] += 100
+                st.session_state["academy_level"] = "Uzman Denetçi Yardımcısı"
+                st.balloons()
+                sesli_bildirim_cal("success")
+                st.success("🎉 TEBRİKLER! Sandalyeler ofis içi kullanım olduğu için 770 seçimi doğru. (+100 XP)")
+            else:
+                sesli_bildirim_cal("error")
+                st.error("⚠️ HATA! Satılmayacak olan ofis mobilyaları 153'e yazılamaz, idari gider (770) olmalıdır. Tekrar deneyin!")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# ------------------------------------------------------------------------------
+# SEKME 3: ⚖️ HUKUKİ ÇERÇEVE, KVKK & SLA (SATIŞTA GÜVENLİK ZIRHI)
+# ------------------------------------------------------------------------------
+with sekme_hukuk:
+    st.markdown("""
+    <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:28px 32px;'>
+        <span class='top-badge' style='background:rgba(56,189,248,0.12); border-color:#38BDF8; color:#38BDF8;'>HUKUKİ ÇERÇEVE & REGÜLASYON</span>
+        <h3 style='color:#FFFFFF; margin:8px 0 16px 0;'>Kurumsal Hizmet Şartları, KVKK & Sorumluluk Dağılımı</h3>
+        
+        <div style='font-size:0.85rem; color:#CBD5E1; line-height:1.7;'>
+            <p><b>1. İnsan-Yapay Zeka Ortaklığı (Dual-Control İlkesi):</b><br>
+            LedgerAI, bir otonom ön muhasebe ve optik veri ayrıştırma terminalidir. Sistem tarafından üretilen yevmiye fişleri, 
+            3568 Sayılı Kanun kapsamında yetkili Serbest Muhasebeci Mali Müşavir (SMMM) veya Yeminli Mali Müşavir (YMM) onayına sunulmak üzere <b>öneri ve taslak</b> niteliğindedir. 
+            Nihai yasal defter kaydı ve beyanname onay yetkisi her zaman kurumun yetkili meslek mensubuna aittir.</p>
+            
+            <p><b>2. Veri Güvenliği ve KVKK / GDPR Uyumluluğu:</b><br>
+            Yüklenen fatura ve belgeler uçtan uca TLS 256-bit protokolü ile işlenir. Finansal verileriniz model eğitimi (training) amacıyla kullanılmaz. 
+            Oturum sonlandırıldığında yüklenen geçici belge baytları bellekten (RAM) kalıcı olarak silinir.</p>
+
+            <p><b>3. Okul & Eğitim Kurumları Lisanslama Çerçevesi:</b><br>
+            Eğitim kurumları için sağlanan demo ve akademi modülleri, öğrencilere Tek Düzen Hesap Planı, KDV Tevkifatı ve 
+            ERP aktarım formatlarını öğretmek üzere hazırlanmış simülasyon ortamıdır. Ticari bağlayıcılığı bulunmaz.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
-
-# ==============================================================================
-# 7. INTERACTIVE JOURNAL VOUCHER GRID, FILTERS & AUDIT CENTER
-# ==============================================================================
-
-if st.session_state["out_df"] is not None:
-    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
-    st.subheader(T["preview_title"])
-    st.caption(T["preview_tip"])
-
-    headers = T["headers"]
-    st.markdown("<div style='background:rgba(30,41,59,0.55); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:10px 16px; margin-bottom:14px;'>", unsafe_allow_html=True)
-    f_col1, f_col2, f_col3 = st.columns([2.5, 3.5, 2])
-    
-    with f_col1:
-        filtre_turu = st.selectbox(
-            "Filtrele", 
-            ["Tüm Satırlar", "Sadece 153 (Ticari Mallar)", "Sadece 770 (Genel Masraflar)", "Tevkifat / Stopaj (360)", "Sadece Satıcılar (320)"],
-            label_visibility="collapsed"
-        )
-    
-    with f_col2:
-        if st.session_state.get("raw_audit_results"):
-            doc_cnt = len(st.session_state["raw_audit_results"])
-            avg_conf = sum(d.get("confidence", 95) for d in st.session_state["raw_audit_results"]) / max(doc_cnt, 1)
-            st.markdown(f"<div style='font-size:0.85rem; padding-top:6px; color:#A7F3D0;'>🛡️ <b>Mühürlü Denetim:</b> {doc_cnt} Belge %{avg_conf:.1f} Güven Skoruyla Hazırlandı.</div>", unsafe_allow_html=True)
-
-    with f_col3:
-        st.markdown("<div style='text-align:right; font-size:0.82rem; padding-top:6px; color:#CBD5E1;'>💡 Uzman Onay Masası</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    df_goruntule = st.session_state["out_df"].copy()
-    if filtre_turu == "Sadece 153 (Ticari Mallar)":
-        df_goruntule = df_goruntule[df_goruntule[headers["code"]].astype(str).str.startswith("153")]
-    elif filtre_turu == "Sadece 770 (Genel Masraflar)":
-        df_goruntule = df_goruntule[df_goruntule[headers["code"]].astype(str).str.startswith("770")]
-    elif filtre_turu == "Tevkifat / Stopaj (360)":
-        df_goruntule = df_goruntule[df_goruntule[headers["code"]].astype(str).str.startswith("360")]
-    elif filtre_turu == "Sadece Satıcılar (320)":
-        df_goruntule = df_goruntule[df_goruntule[headers["code"]].astype(str).str.startswith("320")]
-
-    edited_df = st.data_editor(
-        df_goruntule,
-        use_container_width=True,
-        num_rows="dynamic"
-    )
-
-    deb_col = st.session_state["h_deb"]
-    crd_col = st.session_state["h_crd"]
-
-    tot_deb = st.session_state["out_df"][deb_col].sum()
-    tot_crd = st.session_state["out_df"][crd_col].sum()
-    diff = abs(tot_deb - tot_crd)
-
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric(T["tot_deb"], f"{tot_deb:,.2f}")
-    m2.metric(T["tot_crd"], f"{tot_crd:,.2f}")
-    
-    if diff < 0.05:
-        m3.success(T["balanced"])
-    else:
-        m3.error(f"{T['unbalanced']} (Δ {diff:,.2f})")
-        sesli_bildirim_cal("error")
-        
-    m4.metric("İşlem Süresi", f"{st.session_state['last_processing_time']} sn")
-
-    exp_col1, exp_col2, exp_col3 = st.columns(3)
-    
-    with exp_col1:
-        xlsx_data = export_multitab_corporate_excel(st.session_state["out_df"])
-        st.download_button(
-            label=T["download_btn"],
-            data=xlsx_data,
-            file_name="ledger_kurumsal_muhasebe_raporu.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True
-        )
-
-    with exp_col2:
-        eta_data = export_eta_csv(st.session_state["out_df"])
-        st.download_button(
-            label=T["download_eta"],
-            data=eta_data,
-            file_name="eta_v11_aktarim.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-
-    with exp_col3:
-        json_data = st.session_state["out_df"].to_json(orient="records", indent=2, force_ascii=False)
-        st.download_button(
-            label="💾 JSON Veri İndir",
-            data=json_data,
-            file_name="ledger_audit_data.json",
-            mime="application/json",
-            use_container_width=True
-        )
-
-# ==============================================================================
-# 8. MENTOR FINANS ASİSTANI (HIZLI CACHE + KESİNTİSİZ CEVAP)
-# ==============================================================================
-
-st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
-c_bot_l, c_bot_center, c_bot_r = st.columns([1, 4, 1])
-
-with c_bot_center:
-    with st.expander(T["bot_title"], expanded=False):
-        top_col1, top_col2 = st.columns([5.5, 1.5])
-        top_col1.caption(T["bot_welcome"])
-        with top_col2:
-            if st.button(T["bot_clear"], key="btn_clear_chat", use_container_width=True):
-                st.session_state["chat_messages"] = []
-                st.rerun()
-
-        # GITHUB.COM STİLİ MİKRO HAP BUTONLAR
-        secilen_chip = None
-        btn_cols = st.columns(len(T["quick_chips"]))
-        for c_idx, chip_text in enumerate(T["quick_chips"]):
-            with btn_cols[c_idx]:
-                if st.button(chip_text, key=f"gh_pill_btn_{c_idx}", use_container_width=True):
-                    secilen_chip = chip_text
-
-        # SCROLLABLE CHAT ALANI
-        st.markdown("<div class='chat-scroll-area'>", unsafe_allow_html=True)
-        if not st.session_state["chat_messages"]:
-            st.markdown(f"<div style='color: #94A3B8; font-size: 0.82rem; padding: 8px 0;'>💡 <i>{T['bot_placeholder']}</i></div>", unsafe_allow_html=True)
-        else:
-            for msg in st.session_state["chat_messages"][-6:]:
-                if msg["role"] == "user":
-                    st.markdown(f"<div class='user-bubble'><b>Soru:</b> {msg['content']}</div>", unsafe_allow_html=True)
-                else:
-                    st.markdown(f"<div class='assistant-bubble'>🤖 <b>LedgerAI:</b> {msg['content']}</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        user_query = st.chat_input(T["bot_placeholder"])
-        aktif_soru = user_query or secilen_chip
-        
-        if aktif_soru:
-            st.session_state["chat_messages"].append({"role": "user", "content": aktif_soru})
-            
-            # 1. ADIM: HIZLI CEVAP ÖNBELLEĞİ KONTROLÜ (0.01 SN ANINDA CEVAP!)
-            if aktif_soru in INSTANT_FAQ_CACHE:
-                anlik_cevap = INSTANT_FAQ_CACHE[aktif_soru]
-                st.session_state["chat_messages"].append({"role": "assistant", "content": anlik_cevap})
-                st.rerun()
-            else:
-                # 2. ADIM: ÖZEL SORULAR İÇİN GEMINI MOTORU (3 FARKLI TEMAYA GÖRE KİŞİLİK)
-                if st.session_state["theme_idx"] == 2:
-                    persona_direktifi = "Sen Cyberpunk Akademi finans rehberisin. Öğrencilere ve gençlere muhasebeyi oyunlaştırarak, seviye atlar gibi öğretici anlat."
-                elif st.session_state["theme_idx"] == 1:
-                    persona_direktifi = "Sen yeni nesil dinamik girişim CFO'susun. Modern SaaS ve şirket terminolojisiyle pratik ve hızlı tavsiye ver."
-                else:
-                    persona_direktifi = "Sen kıdemli bir kurumsal vergi denetçisi ve mali müşavirsin. Resmi, net ve Tek Düzen kodlarına tam hakim cevap ver."
-
-                prompt_bot = f"""
-                {persona_direktifi}
-                Kullanıcı Dili: {st.session_state['user_lang']}
-                Kullanıcı Sorusu: "{aktif_soru}"
-
-                TALİMATLAR:
-                1. Asla lafı uzatma, genel tanımlar yazma.
-                2. MAKSİMUM 2-3 CÜMLEDE doğrudan ve net cevabı ver.
-                3. "İnsan + AI ortaklığı" felsefesini koru: Yapay zeka hazırlar, uzman insan onaylar.
-                4. Her cevabın sonuna tek satırlık somut fiş kaydı veya pratik örnek ekle:
-                   - Borç: 153 Ticari Mallar / 191 KDV
-                   - Alacak: 320 Satıcılar
-                5. Türkiye için Tek Düzen kodlarını (153, 770, 740, 255 vb.), global için GAAP/Datev kodlarını kullan.
-                """
-                
-                bot_cevap = None
-                for deneme in range(3):
-                    try:
-                        yanit = client.models.generate_content(
-                            model="gemini-3.5-flash-lite",
-                            contents=prompt_bot
-                        )
-                        if yanit and yanit.text:
-                            bot_cevap = yanit.text.strip()
-                            break
-                    except Exception:
-                        time.sleep(1.0)
-                
-                if bot_cevap:
-                    st.session_state["chat_messages"].append({"role": "assistant", "content": bot_cevap})
-                    st.rerun()
-                else:
-                    # YEDEK GÜVENLİ CEVAP
-                    yedek = "Tevkifat ve gider tasnifi mevzuata göre otomatik yapılmıştır. Uzman onayından sonra fiş ERP sistemine aktarılabilir.\n\nÖrnek Fiş: Borç: 770 & 191 — Alacak: 320"
-                    st.session_state["chat_messages"].append({"role": "assistant", "content": yedek})
-                    st.rerun()
