@@ -4,7 +4,7 @@ LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY HUB
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL + HTML5 Canvas
 Design: Minimal Circular Glass Nav / 100% Dynamic Multi-Language Localization
 Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, US GAAP
-Version: 10.1.0 Bugfix & Smooth Snake Edition
+Version: 11.0.0 Legal Safeguard & Enhanced Audio-Visual Edition
 ================================================================================
 """
 
@@ -258,7 +258,7 @@ if not isinstance(st.session_state.get("sim_current_vaka"), dict):
     st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
 
 # ==============================================================================
-# 3. LOCALIZATION DATA DICTIONARY (6 DİLDE TAM VE EKSİKSİZ)
+# 3. GLOBAL LOCALIZATION DATA DICTIONARY (6 DİLDE TAM & HUKUKEN ZIRHLI)
 # ==============================================================================
 
 LANG_DATA = {
@@ -300,12 +300,15 @@ LANG_DATA = {
             "⚖️ Tevkifat & Stopaj mantığı nedir?",
             "🎯 153 ile 770 arasındaki fark nedir?"
         ],
+        "cockpit_main_title": "🛡️ KURUMSAL FİNANS & GÜVENCE MASASI",
         "cockpit_card1_title": "🏛️ Mevzuat & Tevkifat Uyumu",
         "cockpit_card1_desc": "5/10, 7/10, 9/10 KDV tevkifatları ve Serbest Meslek stopajları kuruş farkı olmadan 360 hesabına aktarılır.",
         "cockpit_card2_title": "⚡ ERP Aktarım Formatları",
         "cockpit_card2_desc": "Tek tıkla ETA V.11 uyumlu CSV, Luca ve çok sayfalı (153 & 770 ayrılmış) kurumsal Excel üretimi.",
         "cockpit_card3_title": "🛡️ Çift Taraflı Denetim Kilidi",
         "cockpit_card3_desc": "Toplam Borç = Toplam Alacak eşitliği sağlanmadan yevmiye fişi kapatılmaz; bakiye farkı riski sıfırlanır.",
+        "cockpit_badge1": "✓ Matematiksel Denge Kontrolü",
+        "cockpit_badge2": "ETA • Luca • Datev Uyumlu",
         "headers": {"vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu", "name": "Hesap Adı", "desc": "Açıklama", "curr": "Para Birimi", "deb": "Borç", "crd": "Alacak"},
         "acad_badge": "SİBER AKADEMİ ARENA",
         "acad_title": "Geleceğin Finans Lideri Yetiştirme Simülasyonu",
@@ -378,12 +381,15 @@ LANG_DATA = {
             "⚖️ Explain Debit vs Credit",
             "🎯 Inventory vs OpEx accounts"
         ],
+        "cockpit_main_title": "🛡️ CORPORATE AUDIT & ASSURANCE DESK",
         "cockpit_card1_title": "🏛️ Tax Withholding Engine",
         "cockpit_card1_desc": "Automatic handling of multi-rate sales taxes and withholding accounts with zero cent deviation.",
         "cockpit_card2_title": "⚡ ERP Interoperability",
         "cockpit_card2_desc": "Direct exports formatted for QuickBooks, SAP, Datev SKR03/04, and multi-tab Excel workbooks.",
         "cockpit_card3_title": "🛡️ Dual-Audit Integrity Lock",
         "cockpit_card3_desc": "Mathematical assurance guaranteeing that Total Debit strictly equals Total Credit before release.",
+        "cockpit_badge1": "✓ Dual-Entry Balance Check",
+        "cockpit_badge2": "QuickBooks • SAP • Datev Ready",
         "headers": {"vouch": "Voucher #", "date": "Date", "code": "Account Code", "name": "Account Name", "desc": "Memo", "curr": "Currency", "deb": "Debit", "crd": "Credit"},
         "acad_badge": "CYBER ACADEMY ARENA",
         "acad_title": "Next-Gen Financial Leader Training Simulation",
@@ -399,8 +405,8 @@ LANG_DATA = {
         "mission": "MISSION",
         "inv_total": "Invoice Total",
         "click_card": "🎯 Click the Correct Account Card:",
-        "tricky_title": "DIFFICULTY: ADVANCED | CHAR OF ACCOUNTS LOGIC",
-        "tricky_sub": "Which primary financial statement class (Assets, Liabilities, Equity, Revenue, Expense) does this account belong to?",
+        "tricky_title": "DIFFICULTY: ADVANCED | CHART OF ACCOUNTS LOGIC",
+        "tricky_sub": "Which primary financial statement class does this account belong to?",
         "snake_title": "🐍 Targeted Balance Snake (Account Hunter)",
         "snake_desc": "<b>Objective:</b> Eat the <b>TARGET ACCOUNT CODE</b> shown above! Correct code grants +100 XP. Eating the wrong code or hitting walls/tail ends the run! (Press <b>[SPACE]</b> to pause).",
         "erp_sim_badge": "📌 LEARNING ACCOUNTING: JOURNAL ENTRY CASE",
@@ -451,12 +457,15 @@ LANG_DATA = {
         "bot_placeholder": "Frage eingeben...",
         "bot_clear": "Löschen",
         "quick_chips": ["💡 Wie spart es Arbeitszeit?", "🔒 Datenschutz & Sicherheit", "⚖️ Soll an Haben Prinzip"],
+        "cockpit_main_title": "🛡️ RECHNUNGSWESEN & DATEV-KONTROLLZENTRUM",
         "cockpit_card1_title": "🏛️ Vorsteuer- & Steuerlogik",
         "cockpit_card1_desc": "Automatische Zuordnung von SKR03/04 Vorsteuern und USt-IdNr Validierung.",
         "cockpit_card2_title": "⚡ Datev Export",
         "cockpit_card2_desc": "Direkter Datev-konformer CSV-Export für das Steuerbüro.",
         "cockpit_card3_title": "🛡️ Soll/Haben Garantie",
         "cockpit_card3_desc": "Mathematische Prüfung auf absolute Ausgeglichenheit der Buchungssätze.",
+        "cockpit_badge1": "✓ Rechnerische Soll/Haben-Prüfung",
+        "cockpit_badge2": "Datev SKR • SAP Kompatibel",
         "headers": {"vouch": "Beleg", "date": "Datum", "code": "Konto", "name": "Bezeichnung", "desc": "Text", "curr": "Währung", "deb": "Soll", "crd": "Haben"},
         "acad_badge": "CYBER AKADEMIE",
         "acad_title": "Finanz- und Buchhaltungssimulation",
@@ -524,12 +533,15 @@ LANG_DATA = {
         "bot_placeholder": "Poser une question...",
         "bot_clear": "Effacer",
         "quick_chips": ["💡 Gain de temps en cabinet", "🔒 Sécurité des données", "⚖️ Principe Débit / Crédit"],
+        "cockpit_main_title": "🛡️ BUREAU D'AUDIT & CONTRÔLE COMPTABLE",
         "cockpit_card1_title": "🏛️ Ventilation PCG",
         "cockpit_card1_desc": "Affectation automatique aux comptes de charges et TVA déductible.",
         "cockpit_card2_title": "⚡ Formats Export",
         "cockpit_card2_desc": "Compatible avec les logiciels Sage, Cegid et tableur multi-feuilles.",
         "cockpit_card3_title": "🛡️ Équilibre Débit/Crédit",
         "cockpit_card3_desc": "Vérification stricte de la balance avant validation finale.",
+        "cockpit_badge1": "✓ Vérification Débit/Crédit",
+        "cockpit_badge2": "Conforme PCG • Sage Ready",
         "headers": {"vouch": "Pièce", "date": "Date", "code": "Compte", "name": "Libellé", "desc": "Détail", "curr": "Devise", "deb": "Débit", "crd": "Crédit"},
         "acad_badge": "CYBER ACADÉMIE",
         "acad_title": "Simulation d'Apprentissage Comptable",
@@ -597,12 +609,15 @@ LANG_DATA = {
         "bot_placeholder": "Escribe tu duda...",
         "bot_clear": "Limpiar",
         "quick_chips": ["💡 Ventajas para la asesoría", "🔒 Seguridad y confidencialidad", "⚖️ Cuadre de Debe y Haber"],
+        "cockpit_main_title": "🛡️ MESA DE CONTROL & AUDITORÍA CONTABLE",
         "cockpit_card1_title": "🏛️ Cuadre Fiscal",
         "cockpit_card1_desc": "Gestión automática de retenciones e IVA soportado.",
         "cockpit_card2_title": "⚡ Compatibilidad ERP",
         "cockpit_card2_desc": "Exportación directa para Contasol, A3 y software contable estándar.",
         "cockpit_card3_title": "🛡️ Control de Asiento",
         "cockpit_card3_desc": "Validación matemática estricta de paridad Debe = Haber.",
+        "cockpit_badge1": "✓ Verificación Matemática de Cuadre",
+        "cockpit_badge2": "Compatible Contasol • A3",
         "headers": {"vouch": "Asiento", "date": "Fecha", "code": "Cuenta", "name": "Nombre Cuenta", "desc": "Concepto", "curr": "Moneda", "deb": "Debe", "crd": "Haber"},
         "acad_badge": "CIBER ACADEMIA",
         "acad_title": "Simulación de Aprendizaje Contable",
@@ -628,14 +643,14 @@ LANG_DATA = {
         "erp_btn_next": "➡️ Siguiente Asiento",
         "leg_title": "⚖️ Marco Legal y Privacidad RGPD",
         "leg_sub": "Garantías y responsabilidad transparente.",
-        "q1": "¿Sustituye la IA al asesor contable?",
-        "a1": "No, prepara borradores bajo el control del profesional.",
-        "q2": "¿Se guardan datos comerciales?",
-        "a2": "No, política de retención cero en memoria RAM.",
-        "q3": "¿Uso en universidades?",
-        "a3": "Sí, entorno simulado seguro sin datos personales.",
-        "q4": "¿Cuadre garantizado?",
-        "a4": "Sí, paridad estricta entre Debe y Haber."
+        "q1": "💬 Pregunta 1: ¿Sustituye la IA al asesor contable?",
+        "a1": "<b>Respuesta:</b> No, prepara borradores bajo el control del profesional.",
+        "q2": "🔒 Pregunta 2: ¿Se guardan datos comerciales?",
+        "a2": "<b>Respuesta:</b> No, política de retención cero en memoria RAM.",
+        "q3": "🏫 Pregunta 3: ¿Uso en universidades?",
+        "a3": "<b>Respuesta:</b> Sí, entorno simulado seguro sin datos personales.",
+        "q4": "⚖️ Pregunta 4: ¿Cuadre garantizado?",
+        "a4": "<b>Respuesta:</b> Sí, paridad estricta entre Debe y Haber."
     },
     "🇮🇹 IT": {
         "tab_terminal": "🏢 Terminale Contabile",
@@ -670,12 +685,15 @@ LANG_DATA = {
         "bot_placeholder": "Fai una domanda contabile...",
         "bot_clear": "Cancella",
         "quick_chips": ["💡 Vantaggi per lo studio", "🔒 Sicurezza dei dati fiscali", "⚖️ Pareggio Dare / Avere"],
+        "cockpit_main_title": "🛡️ CENTRO DI CONTROLLO & AUDIT CONTABILE",
         "cockpit_card1_title": "🏛️ Scritture Bilanciate",
         "cockpit_card1_desc": "Gestione automatica ritenute d'acconto ed IVA a credito.",
         "cockpit_card2_title": "⚡ Compatibilità Gestionale",
         "cockpit_card2_desc": "File pronti per Zucchetti, Teamsystem e formati Excel avanzati.",
         "cockpit_card3_title": "🛡️ Quadratura Certificata",
         "cockpit_card3_desc": "Garanzia matematica di parità tra totale Dare e Avere.",
+        "cockpit_badge1": "✓ Verifica Quadratura Dare/Avere",
+        "cockpit_badge2": "Zucchetti • Teamsystem Ready",
         "headers": {"vouch": "Partita", "date": "Data", "code": "Conto", "name": "Descrizione", "desc": "Causale", "curr": "Valuta", "deb": "Dare", "crd": "Avere"},
         "acad_badge": "CYBER ACCADEMIA",
         "acad_title": "Simulazione Didattica di Contabilità",
@@ -701,14 +719,14 @@ LANG_DATA = {
         "erp_btn_next": "➡️ Prossima Scrittura",
         "leg_title": "⚖️ Quadro Giuridico & Privacy GDPR",
         "leg_sub": "Sicurezza e trasparenza normativa.",
-        "q1": "L'IA sostituisce il commercialista?",
-        "a1": "No, prepara bozze sotto la supervisione dell'esperto.",
-        "q2": "I dati vengono memorizzati?",
-        "a2": "No, principio zero-retention in memoria volatile.",
-        "q3": "Utilizzo scolastico?",
-        "a3": "Sì, ambiente simulato sicuro senza dati personali.",
-        "q4": "Quadratura garantita?",
-        "a4": "Sì, perfetta parità tra Dare e Avere."
+        "q1": "💬 Domanda 1: L'IA sostituisce il commercialista?",
+        "a1": "<b>Risposta:</b> No, prepara bozze sotto la supervisione dell'esperto.",
+        "q2": "🔒 Domanda 2: I dati vengono memorizzati?",
+        "a2": "<b>Risposta:</b> No, principio zero-retention in memoria volatile.",
+        "q3": "🏫 Domanda 3: Utilizzo scolastico?",
+        "a3": "<b>Risposta:</b> Sì, ambiente simulato sicuro senza dati personali.",
+        "q4": "⚖️ Domanda 4: Quadratura garantita?",
+        "a4": "<b>Risposta:</b> Sì, perfetta parità tra Dare e Avere."
     }
 }
 
@@ -716,15 +734,6 @@ if st.session_state["user_lang"] not in LANG_DATA:
     st.session_state["user_lang"] = "🇹🇷 TR"
 
 T = LANG_DATA[st.session_state["user_lang"]]
-
-INSTANT_FAQ_CACHE = {
-    "💡 Muhasebeciye ne kazandırır?": "LedgerAI, manuel veri girişini %80 azaltarak mali müşavirlerin rutin fiş işleme yükünü ortadan kaldırır. Yapay zeka fiş taslağını oluşturur, uzman insan sadece onaylar ve denetler.",
-    "🔒 Verilerim güvende mi?": "Evet. Tüm finansal verileriniz TLS 256-bit uçtan uca şifreleme ile işlenir. Belgeleriniz kalıcı sunucularda saklanmaz ve model eğitiminde (training) kullanılmaz.",
-    "⚖️ Tevkifat & Stopaj mantığı nedir?": "Tevkifat ve stopaj, faturadaki verginin bir kısmının alıcı tarafından kesilerek doğrudan vergi dairesine (360 hesabına) ödenmesidir. Böylece satıcı cari hesabı net tutara oturur ve yevmiye fişi kuruş farkı olmadan dengelenir.",
-    "🎯 153 ile 770 arasındaki fark nedir?": "153 Ticari Mallar satılmak amacıyla alınan ticari ürünlerin stok hesabıdır. 770 Genel Yönetim Giderleri ise işletmenin kendi idari faaliyetlerinde tükettiği (ofis kırtasiyesi, kira, danışmanlık vb.) giderlerin kaydedildiği hesaptır.",
-    "💡 How does it save time?": "LedgerAI automates repetitive invoice typing and multi-tier tax splitting by 80%, leaving the final executive approval to the CPA.",
-    "🔒 Is our data secure?": "Yes. Encrypted via TLS 256-bit bank-grade protocols. Your financial files are processed strictly within the active session and never stored permanently."
-}
 
 # ==============================================================================
 # 4. DYNAMIC STYLING ENGINE (IPHONE CIRCLE GLASS BUTTONS & NEON HUD)
@@ -1156,23 +1165,27 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
+# GELİŞMİŞ SYNTHESIZER SES MOTORU (WEB AUDIO API)
 def sesli_bildirim_cal(tur="success"):
     if tur == "success":
         ses_js = """
         <script>
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(880.00, ctx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.08, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.35);
+                const now = ctx.currentTime;
+                // Çift Katmanlı Kristal Çan Efekti (C6 & G6 Chord)
+                [1046.50, 1567.98].forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + (idx * 0.05));
+                    gain.gain.setValueAtTime(0.06, now + (idx * 0.05));
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + (idx * 0.05));
+                    osc.stop(now + 0.45);
+                });
             } catch(e) {}
         </script>
         """
@@ -1181,17 +1194,19 @@ def sesli_bildirim_cal(tur="success"):
         <script>
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                // Akustik Düşük Frekanslı İkaz Akoru
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(70, now + 0.35);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
                 osc.connect(gain);
                 gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.35);
             } catch(e) {}
         </script>
         """
@@ -1599,7 +1614,7 @@ with sekme_terminal:
         <div class='cockpit-card'>
             <div>
                 <div style='font-size:0.75rem; font-weight:800; letter-spacing:1px; color:#94A3B8; text-transform:uppercase; margin-bottom:12px;'>
-                    🛡️ {T['cockpit_card1_title']}
+                    {T['cockpit_main_title']}
                 </div>
                 <div class='cockpit-info-box'>
                     <div class='cockpit-info-title'>{T['cockpit_card1_title']}</div>
@@ -1615,8 +1630,8 @@ with sekme_terminal:
                 </div>
             </div>
             <div style='display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:10px 14px; background:rgba(0,0,0,0.25); border-radius:12px;'>
-                <span style='font-size:0.75rem; color:#A7F3D0;'>✓ 100% Audit Guaranteed</span>
-                <span style='font-size:0.75rem; color:#CBD5E1;'>ERP & GAAP Ready</span>
+                <span style='font-size:0.75rem; color:#A7F3D0;'>{T['cockpit_badge1']}</span>
+                <span style='font-size:0.75rem; color:#CBD5E1;'>{T['cockpit_badge2']}</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -1847,7 +1862,7 @@ with sekme_akademi:
             T["g_tab4"]
         ])
 
-        # OYUN 1: HESAP KODU AVCISI (TYPEERROR DÜZELTİLDİ)
+        # OYUN 1: HESAP KODU AVCISI
         with oyun_sekme1:
             raw_vaka = st.session_state.get("current_game_vaka")
             if not isinstance(raw_vaka, dict) or "secenekler" not in raw_vaka:
@@ -1965,7 +1980,7 @@ with sekme_akademi:
                             st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
                             st.rerun()
 
-        # OYUN 3: HEDEFLİ BİLANÇO SNAKE (YENİLENMİŞ VE HATASIZ KOD)
+        # OYUN 3: HEDEFLİ BİLANÇO SNAKE
         with oyun_sekme3:
             st.markdown(f"""
             <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:16px 20px; margin-bottom:12px;'>
