@@ -1,8 +1,8 @@
 """
 ================================================================================
-LEDGERAI — INSTITUTIONAL ENTERPRISE ACCOUNTING TERMINAL
+LEDGERAI — HUMAN + AI CO-PILOT FINANCIAL TERMINAL
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL
-Design: Open Slate / Fluid Responsive Micro-UI / Interactive Assistant Chips
+Design: Smooth Pill Micro-Interactions / Open Slate Executive Architecture
 ================================================================================
 """
 
@@ -22,7 +22,7 @@ from openpyxl.utils import get_column_letter
 # ==============================================================================
 
 st.set_page_config(
-    page_title="LedgerAI — Enterprise Accounting Terminal",
+    page_title="LedgerAI — Human + AI Financial Terminal",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -59,18 +59,18 @@ client = genai.Client(api_key=API_KEY)
 
 LANG_DATA = {
     "🇹🇷 TR": {
-        "badge": "OTONOM FİNANS TERMİNALİ",
+        "badge": "İNSAN GÜCÜ + YAPAY ZEKA ORTAKLIĞI",
         "title": "LedgerAI",
-        "subtitle": "Faturaları saniyeler içinde sektörel hesap kodlarına ve kuruşu kuruşuna dengeli ERP fişine dönüştürün.",
+        "subtitle": "Yapay zeka faturaları ve tevkifatı hazırlar; uzman mali müşavir son kararı verir ve onaylar.",
         "drop_title": "Belgeleri Buraya Bırakın veya Seçin",
-        "drop_sub": "PDF, PNG, JPG formatında fatura, makbuz ve fişler • Maksimum 5 belge",
-        "process_btn": "⚡ Otonom Muhasebeleştir & Denetle",
+        "drop_sub": "PDF, PNG, JPG • Fatura, Serbest Meslek Makbuzu ve Fişler",
+        "process_btn": "⚡ Otonom İncele & Fişi Hazırla",
         "limit_err": "🛑 Demo sürümünde oturum başına en fazla 5 fatura işlenebilir.",
         "ready_count": "İşlenecek belge sayısı: **{count}**",
-        "success": "✓ Fişler başarıyla oluşturuldu ve Borç/Alacak kuruşu kuruşuna dengelendi.",
+        "success": "✓ Fişler hazırlandı, Tevkifat & KDV ayrıldı, Borç/Alacak dengelendi.",
         "failed": "❌ Belgeler işlenemedi. Lütfen görsel netliğini kontrol edin.",
-        "preview_title": "📊 Muhasebe Yevmiye Fişi & Denetim Masası",
-        "preview_tip": "💡 Hücrelere çift tıklayarak kod veya tutarları değiştirebilirsiniz. Çok sayfalı Excel'e anında yansır.",
+        "preview_title": "📊 Muhasebe Yevmiye Fişi & İnsan Denetim Masası",
+        "preview_tip": "💡 Yapay zekanın önerdiği kodları ve tutarları değiştirmek için hücreye çift tıklayın.",
         "tot_deb": "Toplam Borç",
         "tot_crd": "Toplam Alacak",
         "balanced": "✅ Fiş Dengeli (Borç = Alacak)",
@@ -88,28 +88,27 @@ LANG_DATA = {
             "✨ Ultra Canlı Aurora",
             "🌌 Cyberpunk Gece"
         ],
-        "about_btn": "ℹ️ İşleyiş & Güvenlik",
-        "about_title": "LedgerAI Otonom Sistem Mimarisi",
+        "about_btn": "ℹ️ İşleyiş & Felsefe",
+        "about_title": "LedgerAI Mimarisi & İnsan-AI Ortaklığı",
         "about_content": """
-        ### 🛡️ Kurumsal Finans & Güvenlik Mimarisi
-        **LedgerAI**, kurumların fiş giriş maliyetlerini sıfıra indiren yeni nesil finans terminalidir.
-        * **1. Çift Taraflı Tevkifat/Stopaj Algoritması:** Tevkifatlı faturalarda veya SMMM makbuzlarında kesintileri otomatik hesaplar; `360 Ödenecek Vergi` satırını açarak borç/alacak denkliğini garanti eder.
-        * **2. Sektörel Mantık:** Faturadaki mal alımını şirketin faaliyetine göre (`153`, `150` veya `770`) dinamik ayırır.
-        * **3. Çoklu KDV Ayrıştırması:** Aynı faturada birden fazla KDV oranı varsa (%1, %10, %20) her oran için ayrı borç satırı üretir.
-        * **4. Çok Sayfalı Kurumsal Raporlama:** Excel çıktısında fişler; 153 Ticari Mallar, 770 Masraflar ve Genel Özet sayfalarına otomatik ayrılır.
+        ### 🛡️ İnsan Gücü ve Yapay Zekanın Güvenli Birleşimi
+        **LedgerAI**, çalışanların veya mali müşavirlerin yerini almak için değil; onların üzerindeki mekanik iş yükünü kaldırıp stratejik denetim gücü kazandırmak için tasarlandı.
+        * **1. Çift Göz Prensibi:** Yapay zeka faturadaki KDV tevkifatını ve matrahı ayrıştırıp yevmiye fişini hazırlar; insan uzman son kontrolü yapıp onaylar.
+        * **2. Sıfır Hata Garantisi:** Matematiksel olarak Borç = Alacak denkliği kuruşu kuruşuna doğrulanmadan sistem fiş üretmez.
+        * **3. İstihdamı Destekleyen Teknoloji:** Muhasebe personeli saatlerce fatura girmek yerine finansal analiz ve danışmanlığa odaklanır.
         """,
-        "step1_title": "1. Belge & Tevkifat Analizi",
-        "step1_desc": "OCR ile çoklu KDV, tevkifat oranları, stopaj ve matrahlar kuruşu kuruşuna okunur.",
-        "step2_title": "2. Sektörel Hesap Eşleme",
-        "step2_desc": "Şirket türüne göre ticari mal (153), üretim (150) veya masraf (770) dinamik atanır.",
-        "step3_title": "3. Çift Bakiye Doğrulama",
-        "step3_desc": "Toplam Borç = Toplam Alacak eşitliği sağlanmadan yevmiye fişi üretilmez.",
+        "step1_title": "1. Belge & Tevkifat Okuma",
+        "step1_desc": "OCR ile çoklu KDV, tevkifat ve stopaj kuruşu kuruşuna ayıklanır.",
+        "step2_title": "2. Sektörel Eşleme & Öneri",
+        "step2_desc": "Faaliyete göre 153, 150 veya 770 kodları otomatik önerilir.",
+        "step3_title": "3. İnsan Onayı & Denge",
+        "step3_desc": "Borç/Alacak dengesi mühürlenir, uzman onayına sunulur.",
         "badge_erp": "✓ ETA • LUCA • DATEV • QUICKBOOKS UYUMLU",
-        "badge_audit": "✓ %100 BORÇ/ALACAK DENGE GARANTİSİ",
-        "badge_sec": "✓ ÇOK SAYFALI ÖZEL EXCEL RAPORU",
+        "badge_audit": "✓ %100 MATEMATİKSEL DENGE GARANTİSİ",
+        "badge_sec": "✓ %100 VERİ GİZLİLİĞİ & GÜVENLİK",
         "bot_title": "👾 LedgerBot Finans Mentorü",
-        "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya pratik hesap kodlarını sormak için aşağıdaki hızlı sorulara tıklayabilir ya da bana yazabilirsin!",
-        "bot_placeholder": "Sorunuzu yazın (Örn: Tevkifatlı fatura nasıl işlenir?)...",
+        "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya fatura mantığını sormak için aşağıdaki hap sorulara tıklayabilirsin:",
+        "bot_placeholder": "Muhasebe sorunuzu yazın...",
         "bot_clear": "🧹 Temizle",
         "quick_chips": [
             "💡 Muhasebeciye ne kazandırır?",
@@ -123,17 +122,17 @@ LANG_DATA = {
         }
     },
     "🇺🇸 EN": {
-        "badge": "AUTONOMOUS FINANCIAL TERMINAL",
+        "badge": "HUMAN + AI COLLABORATIVE TERMINAL",
         "title": "LedgerAI",
-        "subtitle": "Convert raw invoices into balanced, multi-GAAP ERP journal vouchers autonomously.",
+        "subtitle": "AI parses invoices and tax withholdings; human accounting professionals audit and approve.",
         "drop_title": "Drop Financial Documents Here or Browse",
         "drop_sub": "PDF, PNG, JPG • Invoices, Receipts & Vouchers • Up to 5 files",
-        "process_btn": "⚡ Process & Generate Vouchers",
+        "process_btn": "⚡ Process & Prepare Vouchers",
         "limit_err": "🛑 Demo limit is 5 documents per batch.",
         "ready_count": "Documents ready: **{count}**",
-        "success": "✓ Journal vouchers generated and balanced down to the cent.",
+        "success": "✓ Vouchers generated, taxes reconciled, Debit = Credit balanced.",
         "failed": "❌ Documents could not be parsed.",
-        "preview_title": "📊 Journal Voucher Grid & Audit Deck",
+        "preview_title": "📊 Journal Voucher Grid & Human Audit Desk",
         "preview_tip": "💡 Double-click any cell to adjust accounts or descriptions before export.",
         "tot_deb": "Total Debit",
         "tot_crd": "Total Credit",
@@ -150,21 +149,21 @@ LANG_DATA = {
             "✨ Ultra Vivid Aurora",
             "🌌 Cyberpunk Night"
         ],
-        "about_btn": "ℹ️ How it Works & Security",
-        "about_title": "LedgerAI Autonomous Architecture",
-        "about_content": "Autonomous double-entry journal voucher generator compatible with US GAAP, Datev and PCG.",
+        "about_btn": "ℹ️ How it Works & Philosophy",
+        "about_title": "LedgerAI Architecture & Human-AI Collaboration",
+        "about_content": "LedgerAI empowers financial teams by automating data entry while keeping human experts in full control.",
         "step1_title": "1. Multi-Tax Extraction",
-        "step1_desc": "Sub-millisecond OCR extraction of multi-tier tax rates, withholdings, and net amounts.",
+        "step1_desc": "Sub-millisecond extraction of multi-tier tax rates and withholdings.",
         "step2_title": "2. Contextual Mapping",
         "step2_desc": "Automated account mapping to OpEx, Inventory, or Capital Assets.",
-        "step3_title": "3. Double-Entry Verification",
+        "step3_title": "3. Human Audit & Balance",
         "step3_desc": "Mathematical verification guaranteeing Total Debit equals Total Credit.",
         "badge_erp": "✓ QUICKBOOKS • XERO • DATEV • SAP READY",
         "badge_audit": "✓ 100% DEBIT/CREDIT BALANCE GUARANTEE",
-        "badge_sec": "✓ MULTI-TAB WORKBOOK EXPORT",
+        "badge_sec": "✓ SOC2 & BANK-GRADE ENCRYPTION",
         "bot_title": "👾 LedgerBot Finance Mentor",
-        "bot_welcome": "Hi! I am your AI finance mentor. Tap any quick question below or ask me anything directly!",
-        "bot_placeholder": "Ask a question (e.g. How to book SaaS subscriptions?)...",
+        "bot_welcome": "Hi! I am your AI finance mentor. Tap any quick pill question below or ask me directly:",
+        "bot_placeholder": "Ask a question...",
         "bot_clear": "🧹 Clear",
         "quick_chips": [
             "💡 How does it save time?",
@@ -185,7 +184,7 @@ if st.session_state["user_lang"] not in LANG_DATA:
 T = LANG_DATA[st.session_state["user_lang"]]
 
 # ==============================================================================
-# 3. DYNAMIC STYLING ENGINE (FLUID TYPOGRAPHY & EXECUTIVE SLATE CSS)
+# 3. DYNAMIC STYLING ENGINE (SEPETE EKLE TARZI OVAL BUTONLAR & AKICI TİPOGRAFİ)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
@@ -243,32 +242,19 @@ else:
 
 st.markdown(f"""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
     
     html, body, [class*="css"] {{
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }}
     
     /* WHITELABEL: GITHUB, STREAMLIT FOOTER VE MENÜLERİ TAMAMEN GİZLE */
-    header[data-testid="stHeader"] {{
-        display: none !important;
-    }}
-    #MainMenu {{
-        visibility: hidden !important;
-    }}
-    footer {{
-        visibility: hidden !important;
-    }}
-    div[data-testid="stToolbar"] {{
-        display: none !important;
-    }}
-    div[data-testid="stDecoration"] {{
-        display: none !important;
-    }}
-    .viewerBadge_container__1QSob {{
-        display: none !important;
-    }}
-    
+    header[data-testid="stHeader"] {{ display: none !important; }}
+    #MainMenu {{ visibility: hidden !important; }}
+    footer {{ visibility: hidden !important; }}
+    div[data-testid="stToolbar"] {{ display: none !important; }}
+    div[data-testid="stDecoration"] {{ display: none !important; }}
+    .viewerBadge_container__1QSob {{ display: none !important; }}
     [data-testid="stSidebar"] {{ display: none !important; }}
     
     {bg_style}
@@ -285,10 +271,10 @@ st.markdown(f"""
         margin: 15px auto 0 auto;
         background: rgba(30, 41, 59, 0.72);
         border: 1px solid rgba(255, 255, 255, 0.16);
-        border-radius: 24px;
+        border-radius: 28px;
         backdrop-filter: blur(28px);
         -webkit-backdrop-filter: blur(28px);
-        padding: clamp(24px, 4vw, 40px) clamp(20px, 4vw, 44px);
+        padding: clamp(24px, 4vw, 40px) clamp(18px, 4vw, 44px);
         box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 
                     inset 0 1px 0 rgba(255, 255, 255, 0.22);
         text-align: center;
@@ -298,10 +284,10 @@ st.markdown(f"""
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 4px 14px;
+        padding: 5px 16px;
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.20);
-        border-radius: 99px;
+        border-radius: 9999px;
         font-size: clamp(0.65rem, 1vw, 0.72rem);
         font-weight: 700;
         letter-spacing: 1.4px;
@@ -311,9 +297,9 @@ st.markdown(f"""
     }}
 
     .hero-title {{
-        font-size: clamp(2.1rem, 4vw, 3.1rem);
+        font-size: clamp(2.2rem, 4.5vw, 3.2rem);
         font-weight: 800;
-        letter-spacing: -1px;
+        letter-spacing: -1.2px;
         background: linear-gradient(135deg, #FFFFFF 40%, #CBD5E1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -334,7 +320,7 @@ st.markdown(f"""
     div[data-testid="stFileUploader"] {{
         background: rgba(15, 23, 42, 0.65);
         border: 1px dashed rgba(255, 255, 255, 0.25);
-        border-radius: 16px;
+        border-radius: 20px;
         padding: 24px 16px;
         transition: all 0.25s ease;
         margin-bottom: 12px;
@@ -345,24 +331,25 @@ st.markdown(f"""
         background: rgba(30, 41, 59, 0.8);
     }}
 
-    /* ACTION BUTTON */
+    /* SEPETE EKLE TARZI OVAL PILL İŞLEM BUTONU */
     div.stButton > button:first-child {{
-        background: linear-gradient(135deg, #475569 0%, #1E293B 100%);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: clamp(0.88rem, 1.2vw, 0.95rem);
-        padding: 12px 28px;
-        color: #FFFFFF;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        transition: all 0.25s ease;
-        margin-top: 6px;
+        background: #000000 !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        border-radius: 9999px !important; /* TAM OVAL HAP */
+        font-weight: 700 !important;
+        font-size: clamp(0.92rem, 1.3vw, 1.02rem) !important;
+        padding: 13px 34px !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6) !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        margin-top: 6px !important;
+        letter-spacing: 0.3px !important;
     }}
     div.stButton > button:first-child:hover {{
-        background: linear-gradient(135deg, #64748B 0%, #334155 100%);
-        border-color: rgba(255, 255, 255, 0.45);
-        box-shadow: 0 6px 25px rgba(255, 255, 255, 0.2);
-        transform: translateY(-1px);
+        background: #111827 !important;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+        box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2) !important;
+        transform: scale(1.02) !important;
     }}
 
     /* 3 STEP PROCESS CARDS */
@@ -376,8 +363,8 @@ st.markdown(f"""
     .step-card {{
         background: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: 14px;
-        padding: 14px 16px;
+        border-radius: 18px;
+        padding: 16px 18px;
         backdrop-filter: blur(12px);
         transition: all 0.25s;
     }}
@@ -387,15 +374,15 @@ st.markdown(f"""
         transform: translateY(-2px);
     }}
     .step-title {{
-        font-size: 0.82rem;
+        font-size: 0.84rem;
         font-weight: 700;
         color: #F8FAFC;
         margin-bottom: 4px;
     }}
     .step-desc {{
-        font-size: 0.72rem;
+        font-size: 0.74rem;
         color: #CBD5E1;
-        line-height: 1.4;
+        line-height: 1.45;
     }}
 
     /* TRUST BADGES */
@@ -416,80 +403,55 @@ st.markdown(f"""
         color: #CBD5E1;
     }}
 
-    /* CONSOLE CONTROLS */
+    /* KONTROL BARI */
     .console-controls {{
         margin-top: 20px;
         padding-top: 16px;
         border-top: 1px solid rgba(255, 255, 255, 0.10);
     }}
 
-    /* METRIC CARDS */
-    .stMetric {{
-        background: rgba(30, 41, 59, 0.75);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 14px;
-        backdrop-filter: blur(14px);
-        padding: 14px 18px;
+    /* SEPETE EKLE MODELİ MİKRO BUTONLAR (CHIPS) */
+    div[data-testid="stExpander"] div.stButton button {{
+        background: #000000 !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
+        border-radius: 9999px !important; /* Tam oval hap buton */
+        font-size: 0.78rem !important;
+        font-weight: 600 !important;
+        color: #F8FAFC !important;
+        padding: 6px 16px !important;
+        height: auto !important;
+        min-height: 34px !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        white-space: normal !important;
+        line-height: 1.3 !important;
+    }}
+    div[data-testid="stExpander"] div.stButton button:hover {{
+        background: #1E293B !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        transform: scale(1.03) !important;
+        box-shadow: 0 4px 15px rgba(255,255,255,0.15) !important;
     }}
 
-    /* SCROLLABLE CHAT CONTAINER */
     .chat-scroll-area {{
-        max-height: 340px;
+        max-height: 320px;
         overflow-y: auto;
         padding: 12px 14px;
         background: rgba(15, 23, 42, 0.65);
         border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 14px;
+        border-radius: 16px;
         margin-bottom: 12px;
     }}
-    .chat-scroll-area::-webkit-scrollbar {{
-        width: 6px;
-    }}
+    .chat-scroll-area::-webkit-scrollbar {{ width: 6px; }}
     .chat-scroll-area::-webkit-scrollbar-thumb {{
         background: rgba(255, 255, 255, 0.25);
         border-radius: 4px;
-    }}
-
-    /* INSTAGRAM/CHATGPT STYLE QUICK CHIP BUTTONS */
-    .quick-chip-container {{
-        display: flex;
-        gap: 8px;
-        overflow-x: auto;
-        padding: 4px 2px 10px 2px;
-        margin-bottom: 8px;
-    }}
-    div[data-testid="stExpander"] div.stButton button.chip-btn {{
-        height: 28px !important;
-        min-height: 28px !important;
-        font-size: 0.74rem !important;
-        padding: 2px 12px !important;
-        background: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 16px !important;
-        color: #E2E8F0 !important;
-        white-space: nowrap !important;
-        box-shadow: none !important;
-        margin-top: 0 !important;
-    }}
-    div[data-testid="stExpander"] div.stButton button.chip-btn:hover {{
-        background: rgba(255, 255, 255, 0.16) !important;
-        border-color: rgba(255, 255, 255, 0.35) !important;
-        color: #FFFFFF !important;
-    }}
-
-    /* AUDIT FILTER BOX */
-    .filter-card {{
-        background: rgba(30, 41, 59, 0.55);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: 12px;
-        padding: 10px 16px;
-        margin-bottom: 14px;
     }}
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 4. INSTITUTIONAL MULTI-TAB EXCEL ENGINE (153, 770 & ÖZET SEKMELERİ)
+# 4. INSTITUTIONAL MULTI-TAB EXCEL ENGINE
 # ==============================================================================
 
 def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
@@ -502,14 +464,14 @@ def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
             top=Side(style='thin', color='CBD5E1'),
             bottom=Side(style='thin', color='CBD5E1')
         )
-        data_font = Font(name="Inter", size=10)
+        data_font = Font(name="Plus Jakarta Sans", size=10)
         num_font = Font(name="Consolas", size=10)
 
         # TAB 1: TÜM FİŞLER (KONSOLİDE)
         df.to_excel(writer, index=False, sheet_name="Yevmiye Fisi")
         ws1 = writer.sheets["Yevmiye Fisi"]
         h_fill1 = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
-        h_font1 = Font(name="Inter", size=10, bold=True, color="FFFFFF")
+        h_font1 = Font(name="Plus Jakarta Sans", size=10, bold=True, color="FFFFFF")
 
         for col_idx in range(1, len(df.columns) + 1):
             c = ws1.cell(row=1, column=col_idx)
@@ -899,10 +861,10 @@ if st.session_state["out_df"] is not None:
         if st.session_state.get("raw_audit_results"):
             doc_cnt = len(st.session_state["raw_audit_results"])
             avg_conf = sum(d.get("confidence", 95) for d in st.session_state["raw_audit_results"]) / max(doc_cnt, 1)
-            st.markdown(f"<div style='font-size:0.85rem; padding-top:6px; color:#A7F3D0;'>🛡️ <b>Denetim Güvencesi:</b> {doc_cnt} Belge %{avg_conf:.1f} Doğruluk ile Mühürlendi.</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='font-size:0.85rem; padding-top:6px; color:#A7F3D0;'>🛡️ <b>Mühürlü Denetim:</b> {doc_cnt} Belge %{avg_conf:.1f} Güven Skoruyla Hazırlandı.</div>", unsafe_allow_html=True)
 
     with f_col3:
-        st.markdown("<div style='text-align:right; font-size:0.82rem; padding-top:6px; color:#CBD5E1;'>💡 Çift tıklayıp düzenleyin</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:right; font-size:0.82rem; padding-top:6px; color:#CBD5E1;'>💡 Uzman Onay Masası</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
     df_goruntule = st.session_state["out_df"].copy()
@@ -972,7 +934,7 @@ if st.session_state["out_df"] is not None:
         )
 
 # ==============================================================================
-# 8. MENTOR FINANS ASİSTANI (INSTAGRAM/GPT STYLE QUICK CHIPS)
+# 8. MENTOR FINANS ASİSTANI (SEPETE EKLE TARZI OVAL CHIP BUTONLAR)
 # ==============================================================================
 
 st.markdown("<div style='height: 35px;'></div>", unsafe_allow_html=True)
@@ -983,32 +945,17 @@ with c_bot_center:
         top_col1, top_col2 = st.columns([5.5, 1.5])
         top_col1.caption(T["bot_welcome"])
         with top_col2:
-            st.markdown("""
-            <style>
-                div[data-testid="stExpander"] div.stButton > button {
-                    height: 28px !important;
-                    min-height: 28px !important;
-                    padding: 2px 10px !important;
-                    font-size: 0.75rem !important;
-                    border-radius: 8px !important;
-                    white-space: nowrap !important;
-                    margin-top: 0px !important;
-                }
-            </style>
-            """, unsafe_allow_html=True)
             if st.button(T["bot_clear"], use_container_width=True):
                 st.session_state["chat_messages"] = []
                 st.rerun()
 
-        # INSTAGRAM / CHATGPT TARZI MİNİMAL HIZLI SORU BUTONLARI (QUICK CHIPS)
-        st.markdown("<div class='quick-chip-container'>", unsafe_allow_html=True)
-        chip_cols = st.columns(len(T["quick_chips"]))
+        # SEPETE EKLE DİZAYNI OVAL BUTONLAR
         secilen_chip = None
+        chip_cols = st.columns(len(T["quick_chips"]))
         for c_idx, chip_text in enumerate(T["quick_chips"]):
             with chip_cols[c_idx]:
-                if st.button(chip_text, key=f"chip_{c_idx}", use_container_width=True):
+                if st.button(chip_text, key=f"pill_chip_{c_idx}", use_container_width=True):
                     secilen_chip = chip_text
-        st.markdown("</div>", unsafe_allow_html=True)
 
         # SCROLLABLE CHAT ALANI
         st.markdown("<div class='chat-scroll-area'>", unsafe_allow_html=True)
@@ -1021,8 +968,6 @@ with c_bot_center:
         st.markdown("</div>", unsafe_allow_html=True)
 
         user_query = st.chat_input(T["bot_placeholder"])
-        
-        # Kullanıcı elle yazdıysa veya hızlı chip butonuna bastıysa tetikle
         aktif_soru = user_query or secilen_chip
         
         if aktif_soru:
@@ -1030,14 +975,14 @@ with c_bot_center:
             
             prompt_bot = f"""
             Sen LedgerAI'ın kurumsal finans mentorü ve pratik muhasebe uzmanısın.
+            Felsefe: İnsan gücünü kovmak değil, insan ile yapay zekayı birleştirip muhasebeciye süper güç kazandırmak.
             Kullanıcı Dili: {st.session_state['user_lang']}
             Kullanıcı Sorusu: "{aktif_soru}"
 
             TALİMATLAR:
             1. Asla lafı uzatma, genel tanımlar yazma.
             2. MAKSİMUM 2-3 CÜMLEDE doğrudan ve net cevabı ver.
-            3. Muhasebe öğrenmek isteyen birine anlatır gibi mantığını öğret:
-               - "Şu hesaba gider, çünkü..." şeklinde kısaca sebebini söyle.
+            3. "İnsan + AI ortaklığı" felsefesini koru: Yapay zeka hazırlar, uzman insan onaylar.
             4. Her cevabın sonuna tek satırlık somut fiş kaydı veya pratik örnek ekle:
                - Borç: 153 Ticari Mallar / 191 KDV
                - Alacak: 320 Satıcılar
