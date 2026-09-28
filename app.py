@@ -2,9 +2,9 @@
 ================================================================================
 LEDGERAI — MULTI-MODAL ENTERPRISE FINANCIAL TERMINAL & ACADEMY HUB
 Architecture: Streamlit + Google Gemini GenAI SDK + Pandas + OpenPyXL + HTML5 Canvas
-Design: Minimal Circular Glass Nav / Authentic Accounting Learning ERP Engine
+Design: Minimal Circular Glass Nav / 100% Dynamic Multi-Language Localization
 Compliance: KVKK, GDPR, Turkish Uniform Chart of Accounts, Datev, US GAAP
-Version: 9.5.0 Universal Multi-Language Production Edition
+Version: 10.0.0 True Multi-Language Enterprise Master Edition
 ================================================================================
 """
 
@@ -73,197 +73,14 @@ else:
 client = genai.Client(api_key=API_KEY)
 
 # ==============================================================================
-# 2. PROSEDÜREL OYUN VE SİMÜLASYON VERİTABANI
-# ==============================================================================
-
-def generate_simple_puzzle(step: int, lang: str):
-    is_tr = "TR" in lang
-    vakalar_tr = [
-        {
-            "vaka": "Şirketiniz satıp kâr elde etmek amacıyla toptancıdan 100 adet spor ayakkabı satın aldı.",
-            "tutar": "80.000 TL + %20 KDV (16.000 TL) = 96.000 TL",
-            "soru": "Satılmak üzere depoya giren bu ticari mallar hangi hesap koduna borç kaydedilir?",
-            "secenekler": ["153 Ticari Mallar", "770 Genel Yönetim Giderleri", "255 Demirbaşlar", "600 Yurtiçi Satışlar"],
-            "dogru": "153 Ticari Mallar",
-            "ipucu": "Satmak amacıyla alınan her türlü emtia ve ürün 153 hesabında izlenir."
-        },
-        {
-            "vaka": "Şirket merkez ofisinde kullanılmak üzere fotokopi kağıtları, toner ve arşiv dosyaları satın alındı.",
-            "tutar": "12.000 TL + %20 KDV (2.400 TL) = 14.400 TL",
-            "soru": "Ofis idari işleyişi için tüketilen bu kırtasiye malzemeleri hangi hesap koduna borç yazılır?",
-            "secenekler": ["770 Genel Yönetim Giderleri", "153 Ticari Mallar", "100 Kasa Hesabı", "320 Satıcılar"],
-            "dogru": "770 Genel Yönetim Giderleri",
-            "ipucu": "Şirketin idari tüketimleri doğrudan 770 Genel Yönetim Giderleri hesabına aktarılır."
-        },
-        {
-            "vaka": "Ofis çalışanlarının kullanması için 5 adet yüksek performanslı dizüstü bilgisayar satın alındı.",
-            "tutar": "150.000 TL + %20 KDV (30.000 TL) = 180.000 TL",
-            "soru": "1 yıldan uzun süre kullanılacak bu ofis bilgisayarları hangi duran varlık hesabına kaydedilir?",
-            "secenekler": ["255 Demirbaşlar", "770 Genel Yönetim Giderleri", "153 Ticari Mallar", "600 Yurtiçi Satışlar"],
-            "dogru": "255 Demirbaşlar",
-            "ipucu": "İşletmede 1 yıldan uzun süre kullanılan bilgisayar, mobilya vb. eşyalar 255 Demirbaşlar hesabında aktifleştirilir."
-        },
-        {
-            "vaka": "Müşterinize toptan ürün satışı yapıldı ve fatura düzenlenip teslim edildi.",
-            "tutar": "200.000 TL + %20 KDV (40.000 TL) = 240.000 TL",
-            "soru": "Gerçekleşen bu ana faaliyet satışı Tek Düzen Hesap Planında hangi gelir hesabına alacak yazılır?",
-            "secenekler": ["600 Yurtiçi Satışlar", "153 Ticari Mallar", "770 Genel Yönetim Giderleri", "102 Bankalar"],
-            "dogru": "600 Yurtiçi Satışlar",
-            "ipucu": "Yurtiçine yapılan ana ticari mal ve hizmet satışları 600 Yurtiçi Satışlar hesabına alacak kaydedilir."
-        }
-    ]
-    vakalar_en = [
-        {
-            "vaka": "Your business purchased 100 units of sneakers from a wholesaler strictly for resale.",
-            "tutar": "$80,000 + Sales Tax = $96,000",
-            "soru": "Which debit account represents commercial goods purchased for resale?",
-            "secenekler": ["1200 Inventory / Merchandise", "6000 Operating Expenses (OpEx)", "1500 Fixed Assets / Equipment", "4000 Sales Revenue"],
-            "dogru": "1200 Inventory / Merchandise",
-            "ipucu": "Goods acquired to be sold to customers are booked into the Inventory asset account."
-        },
-        {
-            "vaka": "Office printer paper, ink cartridges, and folders were acquired for headquarters administration.",
-            "tutar": "$12,000 + Tax = $14,400",
-            "soru": "Which debit account covers administrative office supply consumption?",
-            "secenekler": ["6000 Operating Expenses (OpEx)", "1200 Inventory / Merchandise", "1010 Cash Account", "2000 Accounts Payable"],
-            "dogru": "6000 Operating Expenses (OpEx)",
-            "ipucu": "Consumable office supplies are recorded directly as General & Administrative Operating Expenses."
-        },
-        {
-            "vaka": "Five high-end laptop computers were purchased for staff use across the upcoming 3 years.",
-            "tutar": "$15,000 + Tax = $18,000",
-            "soru": "Which long-term asset account holds company hardware equipment?",
-            "secenekler": ["1500 Fixed Assets / Equipment", "6000 Operating Expenses (OpEx)", "1200 Inventory", "4000 Sales Revenue"],
-            "dogru": "1500 Fixed Assets / Equipment",
-            "ipucu": "Hardware and furniture used over 1 year are capitalized as Fixed Tangible Assets."
-        }
-    ]
-    v_pool = vakalar_tr if is_tr else vakalar_en
-    secilen = random.choice(v_pool)
-    return {
-        "step": step,
-        "vaka": secilen["vaka"],
-        "tutar": secilen["tutar"],
-        "soru": secilen["soru"],
-        "secenekler": secilen["secenekler"],
-        "dogru": secilen["dogru"],
-        "ipucu": secilen["ipucu"],
-        "xp": 150
-    }
-
-if st.session_state["current_game_vaka"] is None:
-    st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
-
-TRICKY_MATRIX_CARDS = [
-    {
-        "hesap_adi": "BİRİKMİŞ AMORTİSMANLAR (-)",
-        "karakter": "Aktifi Düzenleyici Pasif Karakterli Hesap",
-        "dogru_sinif": 2,
-        "aciklama": "Duran varlıkların aşınma payıdır. 2 ile başlamasına rağmen alacak bakiyesi verir!"
-    },
-    {
-        "hesap_adi": "ALINAN SİPARİŞ AVANSLARI",
-        "karakter": "Kısa Vadeli Borç / Yabancı Kaynak",
-        "dogru_sinif": 3,
-        "aciklama": "Müşteriden mal teslim edilmeden önce alınan paradır, 340 grubunda kısa vadeli borçtur."
-    },
-    {
-        "hesap_adi": "GELECEK AYLARA AİT GİDERLER",
-        "karakter": "Dönen Varlık / Peşin Ödenen Gider",
-        "dogru_sinif": 1,
-        "aciklama": "Gelecek dönem için peşin ödenen kiralardır; 180 grubunda dönen varlık sayılır."
-    },
-    {
-        "hesap_adi": "DÖNEM NET KÂRI",
-        "karakter": "Öz Kaynaklar Unsuru",
-        "dogru_sinif": 5,
-        "aciklama": "İşletme faaliyetleri sonucu kalan net kârdır; 590 grubunda öz kaynaklarda yer alır."
-    },
-    {
-        "hesap_adi": "SATILAN TİCARİ MALLAR MALİYETİ (STMM)",
-        "karakter": "Gelir Tablosu Gider Hesabı",
-        "dogru_sinif": 6,
-        "aciklama": "Satılan malların işletmeye maliyetidir; 621 kodunda gelir tablosunu azaltır."
-    },
-    {
-        "hesap_adi": "BANKA KREDİLERİ (3 YIL VADELİ)",
-        "karakter": "Uzun Vadeli Yabancı Kaynak",
-        "dogru_sinif": 4,
-        "aciklama": "Vadesi 1 yılı aşan borçlanmalar 400 grubunda uzun vadeli yabancı kaynaktır."
-    }
-]
-
-if st.session_state["matrix_current_item"] is None:
-    st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
-
-# 4. MODÜL: MUHASEBE ÖĞRENİYORUM (YEVMİYE FİŞİ PROVA MOTORU)
-def generate_muhasebe_ogreniyorum_scenario(step: int):
-    senaryolar = [
-        {
-            "fis_no": f"YEV-2026/00{step}",
-            "tarih": datetime.date.today().strftime("%d.%m.%Y"),
-            "baslik": "VADELİ TİCARİ MAL ALIMI & KDV",
-            "aciklama": "Toptancıdan satılmak üzere vadeli ticari mal alışı gerçekleşmiştir.",
-            "detay": "Matrah: 50.000 TL | %20 KDV: 10.000 TL | Toplam Satıcı Borcu: 60.000 TL",
-            "satirlar": [
-                {"kod": "153", "ad": "TİCARİ MALLAR", "borc": 50000.0, "alacak": 0.0},
-                {"kod": "191", "ad": "İNDİRİLECEK KDV", "borc": 10000.0, "alacak": 0.0},
-                {"kod": "320", "ad": "SATICILAR (CARİ HESAP)", "borc": 0.0, "alacak": 60000.0}
-            ],
-            "beklenen_toplam": 60000.0,
-            "ipucu": "Borçlu hesaplar: 153 ve 191 | Alacaklı hesap: 320"
-        },
-        {
-            "fis_no": f"YEV-2026/00{step}",
-            "tarih": datetime.date.today().strftime("%d.%m.%Y"),
-            "baslik": "BANKADAN SATICI BORCU HAVALESİ",
-            "aciklama": "Şirketin banka ticari mevduat hesabından satıcıya borç ödenmiştir.",
-            "detay": "Ödenen Borç Tutarı: 35.000 TL (Dekont No: BNK-8819)",
-            "satirlar": [
-                {"kod": "320", "ad": "SATICILAR", "borc": 35000.0, "alacak": 0.0},
-                {"kod": "102", "ad": "BANKALAR (MEVDUAT)", "borc": 0.0, "alacak": 35000.0}
-            ],
-            "beklenen_toplam": 35000.0,
-            "ipucu": "Borçlu hesap: 320 Satıcılar | Alacaklı hesap: 102 Bankalar"
-        },
-        {
-            "fis_no": f"YEV-2026/00{step}",
-            "tarih": datetime.date.today().strftime("%d.%m.%Y"),
-            "baslik": "NAKİT PEŞİN OFİS GİDERİ",
-            "aciklama": "Şirket merkez ofisi için nakit ödenerek kırtasiye ve sarf malzemesi alınmıştır.",
-            "detay": "Gider Tutarı: 5.000 TL | %20 KDV: 1.000 TL | Kasadan Çıkan Nakit: 6.000 TL",
-            "satirlar": [
-                {"kod": "770", "ad": "GENEL YÖNETİM GİDERLERİ", "borc": 5000.0, "alacak": 0.0},
-                {"kod": "191", "ad": "İNDİRİLECEK KDV", "borc": 1000.0, "alacak": 0.0},
-                {"kod": "100", "ad": "KASA HESABI", "borc": 0.0, "alacak": 6000.0}
-            ],
-            "beklenen_toplam": 6000.0,
-            "ipucu": "Borçlu hesaplar: 770 ve 191 | Alacaklı hesap: 100 Kasa"
-        }
-    ]
-    s = random.choice(senaryolar)
-    return {
-        "step": step,
-        "fis_no": s["fis_no"],
-        "tarih": s["tarih"],
-        "baslik": s["baslik"],
-        "aciklama": s["aciklama"],
-        "detay": s["detay"],
-        "satirlar": s["satirlar"],
-        "beklenen_toplam": s["beklenen_toplam"],
-        "ipucu": s["ipucu"],
-        "xp": 250
-    }
-
-if st.session_state["sim_current_vaka"] is None:
-    st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
-
-# ==============================================================================
-# 3. LOCALIZATION DATA DICTIONARY (6 DİLDE TAM EŞİTLENMİŞ LÜKS METİNLER)
+# 2. DYNAMIC GLOBAL LOCALIZATION DATA DICTIONARY (HER ŞEY DİLE BAĞLI)
 # ==============================================================================
 
 LANG_DATA = {
     "🇹🇷 TR": {
+        "tab_terminal": "🏢 Kurumsal Terminal",
+        "tab_academy": "🎓 Siber Akademi",
+        "tab_legal": "⚖️ Hukuki Çerçeve & SLA",
         "badge": "İNSAN GÜCÜ + YAPAY ZEKA ORTAKLIĞI",
         "title": "LedgerAI",
         "subtitle": "Yapay zeka faturaları ve tevkifatı hazırlar; uzman mali müşavir son kararı verir ve onaylar.",
@@ -287,14 +104,7 @@ LANG_DATA = {
         "themes": ["Kurumsal", "Modern", "Akademi"],
         "about_btn": "Hakkında",
         "about_title": "LedgerAI Kurumsal Mimari & Regülasyon",
-        "about_content": """
-        ### 🛡️ Kurumsal Finans & Güvenlik Mimarisi
-        LedgerAI, Türkiye Tek Düzen Hesap Planı, VUK ve uluslararası standartlara tam uyumlu bir otonom ön muhasebe altyapısıdır:
-        * **1. Çift Göz Prensibi (Dual Control):** Yapay zeka veri ayıklayıcı ve tasnif edici olarak çalışır; yasal defter kaydı yetkili SMMM/YMM onayına bağlıdır.
-        * **2. Tevkifat & Stopaj Ayrıştırma:** 5/10, 7/10, 9/10 KDV tevkifatlarını ve serbest meslek stopajlarını ayrı hesap kodlarına (360) dengeli olarak dağıtır.
-        * **3. Çift Bakiye Doğrulama:** Borç ve Alacak tutarları kuruşu kuruşuna eşitlenmeden sistem dışa aktarıma izin vermez.
-        * **4. ERP Entegrasyon Standartları:** ETA V.11, Luca, Logo, Zirve, Datev ve QuickBooks uyumlu veri çıktıları sağlar.
-        """,
+        "about_content": "LedgerAI, Türkiye Tek Düzen Hesap Planı, VUK ve uluslararası standartlara tam uyumlu otonom ön muhasebe terminalidir.",
         "bot_title": "👾 LedgerBot Finans Mentorü",
         "bot_welcome": "Selam! Ben finans asistanınım. Muhasebe öğrenmek veya fatura mantığını sormak için aşağıdaki sorulara tıklayabilirsin:",
         "bot_placeholder": "Muhasebe sorunuzu yazın...",
@@ -311,9 +121,46 @@ LANG_DATA = {
         "cockpit_card2_desc": "Tek tıkla ETA V.11 uyumlu CSV, Luca ve çok sayfalı (153 & 770 ayrılmış) kurumsal Excel üretimi.",
         "cockpit_card3_title": "🛡️ Çift Taraflı Denetim Kilidi",
         "cockpit_card3_desc": "Toplam Borç = Toplam Alacak eşitliği sağlanmadan yevmiye fişi kapatılmaz; bakiye farkı riski sıfırlanır.",
-        "headers": {"vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu", "name": "Hesap Adı", "desc": "Açıklama", "curr": "Para Birimi", "deb": "Borç", "crd": "Alacak"}
+        "headers": {"vouch": "Fiş No", "date": "Tarih", "code": "Hesap Kodu", "name": "Hesap Adı", "desc": "Açıklama", "curr": "Para Birimi", "deb": "Borç", "crd": "Alacak"},
+        # AKADEMİ METİNLERİ
+        "acad_badge": "SİBER AKADEMİ ARENA",
+        "acad_title": "Geleceğin Finans Lideri Yetiştirme Simülasyonu",
+        "acad_sub": "Teorik ezber yok! 4 farklı modda interaktif görevleri tamamla, XP topla, rütbe atla.",
+        "acad_lives": "CAN",
+        "acad_streak": "Seri",
+        "acad_gameover": "💀 GAME OVER! Tüm canlarını kaybettin ve vergi incelemesinden ceza aldın! Rütben sıfırlandı.",
+        "acad_revive": "🔄 Yeniden Başla (Canları Doldur)",
+        "g_tab1": "🎮 1. Hesap Kodu Avcısı",
+        "g_tab2": "🧩 2. Bilanço Karakter Matrisi (Zor)",
+        "g_tab3": "🐍 3. Hedefli Bilanço Snake",
+        "g_tab4": "📑 4. Muhasebe Öğreniyorum (Yevmiye Provası)",
+        "mission": "GÖREV",
+        "inv_total": "Fatura Tutarı",
+        "click_card": "🎯 Doğru Hesap Kartına Tıklayın:",
+        "tricky_title": "ZORLUK: İLERİ SEVİYE | RAKAMSIZ KARAKTER ANALİZİ",
+        "tricky_sub": "Bu hesap Tek Düzen Bilanço sisteminde 1'den 7'ye kadar olan hangi ana muhasebe grubuna aittir?",
+        "snake_title": "🐍 Görevli Bilanço Snake (Hesap Avı)",
+        "snake_desc": "<b>Oyunun Amacı:</b> Ekranda beliren <b>GÖREV HESAP KODUNU</b> ye! Doğru kodu yersen +100 XP kazanırsın. Yanlış kodu yersen veya duvara/kuyruğuna çarparsan oyun durur! (Durdurmak için <b>[BOŞLUK / SPACE]</b> tuşuna bas).",
+        "erp_sim_badge": "📌 MUHASEBE ÖĞRENİYORUM: YEVMİYE FİŞİ VAKASI",
+        "erp_sim_desc": "Bu ticari hareketi çift taraflı kayıt sisteminde hatasız olarak yevmiye fişine bağla!",
+        "erp_btn_save": "💾 Fişi Kaydet & Mühürle",
+        "erp_btn_next": "➡️ Sonraki Fişe Geç",
+        # HUKUK METİNLERİ
+        "leg_title": "⚖️ Kurumsal Güvence, Regülasyon & Sorumluluk Protokolü",
+        "leg_sub": "WhatsApp diyaloğu tarzında anlaşılır ve şeffaf hukuki çerçeve.",
+        "q1": "💬 Soru 1: LedgerAI muhasebecinin yerine mi geçiyor? Bize yasal ceza gelir mi?",
+        "a1": "<b>Cevap:</b> Kesinlikle hayır! LedgerAI bir <b>Dual-Control (İki Göz)</b> asistanıdır. Fişleri sadece ön hazırlık olarak taslak çıkarır. 3568 Sayılı Kanun gereği tüm yasal defter ve beyanname onay yetkisi yetkili meslek mensuplarına aittir.",
+        "q2": "🔒 Soru 2: Faturalarımız, müşteri isimlerimiz veya şirket sırlarımız kaydediliyor mu?",
+        "a2": "<b>Cevap:</b> Asla! <b>Zero-Retention (Sıfır Kalıcı Depolama)</b> prensibiyle çalışıyoruz. Yüklediğiniz fatura belleğe (RAM) alınır, fiş oluştuktan sonra kalıcı olarak bellekten silinir. Model eğitiminde kesinlikle kullanılmaz.",
+        "q3": "🏫 Soru 3: Siber Akademi modülünü okullar ve üniversiteler ders materyali olarak kullanabilir mi?",
+        "a3": "<b>Cevap:</b> Evet! Siber Akademi tamamen simülasyon amaçlı vakalar türetir. Öğrencilerden hiçbir kişisel veri istenmez. Üniversiteler ve liseler için güvenli bir dijital muhasebe laboratuvarıdır.",
+        "q4": "⚖️ Soru 4: Dışa aktarılan fişlerde Borç ve Alacak eşitliği garanti altında mı?",
+        "a4": "<b>Cevap:</b> Evet! Matematiksel Denetim Kilidi sayesinde Toplam Borç = Toplam Alacak eşitliği kuruşu kuruşuna sağlanmadan sistem fişi onaylamaz."
     },
     "🇺🇸 EN": {
+        "tab_terminal": "🏢 Corporate Terminal",
+        "tab_academy": "🎓 Cyber Academy",
+        "tab_legal": "⚖️ Legal Framework & SLA",
         "badge": "HUMAN + AI COLLABORATIVE TERMINAL",
         "title": "LedgerAI",
         "subtitle": "Autonomous AI journal voucher generator with continuous CPA audit & verification.",
@@ -334,17 +181,10 @@ LANG_DATA = {
         "download_eta": "💾 Generic CSV Format",
         "download_luca": "💾 QuickBooks Format",
         "industries": ["⚡ Auto (AI)", "🛒 Trade / Retail", "🏢 Services / SaaS", "🏭 Manufacturing"],
-        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "themes": ["Corporate", "Modern", "Academy"],
         "about_btn": "About",
         "about_title": "LedgerAI Architecture & Regulation",
-        "about_content": """
-        ### 🛡️ Enterprise Financial & Security Architecture
-        Autonomous multi-GAAP accounting terminal compliant with US GAAP, IFRS, and SOC2:
-        * **1. Human-in-the-Loop Audit:** AI structures journal entries; certified financial controllers provide final clearance.
-        * **2. Mathematical Parity Lock:** Absolute verification guaranteeing Debit strictly equals Credit.
-        * **3. Withholding Reconciliation:** Automatic allocation of multi-rate sales taxes and tax withholdings.
-        * **4. ERP Interoperability:** Certified CSV/Excel templates for QuickBooks, SAP, Datev, and Xero.
-        """,
+        "about_content": "Autonomous double-entry journal voucher generator compliant with US GAAP, IFRS and SOC2.",
         "bot_title": "👾 LedgerBot Finance Mentor",
         "bot_welcome": "Hi! I am your AI finance mentor. Tap any quick question below or ask me directly:",
         "bot_placeholder": "Ask a financial question...",
@@ -361,9 +201,46 @@ LANG_DATA = {
         "cockpit_card2_desc": "Direct exports formatted for QuickBooks, SAP, Datev SKR03/04, and multi-tab Excel workbooks.",
         "cockpit_card3_title": "🛡️ Dual-Audit Integrity Lock",
         "cockpit_card3_desc": "Mathematical assurance guaranteeing that Total Debit strictly equals Total Credit before release.",
-        "headers": {"vouch": "Voucher #", "date": "Date", "code": "Account Code", "name": "Account Name", "desc": "Memo", "curr": "Currency", "deb": "Debit", "crd": "Credit"}
+        "headers": {"vouch": "Voucher #", "date": "Date", "code": "Account Code", "name": "Account Name", "desc": "Memo", "curr": "Currency", "deb": "Debit", "crd": "Credit"},
+        # ACADEMY TEXTS
+        "acad_badge": "CYBER ACADEMY ARENA",
+        "acad_title": "Next-Gen Financial Leader Training Simulation",
+        "acad_sub": "No dry memorization! Master real accounting through 4 interactive game modes, collect XP, and level up.",
+        "acad_lives": "LIVES",
+        "acad_streak": "Streak",
+        "acad_gameover": "💀 GAME OVER! You lost all lives and faced audit penalties! Rank has been reset.",
+        "acad_revive": "🔄 Restart Simulation (Refill Lives)",
+        "g_tab1": "🎮 1. Account Code Hunter",
+        "g_tab2": "🧩 2. Balance Matrix (Hard)",
+        "g_tab3": "🐍 3. Targeted Balance Snake",
+        "g_tab4": "📑 4. Learn Accounting (Journal Trial)",
+        "mission": "MISSION",
+        "inv_total": "Invoice Total",
+        "click_card": "🎯 Click the Correct Account Card:",
+        "tricky_title": "DIFFICULTY: ADVANCED | CHAR OF ACCOUNTS LOGIC",
+        "tricky_sub": "Which primary financial statement class (Assets, Liabilities, Equity, Revenue, Expense) does this account belong to?",
+        "snake_title": "🐍 Targeted Balance Snake (Account Hunter)",
+        "snake_desc": "<b>Objective:</b> Eat the <b>TARGET ACCOUNT CODE</b> shown above! Correct code grants +100 XP. Eating the wrong code or hitting walls/tail ends the run! (Press <b>[SPACE]</b> to pause).",
+        "erp_sim_badge": "📌 LEARNING ACCOUNTING: JOURNAL ENTRY CASE",
+        "erp_sim_desc": "Balance this commercial event into dual-entry debit and credit lines without penny discrepancies!",
+        "erp_btn_save": "💾 Post & Seal Voucher",
+        "erp_btn_next": "➡️ Next Journal Entry",
+        # LEGAL TEXTS
+        "leg_title": "⚖️ Corporate Assurance, Regulation & SLA Protocol",
+        "leg_sub": "Transparent, human-readable legal compliance in a dialogue format.",
+        "q1": "💬 Question 1: Does LedgerAI replace certified accountants?",
+        "a1": "<b>Answer:</b> Absolutely not! LedgerAI operates strictly under a <b>Dual-Control</b> standard. It creates drafts; certified controllers and CPAs hold full final legal filing and approval authority.",
+        "q2": "🔒 Question 2: Are invoices, customer names, or trade secrets stored?",
+        "a2": "<b>Answer:</b> Never! We enforce a strict <b>Zero-Retention</b> policy. Documents are parsed in volatile RAM and immediately wiped. Your financial files are never used to train foundational AI models.",
+        "q3": "🏫 Question 3: Can academic institutions license the Cyber Academy?",
+        "a3": "<b>Answer:</b> Yes! The Academy generates purely synthetic scenarios without collecting student PII, serving as a turn-key digital simulation lab for colleges and universities.",
+        "q4": "⚖️ Question 4: Is mathematical Debit = Credit parity guaranteed?",
+        "a4": "<b>Answer:</b> Yes! Our Mathematical Parity Lock blocks any export that deviates by even 1 cent between Total Debit and Total Credit."
     },
     "🇩🇪 DE": {
+        "tab_terminal": "🏢 Finanzterminal",
+        "tab_academy": "🎓 Cyber Akademie",
+        "tab_legal": "⚖️ Rechtliches & SLA",
         "badge": "MENSCH + KI FINANZTERMINAL",
         "title": "LedgerAI",
         "subtitle": "Autonome Belegerfassung und Datev-konforme Kontierung unter ständiger Expertenkontrolle.",
@@ -384,7 +261,7 @@ LANG_DATA = {
         "download_eta": "💾 Datev Format (CSV)",
         "download_luca": "💾 SAP Kompatibel",
         "industries": ["⚡ Automatisch (KI)", "🛒 Handel / Wareneinkauf", "🏢 Dienstleistung / IT", "🏭 Produktion / Fertigung"],
-        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "themes": ["Unternehmen", "Modern", "Akademie"],
         "about_btn": "Über uns",
         "about_title": "LedgerAI Architektur & Datev SKR03/04 Standard",
         "about_content": "Vollautomatisierte Buchungssatzerstellung nach GoBD und Datev-Richtlinien mit strengem Soll/Haben-Ausgleich.",
@@ -399,9 +276,44 @@ LANG_DATA = {
         "cockpit_card2_desc": "Direkter Datev-konformer CSV-Export für das Steuerbüro.",
         "cockpit_card3_title": "🛡️ Soll/Haben Garantie",
         "cockpit_card3_desc": "Mathematische Prüfung auf absolute Ausgeglichenheit der Buchungssätze.",
-        "headers": {"vouch": "Beleg", "date": "Datum", "code": "Konto", "name": "Bezeichnung", "desc": "Text", "curr": "Währung", "deb": "Soll", "crd": "Haben"}
+        "headers": {"vouch": "Beleg", "date": "Datum", "code": "Konto", "name": "Bezeichnung", "desc": "Text", "curr": "Währung", "deb": "Soll", "crd": "Haben"},
+        "acad_badge": "CYBER AKADEMIE",
+        "acad_title": "Finanz- und Buchhaltungssimulation",
+        "acad_sub": "Interaktives Training für SKR-Konten und Buchungssätze.",
+        "acad_lives": "LEBEN",
+        "acad_streak": "Serie",
+        "acad_gameover": "💀 GAME OVER! Alle Leben verloren.",
+        "acad_revive": "🔄 Neu starten",
+        "g_tab1": "🎮 1. Konten-Jäger",
+        "g_tab2": "🧩 2. Bilanz-Matrix",
+        "g_tab3": "🐍 3. Bilanz-Snake",
+        "g_tab4": "📑 4. Buchungstraining",
+        "mission": "AUFGABE",
+        "inv_total": "Rechnungsbetrag",
+        "click_card": "🎯 Wählen Sie das richtige Konto:",
+        "tricky_title": "SCHWIERIGKEIT: FORTGESCHRITTEN",
+        "tricky_sub": "Zu welcher Kontenklasse gehört dieses Konto?",
+        "snake_title": "🐍 Bilanz Snake",
+        "snake_desc": "Fressen Sie das Zielkonto, um Punkte zu sammeln.",
+        "erp_sim_badge": "📌 BUCHUNGSSATZ-TRAINING",
+        "erp_sim_desc": "Erfassen Sie Soll und Haben fehlerfrei.",
+        "erp_btn_save": "💾 Buchen",
+        "erp_btn_next": "➡️ Nächste Buchung",
+        "leg_title": "⚖️ Rechtliche Sicherheit & Datenschutz",
+        "leg_sub": "Transparente DSGVO-Konformität.",
+        "q1": "💬 Frage 1: Ersetzt die KI den Steuerberater?",
+        "a1": "<b>Antwort:</b> Nein. Das System erstellt Vorkontierungen; die finale Freigabe obliegt dem Steuerberater.",
+        "q2": "🔒 Frage 2: Werden Finanzdaten dauerhaft gespeichert?",
+        "a2": "<b>Antwort:</b> Nein, Zero-Retention-Prinzip. Alle Belege werden nach der Verarbeitung gelöscht.",
+        "q3": "🏫 Frage 3: Kann die Akademie für Schulen lizenziert werden?",
+        "a3": "<b>Antwort:</b> Ja, sie dient als anonyme und sichere Lernumgebung.",
+        "q4": "⚖️ Frage 4: Ist Soll = Haben garantiert?",
+        "a4": "<b>Antwort:</b> Ja, ohne rechnerische Ausgeglichenheit wird kein Export erstellt."
     },
     "🇫🇷 FR": {
+        "tab_terminal": "🏢 Terminal Comptable",
+        "tab_academy": "🎓 Cyber Académie",
+        "tab_legal": "⚖️ Cadre Juridique & SLA",
         "badge": "TERMINAL COLLABORATIF IA + HUMAIN",
         "title": "LedgerAI",
         "subtitle": "L'IA prépare les imputations comptables; l'expert-comptable valide et approuve.",
@@ -422,7 +334,7 @@ LANG_DATA = {
         "download_eta": "💾 Format Standard PCG",
         "download_luca": "💾 Sage / Cegid Ready",
         "industries": ["⚡ Auto (IA)", "🛒 Négoce / Stock", "🏢 Services / Conseil", "🏭 Production / Industrie"],
-        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "themes": ["Entreprise", "Moderne", "Académie"],
         "about_btn": "À propos",
         "about_title": "Architecture Comptable & Normes PCG",
         "about_content": "Conformité Plan Comptable Général (PCG) avec vérification stricte du principe Débit = Crédit.",
@@ -437,9 +349,44 @@ LANG_DATA = {
         "cockpit_card2_desc": "Compatible avec les logiciels Sage, Cegid et tableur multi-feuilles.",
         "cockpit_card3_title": "🛡️ Équilibre Débit/Crédit",
         "cockpit_card3_desc": "Vérification stricte de la balance avant validation finale.",
-        "headers": {"vouch": "Pièce", "date": "Date", "code": "Compte", "name": "Libellé", "desc": "Détail", "curr": "Devise", "deb": "Débit", "crd": "Crédit"}
+        "headers": {"vouch": "Pièce", "date": "Date", "code": "Compte", "name": "Libellé", "desc": "Détail", "curr": "Devise", "deb": "Débit", "crd": "Crédit"},
+        "acad_badge": "CYBER ACADÉMIE",
+        "acad_title": "Simulation d'Apprentissage Comptable",
+        "acad_sub": "Maîtrisez les comptes du PCG et la balance carrée en jouant.",
+        "acad_lives": "VIES",
+        "acad_streak": "Série",
+        "acad_gameover": "💀 GAME OVER! Vous avez perdu toutes vos vies.",
+        "acad_revive": "🔄 Recommencer",
+        "g_tab1": "🎮 1. Chasseur de Comptes",
+        "g_tab2": "🧩 2. Matrice PCG",
+        "g_tab3": "🐍 3. Snake Bilan",
+        "g_tab4": "📑 4. Pratique d'Écritures",
+        "mission": "MISSION",
+        "inv_total": "Total Facture",
+        "click_card": "🎯 Cliquez sur le bon compte :",
+        "tricky_title": "DIFFICULTÉ : AVANCÉE",
+        "tricky_sub": "À quelle classe comptable appartient cet élément ?",
+        "snake_title": "🐍 Snake Bilan",
+        "snake_desc": "Mangez le compte cible pour marquer des points.",
+        "erp_sim_badge": "📌 ENTRAÎNEMENT AU JOURNAL",
+        "erp_sim_desc": "Équilibrez Débit et Crédit sans écart.",
+        "erp_btn_save": "💾 Valider l'Écriture",
+        "erp_btn_next": "➡️ Écriture Suivante",
+        "leg_title": "⚖️ Cadre Juridique & Conformité RGPD",
+        "leg_sub": "Sécurité et responsabilité en toute transparence.",
+        "q1": "💬 Question 1 : L'IA remplace-t-elle l'expert-comptable ?",
+        "a1": "<b>Réponse :</b> Non, elle prépare les écritures de pré-comptabilité ; l'expert-comptable conserve le pouvoir de validation légale.",
+        "q2": "🔒 Question 2 : Les données restent-elles confidentielles ?",
+        "a2": "<b>Réponse :</b> Oui, traitement en mémoire vive éphémère sans entraînement de modèles tiers.",
+        "q3": "🏫 Question 3 : Utilisation pédagogique autorisée ?",
+        "a3": "<b>Réponse :</b> Oui, environnement synthétique idéal pour les universités et lycées.",
+        "q4": "⚖️ Question 4 : Équilibre Débit/Crédit garanti ?",
+        "a4": "<b>Réponse :</b> Oui, verrou mathématique strict à 0 centime d'écart."
     },
     "🇪🇸 ES": {
+        "tab_terminal": "🏢 Terminal Contable",
+        "tab_academy": "🎓 Ciber Academia",
+        "tab_legal": "⚖️ Marco Legal & SLA",
         "badge": "TERMINAL COLABORATIVO IA + HUMANO",
         "title": "LedgerAI",
         "subtitle": "La IA estructura los asientos contables; el asesor profesional revisa y valida.",
@@ -460,7 +407,7 @@ LANG_DATA = {
         "download_eta": "💾 Formato Contasol",
         "download_luca": "💾 A3 / Sage Ready",
         "industries": ["⚡ Automático (IA)", "🛒 Comercio / Inventario", "🏢 Servicios / Oficina", "🏭 Fabricación / Industria"],
-        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "themes": ["Corporativo", "Moderno", "Academia"],
         "about_btn": "Acerca de",
         "about_title": "Estándares Contables y Seguridad Fiscal",
         "about_content": "Asientos contables conformes al Plan General Contable (PGC) con cuadre matemático de Debe y Haber.",
@@ -475,9 +422,44 @@ LANG_DATA = {
         "cockpit_card2_desc": "Exportación directa para Contasol, A3 y software contable estándar.",
         "cockpit_card3_title": "🛡️ Control de Asiento",
         "cockpit_card3_desc": "Validación matemática estricta de paridad Debe = Haber.",
-        "headers": {"vouch": "Asiento", "date": "Fecha", "code": "Cuenta", "name": "Nombre Cuenta", "desc": "Concepto", "curr": "Moneda", "deb": "Debe", "crd": "Haber"}
+        "headers": {"vouch": "Asiento", "date": "Fecha", "code": "Cuenta", "name": "Nombre Cuenta", "desc": "Concepto", "curr": "Moneda", "deb": "Debe", "crd": "Haber"},
+        "acad_badge": "CIBER ACADEMIA",
+        "acad_title": "Simulación de Aprendizaje Contable",
+        "acad_sub": "Aprende el PGC y el cuadre de asientos jugando.",
+        "acad_lives": "VIDAS",
+        "acad_streak": "Racha",
+        "acad_gameover": "💀 GAME OVER! Has perdido todas tus vidas.",
+        "acad_revive": "🔄 Reiniciar",
+        "g_tab1": "🎮 1. Cazador de Cuentas",
+        "g_tab2": "🧩 2. Matriz PGC",
+        "g_tab3": "🐍 3. Snake Balance",
+        "g_tab4": "📑 4. Práctica de Asientos",
+        "mission": "MISIÓN",
+        "inv_total": "Total Factura",
+        "click_card": "🎯 Elige la cuenta correcta:",
+        "tricky_title": "DIFICULTAD: AVANZADA",
+        "tricky_sub": "¿A qué grupo del PGC pertenece este elemento?",
+        "snake_title": "🐍 Snake Balance",
+        "snake_desc": "Come la cuenta objetivo para sumar puntos.",
+        "erp_sim_badge": "📌 PRÁCTICA DE LIBRO DIARIO",
+        "erp_sim_desc": "Cuadra Debe y Haber sin diferencias.",
+        "erp_btn_save": "💾 Registrar Asiento",
+        "erp_btn_next": "➡️ Siguiente Asiento",
+        "leg_title": "⚖️ Marco Legal y Privacidad RGPD",
+        "leg_sub": "Garantías y responsabilidad transparente.",
+        "q1": "¿Sustituye la IA al asesor contable?",
+        "a1": "No, prepara borradores bajo el control del profesional.",
+        "q2": "¿Se guardan datos comerciales?",
+        "a2": "No, política de retención cero en memoria RAM.",
+        "q3": "¿Uso en universidades?",
+        "a3": "Sí, entorno simulado seguro sin datos personales.",
+        "q4": "¿Cuadre garantizado?",
+        "a4": "Sí, paridad estricta entre Debe y Haber."
     },
     "🇮🇹 IT": {
+        "tab_terminal": "🏢 Terminale Contabile",
+        "tab_academy": "🎓 Cyber Accademia",
+        "tab_legal": "⚖️ Quadro Giuridico & SLA",
         "badge": "TERMINALE COLLABORATIVO IA + UOMO",
         "title": "LedgerAI",
         "subtitle": "L'IA prepara le scritture contabili; il commercialista esperto valida e autorizza.",
@@ -498,7 +480,7 @@ LANG_DATA = {
         "download_eta": "💾 Formato Zucchetti",
         "download_luca": "💾 Teamsystem Ready",
         "industries": ["⚡ Automatico (IA)", "🛒 Commercio / Magazzino", "🏢 Servizi / Consulenza", "🏭 Manifattura / Produzione"],
-        "themes": ["Kurumsal", "Modern", "Akademi"],
+        "themes": ["Business", "Moderno", "Accademia"],
         "about_btn": "Info",
         "about_title": "Standard di Conformità e Partita Doppia",
         "about_content": "Generazione automatica di scritture in partita doppia perfettamente bilanciate per gestionali Zucchetti e Teamsystem.",
@@ -513,7 +495,39 @@ LANG_DATA = {
         "cockpit_card2_desc": "File pronti per Zucchetti, Teamsystem e formati Excel avanzati.",
         "cockpit_card3_title": "🛡️ Quadratura Certificata",
         "cockpit_card3_desc": "Garanzia matematica di parità tra totale Dare e Avere.",
-        "headers": {"vouch": "Partita", "date": "Data", "code": "Conto", "name": "Descrizione", "desc": "Causale", "curr": "Valuta", "deb": "Dare", "crd": "Avere"}
+        "headers": {"vouch": "Partita", "date": "Data", "code": "Conto", "name": "Descrizione", "desc": "Causale", "curr": "Valuta", "deb": "Dare", "crd": "Avere"},
+        "acad_badge": "CYBER ACCADEMIA",
+        "acad_title": "Simulazione Didattica di Contabilità",
+        "acad_sub": "Impara la partita doppia e il pareggio di bilancio giocando.",
+        "acad_lives": "VITE",
+        "acad_streak": "Serie",
+        "acad_gameover": "💀 GAME OVER! Hai perso tutte le vite.",
+        "acad_revive": "🔄 Riavvia",
+        "g_tab1": "🎮 1. Cacciatore di Conti",
+        "g_tab2": "🧩 2. Matrice di Bilancio",
+        "g_tab3": "🐍 3. Snake Bilancio",
+        "g_tab4": "📑 4. Pratica Scritture",
+        "mission": "MISSIONE",
+        "inv_total": "Totale Fattura",
+        "click_card": "🎯 Scegli il conto corretto:",
+        "tricky_title": "DIFFICOLTÀ: AVANZATA",
+        "tricky_sub": "A quale classe di bilancio appartiene questo conto?",
+        "snake_title": "🐍 Snake Bilancio",
+        "snake_desc": "Mangia il conto obiettivo per accumulare punti.",
+        "erp_sim_badge": "📌 PRATICA PRIMA NOTA",
+        "erp_sim_desc": "Bilancia Dare e Avere senza scarti.",
+        "erp_btn_save": "💾 Salva Scrittura",
+        "erp_btn_next": "➡️ Prossima Scrittura",
+        "leg_title": "⚖️ Quadro Giuridico & Privacy GDPR",
+        "leg_sub": "Sicurezza e trasparenza normativa.",
+        "q1": "L'IA sostituisce il commercialista?",
+        "a1": "No, prepara bozze sotto la supervisione dell'esperto.",
+        "q2": "I dati vengono memorizzati?",
+        "a2": "No, principio zero-retention in memoria volatile.",
+        "q3": "Utilizzo scolastico?",
+        "a3": "Sì, ambiente simulato sicuro senza dati personali.",
+        "q4": "Quadratura garantita?",
+        "a4": "Sì, perfetta parità tra Dare e Avere."
     }
 }
 
@@ -532,11 +546,10 @@ INSTANT_FAQ_CACHE = {
 }
 
 # ==============================================================================
-# 4. DYNAMIC STYLING ENGINE (IPHONE CIRCLE GLASS BUTTONS & NEON HUD)
+# 3. DYNAMIC STYLING ENGINE (IPHONE CIRCLE GLASS BUTTONS & NEON HUD)
 # ==============================================================================
 
 if st.session_state["theme_idx"] == 0:
-    # 🌑 Kurumsal
     bg_style = """
         @keyframes slateShimmer {
             0% { background-position: 0% 50%; }
@@ -553,7 +566,6 @@ if st.session_state["theme_idx"] == 0:
         }
     """
 elif st.session_state["theme_idx"] == 1:
-    # ✨ Modern
     bg_style = """
         @keyframes auroraRealFlow {
             0% { background-position: 0% 30%; filter: hue-rotate(0deg); }
@@ -571,7 +583,6 @@ elif st.session_state["theme_idx"] == 1:
         }
     """
 else:
-    # ⚡ Akademi
     bg_style = """
         @keyframes cyberpunkPulse {
             0% { background-position: 0% 0%, 100% 100%; filter: brightness(1); }
@@ -649,7 +660,6 @@ st.markdown(f"""
         box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25) !important;
     }}
 
-    /* POPOVER İÇİNDEKİ SEÇİM BUTONLARI (SIFIR YAZI, SADECE TIKLAMA) */
     div.pop-pill-grid div.stButton > button {{
         background: rgba(255, 255, 255, 0.08) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
@@ -670,7 +680,6 @@ st.markdown(f"""
         transform: scale(1.02) !important;
     }}
 
-    /* FAALİYET SEKTÖRÜ MİKRO KAPSÜL BUTONLARI */
     div.sector-pills div.stButton > button {{
         background: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -895,7 +904,7 @@ st.markdown(f"""
         line-height: 1.55;
     }}
 
-    /* OTONOM YEVMİYE FİŞİ EĞİTİM MODÜLÜ (RETRO PENCERE) */
+    /* OTONOM YEVMİYE FİŞİ EĞİTİM MODÜLÜ */
     .erp-window {{
         background: #C0C0C0;
         border: 2px solid #FFFFFF;
@@ -1011,7 +1020,7 @@ def sesli_bildirim_cal(tur="success"):
     st.markdown(ses_js, unsafe_allow_html=True)
 
 # ==============================================================================
-# 5. INSTITUTIONAL MULTI-TAB EXCEL ENGINE
+# 4. INSTITUTIONAL MULTI-TAB EXCEL ENGINE
 # ==============================================================================
 
 def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
@@ -1046,7 +1055,7 @@ def export_multitab_corporate_excel(df: pd.DataFrame) -> bytes:
                 cell.border = border_thin
                 if cell.row != 1:
                     cell.alignment = Alignment(vertical="center")
-                    if any(t in col_name.lower() for t in ["borç", "alacak", "debit", "credit"]):
+                    if any(t in col_name.lower() for t in ["borç", "alacak", "debit", "credit", "soll", "haben"]):
                         cell.font = num_font
                         cell.number_format = "#,##0.00"
                         cell.alignment = Alignment(horizontal="right", vertical="center")
@@ -1109,7 +1118,7 @@ def export_eta_csv(df: pd.DataFrame) -> bytes:
     return eta_df.to_csv(sep=";", index=False, encoding="utf-8-sig").encode("utf-8-sig")
 
 # ==============================================================================
-# 6. CORE AI RECOGNITION ENGINE (TEVKİFAT, MULTI-TAX & DUAL AUDIT)
+# 5. CORE AI RECOGNITION ENGINE (TEVKİFAT, MULTI-TAX & DUAL AUDIT)
 # ==============================================================================
 
 def execute_document_audit(uploaded_files, sector_directive: str):
@@ -1192,7 +1201,7 @@ def execute_document_audit(uploaded_files, sector_directive: str):
     return results
 
 # ==============================================================================
-# 7. MULTI-DECK COCKPIT (IPHONE CIRCLE GLASS BUTTONS)
+# 6. MULTI-DECK COCKPIT (IPHONE CIRCLE GLASS BUTTONS)
 # ==============================================================================
 
 st.markdown("<div class='cockpit-container'>", unsafe_allow_html=True)
@@ -1210,7 +1219,6 @@ with nav_right:
             for l_key in list(LANG_DATA.keys()):
                 if st.button(l_key, key=f"btn_lang_pop_{l_key}", use_container_width=True):
                     st.session_state["user_lang"] = l_key
-                    st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], l_key)
                     st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -1235,11 +1243,11 @@ with nav_right:
             st.markdown(T["about_content"])
         st.markdown("</div>", unsafe_allow_html=True)
 
-# SEKME MENÜSÜ
+# DİNAMİK DİL DESTEKLİ SEKME MENÜSÜ
 sekme_terminal, sekme_akademi, sekme_hukuk = st.tabs([
-    "🏢 Kurumsal Terminal", 
-    "🎓 Siber Akademi", 
-    "⚖️ Hukuki Çerçeve & SLA"
+    T["tab_terminal"], 
+    T["tab_academy"], 
+    T["tab_legal"]
 ])
 
 # ------------------------------------------------------------------------------
@@ -1412,7 +1420,7 @@ with sekme_terminal:
         <div class='cockpit-card'>
             <div>
                 <div style='font-size:0.75rem; font-weight:800; letter-spacing:1px; color:#94A3B8; text-transform:uppercase; margin-bottom:12px;'>
-                    🛡️ Kurumsal Finans & Güvence Masası
+                    🛡️ {T['cockpit_card1_title']}
                 </div>
                 <div class='cockpit-info-box'>
                     <div class='cockpit-info-title'>{T['cockpit_card1_title']}</div>
@@ -1428,8 +1436,8 @@ with sekme_terminal:
                 </div>
             </div>
             <div style='display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:10px 14px; background:rgba(0,0,0,0.25); border-radius:12px;'>
-                <span style='font-size:0.75rem; color:#A7F3D0;'>✓ %100 Bakiye Garantisi</span>
-                <span style='font-size:0.75rem; color:#CBD5E1;'>ETA • Luca • Datev Ready</span>
+                <span style='font-size:0.75rem; color:#A7F3D0;'>✓ 100% Audit Guaranteed</span>
+                <span style='font-size:0.75rem; color:#CBD5E1;'>ERP & GAAP Ready</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -1611,7 +1619,7 @@ with sekme_terminal:
                         st.rerun()
 
 # ------------------------------------------------------------------------------
-# SEKME 2: 🎓 SİBER AKADEMİ (4'LÜ EĞLENCELİ OYUN MERKEZİ & RETRO ERP)
+# SEKME 2: 🎓 SİBER AKADEMİ (DİL DUYARLI 4'LÜ OYUN MERKEZİ)
 # ------------------------------------------------------------------------------
 with sekme_akademi:
     xp = st.session_state["academy_xp"]
@@ -1619,26 +1627,26 @@ with sekme_akademi:
     
     kalpler = "❤️ " * lives + "🖤 " * (3 - lives)
     if xp >= 1500:
-        st.session_state["academy_level"] = "🏆 Yeminli Baş Denetçi (Partner)"
+        st.session_state["academy_level"] = "🏆 Senior Auditor" if "TR" not in st.session_state["user_lang"] else "🏆 Yeminli Baş Denetçi (Partner)"
     elif xp >= 800:
-        st.session_state["academy_level"] = "⭐ Kıdemli Denetçi"
+        st.session_state["academy_level"] = "⭐ Senior Associate" if "TR" not in st.session_state["user_lang"] else "⭐ Kıdemli Denetçi"
     elif xp >= 400:
-        st.session_state["academy_level"] = "📈 Denetim Uzmanı"
+        st.session_state["academy_level"] = "📈 Audit Specialist" if "TR" not in st.session_state["user_lang"] else "📈 Denetim Uzmanı"
     else:
-        st.session_state["academy_level"] = "🌱 Mali Stajyer (Junior)"
+        st.session_state["academy_level"] = "🌱 Junior Intern" if "TR" not in st.session_state["user_lang"] else "🌱 Mali Stajyer (Junior)"
 
     st.markdown(f"""
     <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:20px 26px; margin-bottom:20px;'>
         <div style='display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;'>
             <div>
-                <span class='top-badge' style='background:rgba(217,70,239,0.15); border-color:#D946EF; color:#F0ABFC;'>SİBER AKADEMİ ARENA</span>
-                <h3 style='margin:4px 0; color:#FFFFFF;'>Geleceğin Finans Lideri Yetiştirme Simülasyonu</h3>
-                <p style='font-size:0.85rem; color:#CBD5E1; margin:0;'>Teorik ezber yok! 4 farklı modda interaktif görevleri tamamla, XP topla, rütbe atla.</p>
+                <span class='top-badge' style='background:rgba(217,70,239,0.15); border-color:#D946EF; color:#F0ABFC;'>{T['acad_badge']}</span>
+                <h3 style='margin:4px 0; color:#FFFFFF;'>{T['acad_title']}</h3>
+                <p style='font-size:0.85rem; color:#CBD5E1; margin:0;'>{T['acad_sub']}</p>
             </div>
             <div style='text-align:right;'>
-                <div style='font-size:1.15rem; margin-bottom:2px;'>CAN: <b>{kalpler}</b></div>
+                <div style='font-size:1.15rem; margin-bottom:2px;'>{T['acad_lives']}: <b>{kalpler}</b></div>
                 <div style='font-size:1.6rem; font-weight:800; color:#D946EF;'>🏆 {st.session_state["academy_xp"]} XP</div>
-                <div style='font-size:0.8rem; color:#A7F3D0; font-weight:700;'>{st.session_state["academy_level"]} (Seri: {st.session_state["academy_streak"]}🔥)</div>
+                <div style='font-size:0.8rem; color:#A7F3D0; font-weight:700;'>{st.session_state["academy_level"]} ({T['acad_streak']}: {st.session_state["academy_streak"]}🔥)</div>
             </div>
         </div>
     </div>
@@ -1646,21 +1654,21 @@ with sekme_akademi:
 
     if lives <= 0:
         sesli_bildirim_cal("error")
-        st.error("💀 GAME OVER! Tüm canlarını kaybettin ve vergi incelemesinden ceza aldın! Rütben sıfırlandı.")
-        if st.button("🔄 Yeniden Başla (Canları Doldur)", use_container_width=True):
+        st.error(T["acad_gameover"])
+        if st.button(T["acad_revive"], use_container_width=True):
             st.session_state["academy_lives"] = 3
             st.session_state["academy_streak"] = 0
             st.session_state["academy_xp"] = max(0, st.session_state["academy_xp"] - 150)
             st.rerun()
     else:
         oyun_sekme1, oyun_sekme2, oyun_sekme3, oyun_sekme4 = st.tabs([
-            "🎮 1. Hesap Kodu Avcısı", 
-            "🧩 2. Bilanço Karakter Matrisi (Zor)",
-            "🐍 3. Hedefli Bilanço Snake",
-            "📑 4. Muhasebe Öğreniyorum (Yevmiye Provası)"
+            T["g_tab1"], 
+            T["g_tab2"], 
+            T["g_tab3"], 
+            T["g_tab4"]
         ])
 
-        # OYUN 1: HESAP KODU AVCISI (NEON KART BUTONLAR)
+        # OYUN 1: HESAP KODU AVCISI
         with oyun_sekme1:
             vaka = st.session_state["current_game_vaka"]
             c_game1, c_game2 = st.columns([1.2, 1.0], gap="large")
@@ -1668,14 +1676,14 @@ with sekme_akademi:
                 st.markdown(f"""
                 <div style='background:rgba(15,23,42,0.75); border:1px dashed rgba(255,255,255,0.22); border-radius:20px; padding:22px;'>
                     <div style='display:flex; justify-content:space-between; align-items:center;'>
-                        <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1px;'>GÖREV #{vaka['step']}</span>
+                        <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1px;'>{T['mission']} #{vaka['step']}</span>
                         <span style='font-size:0.75rem; color:#F0ABFC; font-weight:700;'>+{vaka['xp']} XP</span>
                     </div>
                     <div style='font-size:0.88rem; color:#CBD5E1; margin:12px 0; line-height:1.5;'>
-                        <b>Olay:</b> {vaka['vaka']}
+                        <b>{vaka['vaka']}</b>
                     </div>
                     <div style='background:rgba(0,0,0,0.35); border-radius:12px; padding:12px; font-family:"Consolas", monospace; font-size:0.82rem; color:#E2E8F0; line-height:1.5;'>
-                        📄 <b>Fatura Tutarı:</b> {vaka['tutar']}
+                        📄 <b>{T['inv_total']}:</b> {vaka['tutar']}
                     </div>
                     <div style='margin-top:14px; font-size:0.85rem; color:#F8FAFC; font-weight:600;'>
                         ❓ {vaka['soru']}
@@ -1685,7 +1693,7 @@ with sekme_akademi:
 
             with c_game2:
                 st.markdown("<div style='background:rgba(30,41,59,0.72); border:1px solid rgba(255,255,255,0.14); border-radius:20px; padding:22px;'>", unsafe_allow_html=True)
-                st.markdown("<div style='font-size:0.82rem; font-weight:700; color:#F1F5F9; margin-bottom:12px;'>🎯 Doğru Hesap Kartına Tıklayın:</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='font-size:0.82rem; font-weight:700; color:#F1F5F9; margin-bottom:12px;'>{T['click_card']}</div>", unsafe_allow_html=True)
 
                 for opt in vaka["secenekler"]:
                     if st.button(f"👉 {opt}", key=f"btn_opt_{opt}_{vaka['step']}", use_container_width=True):
@@ -1694,7 +1702,7 @@ with sekme_akademi:
                             st.session_state["academy_streak"] += 1
                             sesli_bildirim_cal("success")
                             st.balloons()
-                            st.success(f"🎉 DOĞRU CEVAP! {vaka['ipucu']} (+{vaka['xp']} XP)")
+                            st.success(f"🎉 SUCCESS! {vaka['ipucu']} (+{vaka['xp']} XP)")
                             time.sleep(1.2)
                             st.session_state["game_step"] += 1
                             st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
@@ -1703,7 +1711,7 @@ with sekme_akademi:
                             st.session_state["academy_lives"] -= 1
                             st.session_state["academy_streak"] = 0
                             sesli_bildirim_cal("error")
-                            st.error(f"💥 YANDIN! (-1 Can) Doğru hesap: {vaka['dogru']} olmalıydı. {vaka['ipucu']}")
+                            st.error(f"💥 MISMATCH! (-1 Life) Correct: {vaka['dogru']}. {vaka['ipucu']}")
                             time.sleep(1.4)
                             st.session_state["game_step"] += 1
                             st.session_state["current_game_vaka"] = generate_simple_puzzle(st.session_state["game_step"], st.session_state["user_lang"])
@@ -1711,26 +1719,26 @@ with sekme_akademi:
 
                 st.markdown("</div>", unsafe_allow_html=True)
 
-        # OYUN 2: BİLANÇO KARAKTER MATRİSİ (ZOR / TERS KÖŞE)
+        # OYUN 2: BİLANÇO KARAKTER MATRİSİ
         with oyun_sekme2:
             m_item = st.session_state["matrix_current_item"]
             st.markdown(f"""
             <div style='background:rgba(15,23,42,0.75); border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:22px; text-align:center; margin-bottom:16px;'>
-                <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1.2px;'>ZORLUK: İLERİ SEVİYE | RAKAMSIZ KARAKTER ANALİZİ</span>
+                <span style='font-size:0.75rem; font-weight:800; color:#38BDF8; letter-spacing:1.2px;'>{T['tricky_title']}</span>
                 <h2 style='color:#FFFFFF; margin:8px 0; letter-spacing:1px;'>{m_item['hesap_adi']}</h2>
-                <div style='font-size:0.85rem; color:#A7F3D0; font-weight:600; margin-bottom:4px;'>Fonksiyonel Karakter: {m_item['karakter']}</div>
-                <p style='font-size:0.80rem; color:#CBD5E1;'>Bu hesap Tek Düzen Bilanço sisteminde 1'den 7'ye kadar olan hangi ana muhasebe grubuna aittir?</p>
+                <div style='font-size:0.85rem; color:#A7F3D0; font-weight:600; margin-bottom:4px;'>{m_item['karakter']}</div>
+                <p style='font-size:0.80rem; color:#CBD5E1;'>{T['tricky_sub']}</p>
             </div>
             """, unsafe_allow_html=True)
 
             siniflar = [
-                (1, "1. Dönen Varlıklar"),
-                (2, "2. Duran Varlıklar"),
-                (3, "3. Kısa Vadeli Yabancı Kaynak"),
-                (4, "4. Uzun Vadeli Yabancı Kaynak"),
-                (5, "5. Öz Kaynaklar"),
-                (6, "6. Gelir Tablosu"),
-                (7, "7. Maliyet Hesapları")
+                (1, "1. Dönen Varlıklar / Current Assets"),
+                (2, "2. Duran Varlıklar / Fixed Assets"),
+                (3, "3. Kısa Vadeli Yabancı / Current Liab."),
+                (4, "4. Uzun Vadeli Yabancı / Long-Term Liab."),
+                (5, "5. Öz Kaynaklar / Equity"),
+                (6, "6. Gelir Tablosu / Revenues & COGS"),
+                (7, "7. Maliyet Hesapları / Cost Accounts")
             ]
 
             m_cols = st.columns(4)
@@ -1742,7 +1750,7 @@ with sekme_akademi:
                             st.session_state["academy_streak"] += 1
                             sesli_bildirim_cal("success")
                             st.balloons()
-                            st.success(f"🎉 TEBRİKLER! {m_item['hesap_adi']}: {m_item['aciklama']} (+200 XP)")
+                            st.success(f"🎉 CORRECT! {m_item['hesap_adi']}: {m_item['aciklama']} (+200 XP)")
                             time.sleep(1.2)
                             st.session_state["matrix_step"] += 1
                             st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
@@ -1751,21 +1759,18 @@ with sekme_akademi:
                             st.session_state["academy_lives"] -= 1
                             st.session_state["academy_streak"] = 0
                             sesli_bildirim_cal("error")
-                            st.error(f"💥 HATALI TAHMİN! (-1 Can) {m_item['hesap_adi']}: {m_item['aciklama']}")
+                            st.error(f"💥 WRONG CLASS! (-1 Life) {m_item['hesap_adi']}: {m_item['aciklama']}")
                             time.sleep(1.4)
                             st.session_state["matrix_step"] += 1
                             st.session_state["matrix_current_item"] = random.choice(TRICKY_MATRIX_CARDS)
                             st.rerun()
 
-        # OYUN 3: HEDEFLİ BİLANÇO SNAKE (ÖZEL BAŞLANGIÇ EKRANLI)
+        # OYUN 3: HEDEFLİ BİLANÇO SNAKE
         with oyun_sekme3:
-            st.markdown("""
+            st.markdown(f"""
             <div style='background:rgba(30,41,59,0.7); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:16px 20px; margin-bottom:12px;'>
-                <h4 style='color:#FFFFFF; margin:0 0 4px 0;'>🐍 Retro Bilanço Snake (Hesap Avcısı)</h4>
-                <p style='font-size:0.80rem; color:#CBD5E1; margin:0;'>
-                <b>Oyunun Amacı:</b> Ekranda beliren <b>GÖREV HESAP KODUNU</b> ye! Doğru kodu yersen +100 XP kazanırsın. Yanlış kodu yersen veya duvara/kuyruğuna çarparsan oyun durur! 
-                (Durdurmak için <b>[BOŞLUK / SPACE]</b> tuşuna bas).
-                </p>
+                <h4 style='color:#FFFFFF; margin:0 0 4px 0;'>{T['snake_title']}</h4>
+                <p style='font-size:0.80rem; color:#CBD5E1; margin:0;'>{T['snake_desc']}</p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1788,15 +1793,15 @@ with sekme_akademi:
             </head>
             <body>
                 <div class="hud">
-                    <span>SKOR: <span id="score">0</span> XP</span>
-                    <span>HEDEF: <span id="targetCode" style="color:#FACC15;">153 TİCARİ MAL</span></span>
+                    <span>SCORE: <span id="score">0</span> XP</span>
+                    <span>TARGET: <span id="targetCode" style="color:#FACC15;">153 INVENTORY</span></span>
                 </div>
                 <div style="position:relative; display:flex; align-items:center; justify-content:center;">
                     <canvas id="gameCanvas" width="440" height="300"></canvas>
                     <div id="menuOverlay">
-                        <div class="menu-title" id="overlayTitle">🎮 BİLANÇO SNAKE ARENA</div>
-                        <div class="menu-sub" id="overlaySub">Hedef hesap kodunu topla, bilançoyu büyüt! Yanlış hesabı yersen veya duvara çarparsan oyun biter.</div>
-                        <button class="menu-btn" onclick="startGame()">OYUNU BAŞLAT</button>
+                        <div class="menu-title" id="overlayTitle">🎮 BALANCE SNAKE ARENA</div>
+                        <div class="menu-sub" id="overlaySub">Collect the glowing target account codes to grow your ledger. Avoid wrong codes or wall crashes!</div>
+                        <button class="menu-btn" onclick="startGame()">START GAME</button>
                     </div>
                 </div>
                 <div class="touch-grid">
@@ -1825,7 +1830,7 @@ with sekme_akademi:
                     function spawnFoods() {
                         foods = [];
                         targetCode = allCodes[Math.floor(Math.random() * allCodes.length)];
-                        document.getElementById("targetCode").innerText = targetCode + " KODUNU YE!";
+                        document.getElementById("targetCode").innerText = targetCode + " CODE";
 
                         foods.push({
                             x: getRandomInt(0, 22) * grid,
@@ -1846,7 +1851,7 @@ with sekme_akademi:
 
                     function triggerGameOver(msg) {
                         isGameOver = true;
-                        overlayTitle.innerText = "💀 OYUN BİTTİ!";
+                        overlayTitle.innerText = "💀 GAME OVER!";
                         overlayTitle.style.color = "#F43F5E";
                         overlaySub.innerText = msg;
                         overlay.style.display = "flex";
@@ -1873,16 +1878,14 @@ with sekme_akademi:
                         snake.x += snake.dx;
                         snake.y += snake.dy;
 
-                        // DUVARA ÇARPINCA YANMA
                         if (snake.x < 0 || snake.x >= canvas.width || snake.y < 0 || snake.y >= canvas.height) {
-                            triggerGameOver("Duvara çarptın! (Bilanço dışına taştı)");
+                            triggerGameOver("Wall Collision Detected!");
                             return;
                         }
 
                         snake.cells.unshift({x: snake.x, y: snake.y});
                         if (snake.cells.length > snake.maxCells) snake.cells.pop();
 
-                        // YEMLERİ ÇİZ
                         foods.forEach(f => {
                             ctx.fillStyle = f.isTarget ? "#FACC15" : "#EF4444";
                             ctx.fillRect(f.x, f.y, grid-1, grid-1);
@@ -1891,14 +1894,12 @@ with sekme_akademi:
                             ctx.fillText(f.code, f.x + 2, f.y + 13);
                         });
 
-                        // YILAN ÇİZ & ÇARPIŞMALAR
                         ctx.fillStyle = "#10B981";
                         snake.cells.forEach(function(cell, index) {
                             if (index === 0) ctx.fillStyle = "#38BDF8";
                             else ctx.fillStyle = "#10B981";
                             ctx.fillRect(cell.x, cell.y, grid-1, grid-1);
 
-                            // YEM YEME
                             foods.forEach(f => {
                                 if (cell.x === f.x && cell.y === f.y) {
                                     if (f.isTarget) {
@@ -1907,15 +1908,14 @@ with sekme_akademi:
                                         document.getElementById("score").innerText = score;
                                         spawnFoods();
                                     } else {
-                                        triggerGameOver("Yanlış hesabı yedin! (Vergi cezası)");
+                                        triggerGameOver("Wrong Account Booked (Audit Penalty)");
                                     }
                                 }
                             });
 
-                            // KUYRUĞA ÇARPMA
                             for (let i = index + 1; i < snake.cells.length; i++) {
                                 if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-                                    triggerGameOver("Kendi kuyruğuna çarptın!");
+                                    triggerGameOver("Tail Collision Detected!");
                                     return;
                                 }
                             }
@@ -1924,9 +1924,9 @@ with sekme_akademi:
 
                     function changeDir(dir) {
                         if (dir === 'LEFT' && snake.dx === 0) { snake.dx = -grid; snake.dy = 0; }
-                        else if (dir === 'UP' && snake.dy === 0) { snake.dy = -grid; snake.dy = 0; }
+                        else if (dir === 'UP' && snake.dy === 0) { snake.dy = -grid; snake.dx = 0; }
                         else if (dir === 'RIGHT' && snake.dx === 0) { snake.dx = grid; snake.dy = 0; }
-                        else if (dir === 'DOWN' && snake.dy === 0) { snake.dy = grid; snake.dy = 0; }
+                        else if (dir === 'DOWN' && snake.dy === 0) { snake.dy = grid; snake.dx = 0; }
                     }
 
                     document.addEventListener('keydown', function(e) {
@@ -1944,50 +1944,48 @@ with sekme_akademi:
             """
             components.html(snake_html, height=430)
 
-        # OYUN 4: MUHASEBE ÖĞRENİYORUM (YEVMİYE FİŞİ PROVA MOTORU)
+        # OYUN 4: MUHASEBE ÖĞRENİYORUM
         with oyun_sekme4:
             sim_sc = st.session_state["sim_current_vaka"]
 
             st.markdown(f"""
             <div style='background:rgba(15,23,42,0.85); border:1px solid #38BDF8; border-radius:14px; padding:14px 18px; margin-bottom:12px;'>
                 <div style='display:flex; justify-content:space-between; align-items:center;'>
-                    <span style='font-size:0.78rem; font-weight:800; color:#38BDF8;'>📌 MUHASEBE ÖĞRENİYORUM: YEVMİYE FİŞİ VAKASI #{sim_sc['step']}</span>
-                    <span style='font-size:0.75rem; color:#F0ABFC; font-weight:700;'>Ödül: +{sim_sc['xp']} XP</span>
+                    <span style='font-size:0.78rem; font-weight:800; color:#38BDF8;'>{T['erp_sim_badge']} #{sim_sc['step']}</span>
+                    <span style='font-size:0.75rem; color:#F0ABFC; font-weight:700;'>Reward: +{sim_sc['xp']} XP</span>
                 </div>
                 <div style='font-size:0.86rem; color:#FFFFFF; font-weight:600; margin:4px 0;'>{sim_sc['baslik']}</div>
-                <div style='font-size:0.80rem; color:#CBD5E1;'><b>Olay:</b> {sim_sc['aciklama']} | <b>Detay:</b> {sim_sc['detay']}</div>
+                <div style='font-size:0.80rem; color:#CBD5E1;'><b>{sim_sc['aciklama']}</b> | <b>{sim_sc['detay']}</b></div>
             </div>
             """, unsafe_allow_html=True)
 
             st.markdown(f"""
             <div class='erp-window'>
                 <div class='erp-titlebar'>
-                    <span>🗂️ Muhasebe Öğreniyorum - [Otonom Yevmiye Fişi Girişi - {sim_sc['fis_no']}]</span>
+                    <span>🗂️ Accounting Sandbox - [Journal Voucher Entry #{sim_sc['fis_no']}]</span>
                     <span>_ □ ✕</span>
                 </div>
                 <div class='erp-toolbar'>
-                    <span>[F2] Kayıt</span> | <span>[F3] Sil</span> | <span>[F5] İptal</span> | <span>[F6] Kart Arama</span> | <span>[F7] Fiş Listesi</span> | <span>[F8] Yazıcı</span>
+                    <span>[F2] Post</span> | <span>[F3] Delete</span> | <span>[F5] Cancel</span> | <span>[F6] Lookup</span> | <span>[F7] List</span> | <span>[F8] Print</span>
                 </div>
                 <div class='erp-header-card'>
-                    <div>FİŞ NO: <b>{sim_sc['fis_no']}</b></div>
-                    <div>TARİH: <b>{sim_sc['tarih']}</b></div>
-                    <div>FİŞ TİPİ: <b>02 - MAHSUP</b></div>
-                    <div>DURUM: <span style='color:#008000;'>AÇIK / DÜZENLEME</span></div>
+                    <div>VOUCHER NO: <b>{sim_sc['fis_no']}</b></div>
+                    <div>DATE: <b>{sim_sc['tarih']}</b></div>
+                    <div>TYPE: <b>02 - GENERAL JOURNAL</b></div>
+                    <div>STATUS: <span style='color:#008000;'>ACTIVE / EDIT</span></div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
 
-            st.markdown("<div style='font-size:0.78rem; font-weight:700; color:#CBD5E1; margin:6px 0 4px 0;'>FİŞ SATIRLARI (HESAP KODU VE TUTARLARI GİRİNİZ):</div>", unsafe_allow_html=True)
-            
             satir_sayisi = len(sim_sc["satirlar"])
             girilen_satirlar = []
 
             col_w = [2.2, 3.5, 2.0, 2.0]
             h_c1, h_c2, h_c3, h_c4 = st.columns(col_w)
-            h_c1.caption("HESAP KODU")
-            h_c2.caption("AÇIKLAMA")
-            h_c3.caption("BORÇ (TL)")
-            h_c4.caption("ALACAK (TL)")
+            h_c1.caption("ACCOUNT CODE")
+            h_c2.caption("DESCRIPTION")
+            h_c3.caption("DEBIT")
+            h_c4.caption("CREDIT")
 
             toplam_girilen_borc = 0.0
             toplam_girilen_alacak = 0.0
@@ -1995,7 +1993,7 @@ with sekme_akademi:
             for i in range(satir_sayisi):
                 s_c1, s_c2, s_c3, s_c4 = st.columns(col_w)
                 with s_c1:
-                    kod = st.text_input(f"Kod {i+1}", key=f"sim_k_{sim_sc['step']}_{i}", label_visibility="collapsed", placeholder="Örn: 153, 320")
+                    kod = st.text_input(f"Kod {i+1}", key=f"sim_k_{sim_sc['step']}_{i}", label_visibility="collapsed", placeholder="Code (e.g. 153, 320)")
                 with s_c2:
                     aciklama = st.text_input(f"Açıklama {i+1}", key=f"sim_a_{sim_sc['step']}_{i}", label_visibility="collapsed", value=sim_sc["satirlar"][i]["ad"])
                 with s_c3:
@@ -2012,15 +2010,15 @@ with sekme_akademi:
             fark_renk = "#008000" if (fark < 0.05 and toplam_girilen_borc > 0) else "#CC0000"
             st.markdown(f"""
             <div class='erp-footer-bar'>
-                <span>TOPLAM BORÇ: <b style='color:#000080;'>{toplam_girilen_borc:,.2f} TL</b></span>
-                <span>TOPLAM ALACAK: <b style='color:#000080;'>{toplam_girilen_alacak:,.2f} TL</b></span>
-                <span>BAKİYE FARKI: <b style='color:{fark_renk};'>{fark:,.2f} TL</b></span>
+                <span>TOTAL DEBIT: <b style='color:#000080;'>{toplam_girilen_borc:,.2f}</b></span>
+                <span>TOTAL CREDIT: <b style='color:#000080;'>{toplam_girilen_alacak:,.2f}</b></span>
+                <span>VARIANCE: <b style='color:{fark_renk};'>{fark:,.2f}</b></span>
             </div>
             """, unsafe_allow_html=True)
 
             b_sim1, b_sim2 = st.columns([1.5, 1.0])
             with b_sim1:
-                if st.button("💾 [F2] Fişi Kaydet & Mühürle", use_container_width=True):
+                if st.button(T["erp_btn_save"], use_container_width=True):
                     hepsi_dogru = True
                     for i in range(satir_sayisi):
                         hedef = sim_sc["satirlar"][i]
@@ -2034,7 +2032,7 @@ with sekme_akademi:
                         st.session_state["academy_streak"] += 1
                         sesli_bildirim_cal("success")
                         st.balloons()
-                        st.success(f"🎉 MÜKEMMEL KAYIT! Fiş {sim_sc['fis_no']} başarıyla mühürlendi. (+{sim_sc['xp']} XP)")
+                        st.success(f"🎉 BALANCED ENTRY! Voucher #{sim_sc['fis_no']} posted successfully. (+{sim_sc['xp']} XP)")
                         time.sleep(1.5)
                         st.session_state["sim_step"] += 1
                         st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
@@ -2043,57 +2041,44 @@ with sekme_akademi:
                         st.session_state["academy_lives"] -= 1
                         st.session_state["academy_streak"] = 0
                         sesli_bildirim_cal("error")
-                        st.error(f"💥 YEVMİYE KAYIT HATASI! (-1 Can) Fiş dengesiz veya hesap kodları yanlış. {sim_sc['ipucu']}")
+                        st.error(f"💥 UNBALANCED VOUCHER! (-1 Life) Expected: {sim_sc['ipucu']}")
                         time.sleep(1.5)
                         st.session_state["sim_step"] += 1
                         st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
                         st.rerun()
 
             with b_sim2:
-                if st.button("➡️ Sonraki Fişe Geç", use_container_width=True):
+                if st.button(T["erp_btn_next"], use_container_width=True):
                     st.session_state["sim_step"] += 1
                     st.session_state["sim_current_vaka"] = generate_muhasebe_ogreniyorum_scenario(st.session_state["sim_step"])
                     st.rerun()
 
 # ------------------------------------------------------------------------------
-# SEKME 3: ⚖️ HUKUKİ ÇERÇEVE & SLA (WHATSAPP BALONLARI)
+# SEKME 3: ⚖️ HUKUKİ ÇERÇEVE & SLA (DİL DUYARLI WHATSAPP BALONLARI)
 # ------------------------------------------------------------------------------
 with sekme_hukuk:
-    st.markdown("### ⚖️ Kurumsal Güvence, Regülasyon & Sorumluluk Protokolü")
-    st.caption("WhatsApp diyaloğu tarzında anlaşılır ve şeffaf hukuki çerçeve.")
+    st.markdown(f"### {T['leg_title']}")
+    st.caption(T['leg_sub'])
 
-    st.markdown("""
+    st.markdown(f"""
     <div class='wa-bubble-left'>
-        <div class='wa-title'>💬 Soru 1: LedgerAI muhasebecinin yerine mi geçiyor? Bize yasal ceza gelir mi?</div>
-        <div class='wa-text'>
-            <b>Cevap:</b> Kesinlikle hayır! LedgerAI bir <b>Dual-Control (İki Göz)</b> asistanıdır. Fişleri sadece ön hazırlık olarak taslak çıkarır. 
-            3568 Sayılı Kanun gereği tüm yasal defter ve beyanname onay yetkisi yetkili Serbest Muhasebeci Mali Müşavir (SMMM) veya YMM'ye aittir. 
-            Nihai kontrolü her zaman uzman insan yapar.
-        </div>
+        <div class='wa-title'>{T['q1']}</div>
+        <div class='wa-text'>{T['a1']}</div>
     </div>
 
     <div class='wa-bubble-right'>
-        <div class='wa-title'>🔒 Soru 2: Faturalarımız, müşteri isimlerimiz veya şirket sırlarımız kaydediliyor mu?</div>
-        <div class='wa-text'>
-            <b>Cevap:</b> Asla! <b>Zero-Retention (Sıfır Kalıcı Depolama)</b> prensibiyle çalışıyoruz. Yüklediğiniz fatura belleğe (RAM) alınır, 
-            kuruşu kuruşuna okunup fiş oluştuktan sonra kalıcı olarak bellekten silinir. Verileriniz model eğitiminde (training) kesinlikle kullanılmaz.
-        </div>
+        <div class='wa-title'>{T['q2']}</div>
+        <div class='wa-text'>{T['a2']}</div>
     </div>
 
     <div class='wa-bubble-left'>
-        <div class='wa-title'>🏫 Soru 3: Siber Akademi modülünü okullar ve üniversiteler ders materyali olarak kullanabilir mi?</div>
-        <div class='wa-text'>
-            <b>Cevap:</b> Evet! Siber Akademi tamamen hayali, simülasyon amaçlı vakalar türetir. Öğrencilerden hiçbir kişisel veri veya TC kimlik numarası istenmez. 
-            Üniversiteler, meslek yüksekokulları ve liseler için güvenli bir dijital muhasebe laboratuvarıdır.
-        </div>
+        <div class='wa-title'>{T['q3']}</div>
+        <div class='wa-text'>{T['a3']}</div>
     </div>
 
     <div class='wa-bubble-right'>
-        <div class='wa-title'>⚖️ Soru 4: Dışa aktarılan fişlerde Borç ve Alacak eşitliği garanti altında mı?</div>
-        <div class='wa-text'>
-            <b>Cevap:</b> Evet! Matematiksel Denetim Kilidi sayesinde Toplam Borç = Toplam Alacak eşitliği kuruşu kuruşuna sağlanmadan sistem fişi onaylamaz. 
-            İndirilen Excel ve ETA V.11 dosyaları ERP yazılımlarına sıfır bakiye farkı ile aktarılır.
-        </div>
+        <div class='wa-title'>{T['q4']}</div>
+        <div class='wa-text'>{T['a4']}</div>
     </div>
     """, unsafe_allow_html=True)
 
